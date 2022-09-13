@@ -7,9 +7,10 @@
     <Form v-if="isFormVisible" :tag="tag"/>
   </b-modal>
 
-  <hr>
+  <hr v-if="isContentExist">
 
   <b-pagination
+    v-if="isContentExist"
     :total="count"
     :current="current"
     :per-page="perPage"
@@ -23,7 +24,7 @@
 
   <div class="board-threads">
     <section class="threads" v-for="post in threads" :key="post.id">
-      <hr>
+      <hr v-if="isContentExist">
       <Thread
 	:board="post.board"
 	:id="post.id"
@@ -42,6 +43,7 @@
   </div>
 
   <b-pagination
+    v-if="isContentExist"
     :total="count"
     :current="current"
     :per-page="perPage"
@@ -53,7 +55,7 @@
     size="is-small">
   </b-pagination>
 
-  <hr>
+  <hr v-if="isContentExist">
 </div>
 </template>
 
@@ -98,6 +100,13 @@ export default {
   computed: {
     title: function () {
       return 'U III E : /' + this.tag;
+    },
+    isContentExist: function () {
+      if (this.threads.length === 0) {
+	return false;
+      }
+
+      return true;
     }
   },
   methods: {
@@ -105,6 +114,7 @@ export default {
       this.$router.push('/thread/' + id);
     },
     init: function () {
+      this.threads = [];
       var self = this;
       var offset = (this.current - 1) * this.perPage;
       bus.$emit('app.loader', [true]);
