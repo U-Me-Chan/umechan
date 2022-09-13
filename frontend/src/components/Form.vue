@@ -61,7 +61,7 @@ export default {
 
             uploadData.append('image', this.file, 'name.jpg');
 
-            axios.post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data'}}).then((response) => {
+            axios.post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data' }}).then((response) => {
                 var orig = response.data.original_file;
                 var thumb = response.data.thumbnail_file;
 
