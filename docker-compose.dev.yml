@@ -1,0 +1,63 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:latest
+    container_name: umechan-db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    env_file:
+      - '.env'
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - './data/db:/var/lib/mysql'
+  api:
+    build:
+      dockerfile: images/Dockerfile.api.dev
+      context: .
+    container_name: umechan-api
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - '.env'
+    environment:
+      - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USERNAME=${MYSQL_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - ADMINISTATOR_KEY=${ADMINISTRATOR_KEY}
+      - PASSPORT_SALT=${PASSPORT_SALT}
+      - PHINX_HOSTNAME=${MYSQL_HOSTNAME}
+      - PHINX_DATABASE=${MYSQL_DATABASE}
+      - PHINX_USER=${MYSQL_USERNAME}
+      - PHINX_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - './api:/var/www/html'
+  filestore:
+    build:
+      dockerfile: images/Dockerfile.filestore.dev
+      context: .
+    container_name: umechan-filestore
+    restart: always
+    volumes:
+      - './filestore:/var/www/html'
+      - './data/files:/var/www/html/files'
+  nginx:
+    build:
+      dockerfile: images/Dockerfile.frontend.dev
+      context: .
+    container_name: umechan-frontend
+    restart: always
+    env_file:
+      - '.env'
+    environment:
+      - DOMAIN=${DOMAIN}
+    depends_on:
+      - api
+    volumes:
+      - './data/files:/var/www/html/files'
+    ports:
+      - '80:80'

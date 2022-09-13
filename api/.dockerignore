@@ -1,0 +1,4 @@
+.ac-php-conf.json
+.gitignore
+phpunit.xml
+tests/*
