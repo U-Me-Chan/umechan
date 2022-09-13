@@ -13,6 +13,7 @@ use PK\Http\Response;
 class Router
 {
     private $route_collector;
+    private const PREFIX = '/api';
 
     public function __construct()
     {
@@ -52,6 +53,6 @@ class Router
             throw new \InvalidArgumentException();
         }
 
-        $this->route_collector->addRoute($method, $path, $callback);
+        $this->route_collector->addRoute($method, self::PREFIX . $path, $callback);
     }
 }
