@@ -1,8 +1,5 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 use Rweb\App;
 use Rweb\Middlewares\Router;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,8 +13,8 @@ $app = App::create();
 /** @var Router */
 $r = new Router();
 
-$r->addRoute('GET', '/', new Index());
-$r->addRoute('POST', '/', new UploadFile());
+$r->addRoute('GET', '/filestore', new Index());
+$r->addRoute('POST', '/filestore', new UploadFile($_ENV['STATIC_URL']));
 
 $app->addMiddleware($r);
 

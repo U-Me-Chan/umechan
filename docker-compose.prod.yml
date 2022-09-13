@@ -40,6 +40,8 @@ services:
       context: .
     container_name: umechan-filestore
     restart: always
+    environment:
+      - STATIC_URL=${STATIC_URL}
     volumes:
       - './data/files:/var/www/html/files'
   nginx:

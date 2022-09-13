@@ -4,4 +4,4 @@ RUN docker-php-ext-install zip
 RUN pecl install imagick
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php composer-setup.php --install-dir=/usr/local/bin/ --filename composer; rm composer-setup.php
-COPY configs/api-php.ini /usr/local/etc/php/conf.d
+COPY configs/filestore-php.ini /usr/local/etc/php/conf.d

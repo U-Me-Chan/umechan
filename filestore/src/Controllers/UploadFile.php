@@ -12,7 +12,11 @@ use Rweb\IController;
 class UploadFile implements IController
 {
     private const UPLOAD_DIR   = __DIR__ . '/../../files/';
-    private const WEBROOT_PATH = 'http://filestore.scheoble.xyz/files/';
+
+    public function __construct(
+        private string $static_url
+    ) {
+    }
 
     public function __invoke(Request $req, array $vars = []): Response
     {
@@ -50,13 +54,13 @@ class UploadFile implements IController
             $file->move(self::UPLOAD_DIR, $filename);
         } catch (FileException $e) {
             return new Response(
-                json_encode(['error' => 'save error']),
+                json_encode(['error' => 'save error', 'exception' => $e->getMessage()]),
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 $this->getResponseHeaders()
             );
         }
 
-        $data['original_file'] = sprintf('%s%s', self::WEBROOT_PATH, $filename);
+        $data['original_file'] = sprintf('%s/%s', $this->static_url, $filename);
 
         $thumb = new Imagick();
 
@@ -72,7 +76,7 @@ class UploadFile implements IController
 
         fclose($fhandle);
 
-        $data['thumbnail_file'] = sprintf('%s%s', self::WEBROOT_PATH, $thumbname);
+        $data['thumbnail_file'] = sprintf('%s/%s', $this->static_url, $thumbname);
 
         return new Response(
             json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_LINE_TERMINATORS),
