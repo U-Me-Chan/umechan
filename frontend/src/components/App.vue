@@ -130,7 +130,7 @@ p {
     box-sizing: border-box;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 970px) {
     .main-content {
 	margin: 10px 5px 10px 5px;
     }

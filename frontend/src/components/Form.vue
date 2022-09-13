@@ -16,7 +16,7 @@
     <b-upload v-model="file" class="file-label">
       <span class="file-cta">
 	<b-icon class="file-icon" icon="upload"></b-icon>
-	<span class="file-label">PNG,JPEG или GIF файл(необязательно)</span>
+	<span class="file-label">PNG, JPEG или GIF файл</span>
       </span>
       <span class="file-name" v-if="file">
 	{{ file.name }}
