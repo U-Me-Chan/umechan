@@ -164,4 +164,9 @@ h3 {
 .post-reply {
     background-color: #fff;    
 }
+
+.card {
+    margin: 5px;
+    padding: 10px;
+}
 </style>
