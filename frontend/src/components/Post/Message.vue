@@ -28,53 +28,37 @@ export default {
     },
     formattedMessage: function () {
       marked.use({
-        breaks: true,
         gfm: true,
-        xhtml: true
-      });
-
-      marked.use({
+        breaks: true,
+        mangle: true,
+        xhtml: true,
+        smartList: true,
+        smartypants: true,
         extensions: [
           {
             name: 'replier',
             level: 'block',
             tokenizer(src) {
-              const rule = />>\d{1,10}/g;
+              const rule = />{2}([0-9]+)/gmi;
               const match = rule.exec(src);
 
               if (match) {
-                return {
+                const text = src.replace(match[0], match => {
+                  return `<a href='#${match.slice('>>'.length)}'>&gt;&gt;${match.slice('>>'.length)}</a>`;
+                });
+
+                const token = {
                   type: 'replier',
-                  raw: match[0],
-                  text: match[0].replace(rule, match => {
-                    return `<a href='#${match.slice('>>'.length)}'>${match}</a>`;
-                  })
-                };
-              }
-            },
-            renderer(token) {
-              return `${token.text}<br>`;
-            }
-          },
-          {
-            name: 'audio-linker',
-            level: 'block',
-            tokenizer(src) {
-              const rule = /(https?):\/\/[a-z./0-9-_]+(\.(ogg|mp3)$)/gmi;
-              const match = rule.exec(src);
+                  raw: src,
+                  text: text,
+                  tokens: this.lexer.blockTokens(text, [])
+                }
 
-              if (match) {
-                return {
-                  type: 'audio-linker',
-                  raw: match[0],
-                  text: match[0].replace(rule, match => {
-                    return `<br><audio controls=true src='${match}'><br>`;
-                  })
-                };
+                return token;
               }
             },
             renderer(token) {
-              return `${token.text}`;
+              return `${this.parser.parse(token.tokens)}`
             }
           }
         ]
@@ -82,8 +66,6 @@ export default {
 
       return marked.parse(this.message);
     }
-  },
-  methods: {
   }
 }
 </script>
@@ -99,6 +81,7 @@ export default {
 
 pre {
     background-color: #f5f2f0;
+    max-width: auto;
 }
 
 blockquote {
@@ -106,6 +89,18 @@ blockquote {
     border-left: 5px solid #ddd;
     padding-left: 2px;
     color: #083;
+}
+
+ol {
+    padding-left: 30px;
+}
+
+table, tr, th, td {
+    border: 1px solid #ddd;
+}
+
+ul {
+    list-style: inside;
 }
 </style>
   
