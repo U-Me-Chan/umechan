@@ -38,7 +38,7 @@ class PostStorage
         $count      = $this->db->count('posts', $conditions);
 
         if ($post_datas == null) {
-            throw new \OutOfBoundsException();
+            return [[], 0];
         }
 
         $posts = [];
