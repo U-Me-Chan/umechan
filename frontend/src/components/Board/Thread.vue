@@ -12,7 +12,7 @@
     <span v-if="repliesCount > 500" style="color: red">Тред не поднимется, достигнут лимит ответов</span>
 
     <div class="card" :key="post.id" :ref="post.id" v-for="post in replies">
-      <Meta :id="post.id" :poster="post.poster" :subject="post.subject" :datetime="post.datetime" :isVerify="post.isVerify" :parentId="post.parent_id"/>
+      <Meta :id="post.id" :poster="post.poster" :subject="post.subject" :datetime="post.datetime" :isVerify="post.is_verify" :parentId="post.parent_id"/>
 
       <div class="post-body">
 	<Media :images="post.media.images" :youtubes="post.media.youtubes"/>
