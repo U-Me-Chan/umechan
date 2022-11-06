@@ -1,4 +1,0 @@
-/vendor/
-.phpunit.result.cache
-config.php
-phinx.yml
