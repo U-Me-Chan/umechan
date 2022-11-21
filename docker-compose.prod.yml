@@ -48,13 +48,13 @@ services:
     build:
       dockerfile: images/Dockerfile.frontend
       context: .
-    container_name: umechan-frontend
-    restart: always
+      args:
+        - API_URL=${API_URL}
+        - FILESTORE_URL=${FILESTORE_URL}
     env_file:
       - '.env'
-    environment:
-      - API_URL=${API_URL}
-      - FILESTORE_URL=${FILESTORE_URL}
+    container_name: umechan-frontend
+    restart: always
     depends_on:
       - api
     volumes:
