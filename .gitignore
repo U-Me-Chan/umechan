@@ -4,4 +4,5 @@ data/dumps/*
 api/vendor/*
 filestore/vendor/*
 frontend/node_modules/*
+logs/*
 .env

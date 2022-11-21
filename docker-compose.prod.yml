@@ -34,6 +34,8 @@ services:
       - PHINX_DATABASE=${MYSQL_DATABASE}
       - PHINX_USER=${MYSQL_USERNAME}
       - PHINX_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - './logs:/var/log'
   filestore:
     build:
       dockerfile: images/Dockerfile.filestore
@@ -44,6 +46,7 @@ services:
       - STATIC_URL=${STATIC_URL}
     volumes:
       - './data/files:/var/www/html/files'
+      - './logs:/var/log'
   nginx:
     build:
       dockerfile: images/Dockerfile.frontend
@@ -59,5 +62,24 @@ services:
       - api
     volumes:
       - './data/files:/var/www/html/files'
+      - './logs:/var/log/nginx'
     ports:
       - '80:80'
+  promtail:
+    container_name: umechan-promtail
+    image: grafana/promtail:latest
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - './logs:/var/log:ro'
+  loki:
+    container_name: umechan-loki
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+  grafana:
+    container_name: umechan-grafana
+    image: grafana/grafana:latest
+    user: '$UID:$GID'
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./data/grafana:/var/lib/grafana"
