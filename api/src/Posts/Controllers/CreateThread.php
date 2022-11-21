@@ -20,15 +20,15 @@ final class CreateThread
     public function __invoke(Request $req): Response
     {
         if ($req->getParams('tag') == null) {
-            return (new Response([], 400))->setException(new \Exception("tag not bind param"));
+            return (new Response([], 400))->setException(new \InvalidArgumentException("tag not bind param"));
         }
 
         if ($req->getParams('message') == null) {
-            return new Response([], 400);
+            return (new Response([], 400))->setException(new \InvalidArgumentException("message not bind param"));
         }
 
         if (empty($req->getParams('message'))) {
-            return new Response([], 400);
+            return (new Response([], 400))->setException(new \InvalidArgumentException("message param cannot be empty"));
         }
 
         /** @var Board */
