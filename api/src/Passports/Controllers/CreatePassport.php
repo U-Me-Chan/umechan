@@ -16,19 +16,19 @@ final class CreatePassport
     public function __invoke(Request $req): Response
     {
         if ($req->getParams('name') == null) {
-            return new Response([], 400);
+            return (new Response([], 400))->setException(new \InvalidArgumentException("Параметр name не передан"));
         }
 
         if (empty($req->getParams('name'))) {
-            return new Response([], 400);
+            return (new Response([], 400))->setException(new \InvalidArgumentException("Параметр name не может быть пустым"));
         }
 
         if ($req->getParams('key') == null) {
-            return new Response([], 400);
+            return (new Response([], 400))->setException(new \InvalidArgumentException("Параметр key не передан"));
         }
 
         if (empty($req->getParams('key'))) {
-            return new Response([], 400);
+            return (new Response([], 400))->setException(new \InvalidArgumentException("Параметр key не может быть пустым"));
         }
 
         try {
@@ -36,8 +36,8 @@ final class CreatePassport
                 'name' => $req->getParams('name'),
                 'hash'  => hash('sha512', $req->getParams('key'))
             ]);
-        } catch (\PDOException $e) {
-            return (new Response([], 409))->setException(new \Exception("Такой ключ или имя уже используется, выберите иное"));
+        } catch (\PDOException) {
+            return (new Response([], 409))->setException(new \InvalidArgumentException("Такой ключ или имя уже используется, выберите иное"));
         }
 
         return new Response([], 201);
