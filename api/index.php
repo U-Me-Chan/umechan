@@ -69,6 +69,6 @@ $r->addRoute('PUT', '/v2/post/{id:[0-9]+}', new CreateReply($post_storage));
 $r->addRoute('PATCH', 'v2/post/{id:[0-9]+}', new UpdatePost($post_storage, $config['maintenance_key']));
 $r->addRoute('DELETE', '/v2/post/{id:[0-9]+}', new DeletePost($post_storage, $config['maintenance_key']));
 
-$r->addRoute('POST', '/v2/passport', new CreatePassport($app['db']));
+$r->addRoute('POST', '/v2/passport', new CreatePassport($app['db'], $app['config']['default_name']));
 
 $app->run();

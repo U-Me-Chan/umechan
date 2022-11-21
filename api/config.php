@@ -8,5 +8,5 @@ return [
         'password' => $_ENV['MYSQL_PASSWORD']
     ],
     'maintenance_key' => $_ENV['ADMINISTRATOR_KEY'],
-    'passport_salt'   => $_ENV['PASSPORT_SALT']
+    'default_name'    => $_ENV['DEFAULT_NAME']
 ];

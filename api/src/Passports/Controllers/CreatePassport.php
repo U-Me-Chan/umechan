@@ -9,7 +9,8 @@ use PK\Http\Response;
 final class CreatePassport
 {
     public function __construct(
-        private Medoo $db
+        private Medoo $db,
+        private string $default_name
     ) {
     }
 
@@ -29,6 +30,10 @@ final class CreatePassport
 
         if (empty($req->getParams('key'))) {
             return (new Response([], 400))->setException(new \InvalidArgumentException("Параметр key не может быть пустым"));
+        }
+
+        if ($req->getParams('name') == $this->default_name || $req->getParams('key') == $this->default_name) {
+            return (new Response([], 409))->setException(new \InvalidArgumentException("Нельзя использовать имя автора по умолчанию для любого из параметров: {$this->default_name}"));
         }
 
         try {
