@@ -17,7 +17,7 @@ umechan
 1. Может быть проблема доступа к директории `./data` и её содержимому, выход - выдать такие права: `chmod 777 -R data`.
 2. Как накатить дамп? Положи его куда-нибудь, например, в `./data/dumps`; пробрось volume в сервисе `db`, отредактировав файл `docker-compose.prod.yml`; зайди в контейнер СУБД: `docker exec -it umechan-db bash`; накати дамп: `mysql -uroot -proot pissykaka < /path/to/dump/dump.sql`.
 3. Дамп filestore нужно просто положить в `./data/files`.
-4. Снять дамп БД проекта: `docker exec umechan-db mysqldump -uroot -proot pissykaka > dump.sql
+4. Снять дамп БД проекта: `docker exec umechan-db mysqldump -uroot -proot pissykaka > dump.sql`
 
 Для разработчиков
 ------------------
