@@ -1,2 +1,6 @@
 data/*
 logs/*
+api/vendor/*
+api/tests/*
+filestore/vendor/*
+frontend/node_modules/*
