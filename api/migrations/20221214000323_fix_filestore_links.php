@@ -22,6 +22,7 @@ final class FixFilestoreLinks extends AbstractMigration
 
         foreach ($posts as $post) {
             $message = str_replace('filestore.scheoble.xyz', 'scheoble.xyz', $post['message']);
+            $message = $this->getAdapter()->getConnection()->quote($message);
 
             $this->execute("UPDATE posts SET message = '{$message}' WHERE id = {$post['id']}");
         }
