@@ -71,10 +71,12 @@ services:
     command: -config.file=/etc/promtail/config.yml
     volumes:
       - './logs:/var/log:ro'
+    restart: always
   loki:
     container_name: umechan-loki
     image: grafana/loki:latest
     command: -config.file=/etc/loki/local-config.yaml
+    restart: always
   grafana:
     container_name: umechan-grafana
     image: grafana/grafana:latest
@@ -83,3 +85,4 @@ services:
       - "3000:3000"
     volumes:
       - "./data/grafana:/var/lib/grafana"
+    restart: always
