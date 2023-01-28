@@ -42,7 +42,7 @@ $app['db'] = function ($app) {
         'username' => $app['config']['db']['username'],
         'password' => $app['config']['db']['password'],
         'charset' => 'utf8mb4',
-        'collation' => 'utf8m4_unicode_ci'
+        'collation' => 'utf8mb4_unicode_ci'
     ]);
 };
 
