@@ -28,6 +28,7 @@ require_once "vendor/autoload.php";
 
 $config = require "config.php";
 
+/** @var array */
 $app = new Application($config);
 
 $app['request'] = new Request($_SERVER, $_POST, $_FILES);
@@ -40,8 +41,8 @@ $app['db'] = function ($app) {
         'server' => $app['config']['db']['hostname'],
         'username' => $app['config']['db']['username'],
         'password' => $app['config']['db']['password'],
-        'charset' => 'utf8',
-        'collation' => 'utf8_unicode_ci'
+        'charset' => 'utf8mb4',
+        'collation' => 'utf8m4_unicode_ci'
     ]);
 };
 
