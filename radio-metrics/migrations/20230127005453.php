@@ -53,9 +53,12 @@ final class V20230127005453 extends AbstractMigration
 
         if (!$this->hasTable('records')) {
             $this->table('records')
-                 ->addColumn('artist_id', 'integer')->addForeignKey('artist_id', 'artists', 'id')
-                 ->addColumn('track_id', 'integer')->addForeignKey('track_id', 'tracks', 'id')
-                 ->addColumn('playlist_id', 'integer')->addForeignKey('playlist_id', 'playlists', 'id')
+                 ->addColumn('artist_id', 'integer', ['null' => false, 'signed' => false])
+                 ->addForeignKey('artist_id', 'artists', 'id')
+                 ->addColumn('track_id', 'integer', ['null' => false, 'signed' => false])
+                 ->addForeignKey('track_id', 'tracks', 'id')
+                 ->addColumn('playlist_id', 'integer', ['null' => false, 'signed' => false])
+                 ->addForeignKey('playlist_id', 'playlists', 'id')
                  ->addColumn('listeners', 'integer')
                  ->addColumn('timestamp', 'integer')
                  ->create();
