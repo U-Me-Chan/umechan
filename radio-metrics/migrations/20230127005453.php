@@ -20,18 +20,18 @@ final class V20230127005453 extends AbstractMigration
     {
         if (!$this->hasTable('artists')) {
             $this->table('artists', ['id' => false, 'primary_key' => ['id']])
-                 ->addColumn('id', 'integer', ['null' => false])
-                ->addColumn('artist', 'string')
-                ->addColumn('first_playing', 'integer')
-                ->addColumn('last_playing', 'integer')
-                ->addColumn('play_count', 'integer')
-                ->addColumn('estimate', 'integer')
-                ->create();
+                 ->addColumn('id', 'integer', ['null' => false, 'identity' => true, 'signed' => false])
+                 ->addColumn('artist', 'string')
+                 ->addColumn('first_playing', 'integer')
+                 ->addColumn('last_playing', 'integer')
+                 ->addColumn('play_count', 'integer')
+                 ->addColumn('estimate', 'integer')
+                 ->create();
         }
 
         if (!$this->hasTable('tracks')) {
             $this->table('tracks', ['id' => false, 'primary_key' => ['id']])
-                 ->addColumn('id', 'integer', ['null' => false])
+                 ->addColumn('id', 'integer', ['null' => false, 'identity' => true, 'signed' => false])
                 ->addColumn('track', 'string')
                 ->addColumn('first_playing', 'integer')
                 ->addColumn('last_playing', 'integer')
@@ -42,7 +42,7 @@ final class V20230127005453 extends AbstractMigration
 
         if (!$this->hasTable('playlists')) {
             $this->table('playlists', ['id' => false, 'primary_key' => ['id']])
-                 ->addColumn('id', 'integer', ['null' => false])
+                 ->addColumn('id', 'integer', ['null' => false, 'identity' => true, 'signed' => false])
                  ->addColumn('playlist', 'string')
                  ->addColumn('first_playing', 'integer')
                  ->addColumn('last_playing', 'integer')
