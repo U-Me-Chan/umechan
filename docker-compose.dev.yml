@@ -47,6 +47,22 @@ services:
     volumes:
       - './filestore:/var/www/html'
       - './data/files:/var/www/html/files'
+  radio-metrics:
+    build:
+      dockerfile: images/Dockerfile.radio-metrics
+      context: .
+      args:
+        - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+        - MYSQL_USERNAME=${MYSQL_USERNAME}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - RADIO_API_URL=${RADIO_API_URL}
+        - PHINX_HOSTNAME=${MYSQL_HOSTNAME}
+        - PHINX_DATABASE=${MYSQL_DATABASE}
+        - PHINX_USER=${MYSQL_USERNAME}
+        - PHINX_PASSWORD=${MYSQL_PASSWORD}
+    container_name: umechan-radio-metrics
+    restart: always
   nginx:
     build:
       dockerfile: images/Dockerfile.frontend.dev
