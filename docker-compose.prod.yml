@@ -28,12 +28,12 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USERNAME=${MYSQL_USERNAME}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - ADMINISTATOR_KEY=${ADMINISTRATOR_KEY}
-      - DEFAULT_NAME=${DEFAULT_NAME}
       - PHINX_HOSTNAME=${MYSQL_HOSTNAME}
       - PHINX_DATABASE=${MYSQL_DATABASE}
       - PHINX_USER=${MYSQL_USERNAME}
       - PHINX_PASSWORD=${MYSQL_PASSWORD}
+      - ADMINISTATOR_KEY=${ADMINISTRATOR_KEY}
+      - DEFAULT_NAME=${DEFAULT_NAME}
     volumes:
       - './logs:/var/log'
   filestore:
@@ -47,6 +47,27 @@ services:
     volumes:
       - './data/files:/var/www/html/files'
       - './logs:/var/log'
+  radio-metrics:
+    build:
+      dockerfile: images/Dockerfile.radio-metrics
+      context: .
+      args:
+        - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+        - MYSQL_USERNAME=${MYSQL_USERNAME}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - RADIO_API_URL=${RADIO_API_URL}
+    container_name: umechan-radio-metrics
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - '.env'
+    environment:
+      - PHINX_HOSTNAME=${MYSQL_HOSTNAME}
+      - PHINX_DATABASE=${MYSQL_DATABASE}
+      - PHINX_USER=${MYSQL_USERNAME}
+      - PHINX_PASSWORD=${MYSQL_PASSWORD}
   nginx:
     build:
       dockerfile: images/Dockerfile.frontend
