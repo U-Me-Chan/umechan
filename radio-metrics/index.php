@@ -73,21 +73,6 @@ Loop::addPeriodicTimer(1, function () use ($repository, $collector, &$current_da
         $playlist->last_playing = time();
     }
 
-    if (
-        isset($current_data['listeners'])
-        && $current_data['listeners'] !== $data['listeners']
-        && (
-            $current_data['track'] == $data['track']
-            && $current_data['artist'] == $data['artist']
-        )
-    ) {
-        if ($current_data['listeners'] > $data['listeners']) {
-            $artist->estimate   = $artist->estimate - 1;
-            $track->estimate    = $track->estimate - 1;
-            $playlist->estimate = $playlist->estimate - 1;
-        }
-    }
-
     if ($data['listeners'] !== 0) {
         $artist->estimate   = $artist->estimate + 1;
         $track->estimate    = $track->estimate + 1;
