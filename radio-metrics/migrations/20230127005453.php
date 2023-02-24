@@ -20,7 +20,7 @@ final class V20230127005453 extends AbstractMigration
     {
         if (!$this->hasTable('artists')) {
             $this->table('artists', ['id' => false, 'primary_key' => ['id']])
-                ->addColumn('id', 'integer')
+                 ->addColumn('id', 'integer', ['null' => false])
                 ->addColumn('artist', 'string')
                 ->addColumn('first_playing', 'integer')
                 ->addColumn('last_playing', 'integer')
@@ -31,7 +31,7 @@ final class V20230127005453 extends AbstractMigration
 
         if (!$this->hasTable('tracks')) {
             $this->table('tracks', ['id' => false, 'primary_key' => ['id']])
-                ->addColumn('id', 'integer')
+                 ->addColumn('id', 'integer', ['null' => false])
                 ->addColumn('track', 'string')
                 ->addColumn('first_playing', 'integer')
                 ->addColumn('last_playing', 'integer')
@@ -42,7 +42,7 @@ final class V20230127005453 extends AbstractMigration
 
         if (!$this->hasTable('playlists')) {
             $this->table('playlists', ['id' => false, 'primary_key' => ['id']])
-                 ->addColumn('id', 'integer')
+                 ->addColumn('id', 'integer', ['null' => false])
                  ->addColumn('playlist', 'string')
                  ->addColumn('first_playing', 'integer')
                  ->addColumn('last_playing', 'integer')
