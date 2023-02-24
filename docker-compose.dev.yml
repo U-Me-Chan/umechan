@@ -57,12 +57,15 @@ services:
         - MYSQL_USERNAME=${MYSQL_USERNAME}
         - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         - RADIO_API_URL=${RADIO_API_URL}
-        - PHINX_HOSTNAME=${MYSQL_HOSTNAME}
-        - PHINX_DATABASE=${MYSQL_DATABASE}
-        - PHINX_USER=${MYSQL_USERNAME}
-        - PHINX_PASSWORD=${MYSQL_PASSWORD}
     container_name: umechan-radio-metrics
     restart: always
+    env_file:
+      - '.env'
+    environment:
+      - PHINX_HOSTNAME=${MYSQL_HOSTNAME}
+      - PHINX_DATABASE=${MYSQL_DATABASE}
+      - PHINX_USER=${MYSQL_USERNAME}
+      - PHINX_PASSWORD=${MYSQL_PASSWORD}
   nginx:
     build:
       dockerfile: images/Dockerfile.frontend.dev
