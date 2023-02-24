@@ -79,10 +79,10 @@ Loop::addPeriodicTimer(1, function () use ($repository, $collector, &$current_da
         $playlist->estimate = $playlist->estimate + 1;
     }
 
-    $repository->save($artist);
-    $repository->save($track);
-    $repository->save($playlist);
-    $repository->save(Record::draft($artist->id, $track->id, $playlist->id, $data['listeners']));
+    $artist_id   = $repository->save($artist);
+    $track_id    = $repository->save($track);
+    $playlist_id = $repository->save($playlist);
+    $repository->save(Record::draft($artist_id, $track_id, $playlist_id, $data['listeners']));
 
     $current_data = $data;
 });
