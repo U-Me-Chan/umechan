@@ -14,7 +14,7 @@ use Ridouchire\RadioMetrics\Storage\Record\Record;
 define('ESTIMATE_VALUE_LISTENERS_NOT_CHANGE', 1);
 define('ESTIMATE_VALUE_LISTENERS_INCREASE', 100);
 define('ESTIMATE_VALUE_LISTENERS_DECREASE', 100);
-define('PLAYING_PERIOD', 10); // 10 минут
+define('PLAYING_PERIOD', 10 * 60); // 10 минут
 
 $db = new Medoo([
     'database_type' => 'mysql',
