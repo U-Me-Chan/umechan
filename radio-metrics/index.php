@@ -103,7 +103,7 @@ Loop::addPeriodicTimer(1, function () use ($repository, $collector, &$current_da
         time() - $current_data['last_start_playlist'] > PLAYING_PERIOD
         && $data['listeners'] !== 0
     ) {
-        $playlist->estimate = $playlist->estimate + ESTIMATE_VALUE_LISTENERS_NOT_CHANGE;
+        $playlist->estimate = $playlist->estimate + (ESTIMATE_VALUE_LISTENERS_NOT_CHANGE * 60 * 10);
         $current_data['last_start_playlist'] = time();
     }
 
