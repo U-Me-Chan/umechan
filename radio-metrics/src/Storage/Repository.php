@@ -23,7 +23,7 @@ class Repository
         $data = $this->db->get($this->getTable($entity), '*', !empty($filters) ? $filters : null);
 
         if (!$data) {
-            throw new \DomainException();
+            throw new \RuntimeException();
         }
 
         return $entity::fromArray($data);

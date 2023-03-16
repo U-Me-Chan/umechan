@@ -1,6 +1,6 @@
 <?php
 
-namespace Ridouchire\RadioMetrics\Storage\Track;
+namespace Ridouchire\RadioMetrics\Storage\Entites;
 
 use Ridouchire\RadioMetrics\Storage\AEntity;
 
@@ -8,7 +8,7 @@ class Track extends AEntity
 {
     public static function draft(string $track = ''): self
     {
-        return new self(0, $track, time(), time(), 1, 0);
+        return new self(0, $track, time(), time(), 0, 0);
     }
 
     public static function fromArray(array $state): self
@@ -33,13 +33,28 @@ class Track extends AEntity
         return get_object_vars($this);
     }
 
+    public function bumpPlayCount(): void
+    {
+        $this->play_count = $this->play_count + 1;
+    }
+
+    public function togglePlaying(): void
+    {
+        $this->last_playing = time();
+    }
+
+    public function bumpEstimate(): void
+    {
+        $this->estimate = $this->estimate + 1;
+    }
+
     private function __construct(
-        public int $id,
-        public string $track,
-        public int $first_playing,
-        public int $last_playing,
-        public int $play_count,
-        public int $estimate
+        private int $id,
+        private string $track,
+        private int $first_playing,
+        private int $last_playing,
+        private int $play_count,
+        private int $estimate
     ) {
     }
 }
