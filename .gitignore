@@ -1,10 +1,11 @@
 data/db/*
 data/files/*
 data/dumps/*
-data/grafana/grafana.db
+data/grafana/*
 api/vendor/*
 filestore/vendor/*
 radio-metrics/vendor/*
+radio-metrics/logs/*
 frontend/node_modules/*
 logs/*
 .env

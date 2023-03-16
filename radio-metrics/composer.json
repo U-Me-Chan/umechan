@@ -6,7 +6,8 @@
         "guzzlehttp/guzzle": "^7.5",
         "catfan/medoo": "^2.1",
         "robmorgan/phinx": "^0.13.4",
-        "symfony/yaml": "^6.2"
+        "symfony/yaml": "^6.2",
+        "monolog/monolog": "^3.3"
     },
     "license": "MIT",
     "autoload": {

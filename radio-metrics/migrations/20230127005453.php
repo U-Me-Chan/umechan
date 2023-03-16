@@ -18,49 +18,29 @@ final class V20230127005453 extends AbstractMigration
      */
     public function change(): void
     {
-        if (!$this->hasTable('artists')) {
-            $this->table('artists', ['id' => false, 'primary_key' => ['id']])
-                 ->addColumn('id', 'integer', ['null' => false, 'identity' => true, 'signed' => false])
-                 ->addColumn('artist', 'string')
-                 ->addColumn('first_playing', 'integer')
-                 ->addColumn('last_playing', 'integer')
-                 ->addColumn('play_count', 'integer')
-                 ->addColumn('estimate', 'integer')
-                 ->create();
-        }
-
         if (!$this->hasTable('tracks')) {
             $this->table('tracks', ['id' => false, 'primary_key' => ['id']])
                  ->addColumn('id', 'integer', ['null' => false, 'identity' => true, 'signed' => false])
-                ->addColumn('track', 'string')
-                ->addColumn('first_playing', 'integer')
-                ->addColumn('last_playing', 'integer')
-                ->addColumn('play_count', 'integer')
-                ->addColumn('estimate', 'integer')
-                ->create();
-        }
-
-        if (!$this->hasTable('playlists')) {
-            $this->table('playlists', ['id' => false, 'primary_key' => ['id']])
-                 ->addColumn('id', 'integer', ['null' => false, 'identity' => true, 'signed' => false])
-                 ->addColumn('playlist', 'string')
+                 ->addColumn('track', 'string')
+                 ->addIndex(['track'])
                  ->addColumn('first_playing', 'integer')
                  ->addColumn('last_playing', 'integer')
+                 ->addIndex(['last_playing'])
                  ->addColumn('play_count', 'integer')
                  ->addColumn('estimate', 'integer')
-                 ->create();
+                 ->addIndex(['estimate'])
+                ->create();
         }
 
         if (!$this->hasTable('records')) {
             $this->table('records')
-                 ->addColumn('artist_id', 'integer', ['null' => false, 'signed' => false])
-                 ->addForeignKey('artist_id', 'artists', 'id')
                  ->addColumn('track_id', 'integer', ['null' => false, 'signed' => false])
                  ->addForeignKey('track_id', 'tracks', 'id')
-                 ->addColumn('playlist_id', 'integer', ['null' => false, 'signed' => false])
-                 ->addForeignKey('playlist_id', 'playlists', 'id')
+                 ->addIndex(['track_id'])
                  ->addColumn('listeners', 'integer')
+                 ->addIndex(['listeners'])
                  ->addColumn('timestamp', 'integer')
+                 ->addIndex(['timestamp'])
                  ->create();
         }
     }
