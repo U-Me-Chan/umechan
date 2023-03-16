@@ -43,9 +43,9 @@ class Track extends AEntity
         $this->last_playing = time();
     }
 
-    public function bumpEstimate(): void
+    public function bumpEstimate(int $listeners): void
     {
-        $this->estimate = $this->estimate + 1;
+        $this->estimate = $this->estimate + $listeners;
     }
 
     private function __construct(
