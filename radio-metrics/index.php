@@ -71,7 +71,7 @@ Loop::addPeriodicTimer(1, function () use ($collector, $repo, $log, &$listeners,
 
     if ($data->getListeners() !== 0) {
         $log->debug('Увеличиваю оценку', ['track' => $data->getTrack(), 'listeners' => $data->getListeners()]);
-        $track->bumpEstimate();
+        $track->bumpEstimate($data->getListeners());
     }
 
     if ($data->getTrack() !== $last_track) {
