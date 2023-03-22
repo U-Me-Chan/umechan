@@ -26,7 +26,7 @@
     <div class="card" v-if="isMusicBoard">
       <Meta :poster="'Mod'" :isVerify="true" :subject="'Chernarus Radio'" :datetime="'2012/12/22 12:23:34'" :isShowButtons="false"/>
       <br>
-      <center><audio controls src="http://scheoble.xz:8000/stream" :id="id">
+      <center><audio controls src="http://scheoble.xyz:8000/stream" :id="id">
         <a href="http://scheoble.xyz:8000/stream.m3u">Download M3U playlist</a>
       </audio></center>
     </div>
