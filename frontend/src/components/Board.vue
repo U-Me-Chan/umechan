@@ -23,22 +23,30 @@
   </b-pagination>
 
   <div class="board-threads">
+    <div class="card" v-if="isMusicBoard">
+      <Meta :poster="'Mod'" :isVerify="true" :subject="'Chernarus Radio'" :datetime="'2012/12/22 12:23:34'" :isShowButtons="false"/>
+      <br>
+      <center><audio controls src="http://scheoble.xz:8000/stream" :id="id">
+        <a href="http://scheoble.xyz:8000/stream.m3u">Download M3U playlist</a>
+      </audio></center>
+    </div>
+
     <section class="threads" v-for="post in threads" :key="post.id">
       <hr v-if="isContentExist">
       <Thread
-	:board="post.board"
-	:id="post.id"
-	:poster="post.poster"
-	:isVerify="post.is_verify"
-	:subject="post.subject"
-	:parentId="post.parent_id"
-	:datetime="post.datetime"
-	:message="post.truncated_message"
-	:images="post.media.images"
-	:youtubes="post.media.youtubes"
-	:replies="post.replies"
-	:repliesCount="post.replies_count"
-	/>
+        :board="post.board"
+        :id="post.id"
+        :poster="post.poster"
+        :isVerify="post.is_verify"
+        :subject="post.subject"
+        :parentId="post.parent_id"
+        :datetime="post.datetime"
+        :message="post.truncated_message"
+        :images="post.media.images"
+        :youtubes="post.media.youtubes"
+        :replies="post.replies"
+        :repliesCount="post.replies_count"
+        />
     </section>
   </div>
 
@@ -63,6 +71,7 @@
 import { bus } from '../bus'
 import Thread from './Board/Thread.vue'
 import Form from './Form.vue'
+import Meta from './Post/Meta.vue'
 
 const axios = require('axios')
 const config = require('../../config')
@@ -70,7 +79,7 @@ const config = require('../../config')
 export default {
   name: 'Board',
   components: {
-    Thread, Form
+    Thread, Form, Meta
   },
   data: function () {
     return {
@@ -98,6 +107,13 @@ export default {
     this.init();
   },
   computed: {
+    isMusicBoard: function () {
+      if (this.tag == 'm') {
+	return true;
+      }
+
+      return false
+    },
     title: function () {
       return 'U III E : /' + this.tag;
     },

@@ -5,11 +5,12 @@
   <b-tag>{{ datetime }}</b-tag>
   <b-tag v-if="board">/{{board.tag}}/</b-tag>
   <b-tag>№{{ id }}</b-tag>
-  <a v-if="!parentId" :href="'/thread/' + id">
+  
+  <a v-if="isShowButtons && !parentId" :href="'/thread/' + id">
     <b-button type="is-text" size="is-small" @click="selectThread(id, $event)">Открыть</b-button>
   </a>
 
-  <b-button type="is-text" size="is-small" @click="isFormVisible = !isFormVisible">Ответить</b-button>
+  <b-button v-if="isShowButtons" type="is-text" size="is-small" @click="isFormVisible = !isFormVisible">Ответить</b-button>
   <b-modal v-model="isFormVisible">
     <Form v-if="isFormVisible"
           :parent_id="!parentId ? id : parentId"
@@ -30,7 +31,10 @@ export default {
     Poster, Subject, Form
   },
   props: {
-    id: Number,
+    id: {
+      type: Number,
+      default: 0
+    },
     poster: String,
     subject: String,
     datetime: String,
@@ -39,7 +43,11 @@ export default {
       type: [Number, Boolean],
       default: false
     },
-    board: Object
+    board: Object,
+    isShowButtons: {
+      type: Boolean,
+      default: true
+    }
   },
   methods: {
     selectThread: function (id, event) {
