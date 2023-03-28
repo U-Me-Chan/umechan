@@ -5,10 +5,13 @@
     <span>🎧: {{listeners}}</span>
     <span>💜: coming soon</span>
     <span>📋: coming soon</span>
-    <span>📝: <a href="https://scheoble.xyz/thread/34298">Обсудить</a></span>
+    <span>📝: <a href="#" @click="goToThread">Обсудить</a></span>
   </div>
   <br/>
-  <audio preload="none" controls :src="stream_url"></audio>
+  <audio preload="none" controls :src="stream_url">
+    Ваш браузер не поддерживает возможность воспроизведения аудио. Попробуйте слушать внешним плеером.
+    <a :href="m3u_list_url">Плейлист для внешнего плеера</a>
+  </audio>
 </div>
 </template>
 
@@ -38,6 +41,10 @@ export default {
         .catch(() => {
           self.$buefy.toast.open('Произошла ошибка при запросе данных');
         })
+    },
+    goToThread: function () {
+      event.preventDefault();
+      this.$router.push('/thread/34298')
     }
   },
   created: function () {
