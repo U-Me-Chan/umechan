@@ -43,16 +43,20 @@ Vue.use(VueRouter)
 
 const routes = [
     {
-        path: '/',
-        component: () => import('./components/TOS.vue')
+      path: '/',
+      component: () => import('./components/TOS.vue')
     },
     {
-        path: '/thread/:id',
-        component: () => import('./components/Thread.vue')
+      path: '/thread/:id',
+      component: () => import('./components/Thread.vue')
     },
     {
-        path: '/board/:tag',
-        component: () => import('./components/Board.vue')
+      path: '/board/:tag',
+      component: () => import('./components/Board.vue')
+    },
+    {
+      path: '/radio',
+      component: () => import('./components/Radio.vue')
     }
 ]
 

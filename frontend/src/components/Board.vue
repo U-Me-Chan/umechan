@@ -2,11 +2,12 @@
 <div class="board">
   <h1>{{ tag }}</h1>
 
-  <center><b-button type="is-text" @click="isFormVisible = !isFormVisible">Создать тред</b-button></center>
-  <b-modal v-model="isFormVisible">
-    <Form v-if="isFormVisible" :tag="tag"/>
-  </b-modal>
-
+  <div v-if="!isMetaBoard">
+    <center><b-button type="is-text" @click="isFormVisible = !isFormVisible">Создать тред</b-button></center>
+    <b-modal v-model="isFormVisible">
+      <Form v-if="isFormVisible" :tag="tag"/>
+    </b-modal>
+  </div>
   <hr v-if="isContentExist">
 
   <b-pagination
@@ -23,14 +24,6 @@
   </b-pagination>
 
   <div class="board-threads">
-    <div class="card" v-if="isMusicBoard">
-      <Meta :poster="'Mod'" :isVerify="true" :subject="'Chernarus Radio'" :datetime="'2012/12/22 12:23:34'" :isShowButtons="false"/>
-      <br>
-      <center><audio controls src="http://scheoble.xyz:8000/stream" :id="id">
-        <a href="http://scheoble.xyz:8000/stream.m3u">Download M3U playlist</a>
-      </audio></center>
-    </div>
-
     <section class="threads" v-for="post in threads" :key="post.id">
       <hr v-if="isContentExist">
       <Thread
@@ -71,7 +64,6 @@
 import { bus } from '../bus'
 import Thread from './Board/Thread.vue'
 import Form from './Form.vue'
-import Meta from './Post/Meta.vue'
 
 const axios = require('axios')
 const config = require('../../config')
@@ -79,7 +71,7 @@ const config = require('../../config')
 export default {
   name: 'Board',
   components: {
-    Thread, Form, Meta
+    Thread, Form
   },
   data: function () {
     return {
@@ -107,13 +99,6 @@ export default {
     this.init();
   },
   computed: {
-    isMusicBoard: function () {
-      if (this.tag == 'm') {
-	return true;
-      }
-
-      return false
-    },
     title: function () {
       return 'U III E : /' + this.tag;
     },
@@ -123,6 +108,13 @@ export default {
       }
 
       return true;
+    },
+    isMetaBoard: function () {
+      if (this.tag.search(/\+/) !== -1) {
+	return true;
+      }
+
+      return false;
     }
   },
   methods: {
@@ -158,7 +150,7 @@ export default {
     '$route': function (to, from) {
       if (to.path !== from.path) {
         this.tag = this.$route.params.tag;
-	this.current = 1;
+        this.current = 1;
         this.init();
       }
     }

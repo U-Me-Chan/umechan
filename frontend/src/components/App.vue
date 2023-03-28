@@ -4,9 +4,13 @@
     <a :href="'/board/' + board.tag" class="board-link" v-for="board in boards" @click="selectBoard(board.tag, $event)" :key="board.id" v-bind:class="{ active: tag === board.tag }">{{ board.name }} (+{{ board.new_posts_count }}) </a>
   </div>
 
-  <div class="main-content">
-    <b-loading :can-cancel="true" v-model="isLoading" :isFullPage="true"></b-loading>
-    <router-view/>
+  <div class="columns">
+    <div class="main-content column">
+      <b-loading :can-cancel="true" v-model="isLoading" :isFullPage="true"></b-loading>
+      <router-view/>
+    </div>
+
+    <Radio class="column radio-content"/>
   </div>
 
   <footer class="footer">
@@ -22,11 +26,15 @@
 <script>
 import axios from 'axios'
 import { bus} from '../bus'
+import Radio from './Radio.vue'
 
 const config = require('../../config')
 
 export default {
   name: 'App',
+  components: {
+    Radio
+  },
   data: function () {
     return {
       boards: [],
@@ -126,13 +134,25 @@ p {
 }
 
 .main-content {
-    margin: 10px 350px 10px 350px;
+    margin: 10px 500px 10px 150px;
     box-sizing: border-box;
+}
+
+.radio-content {
+    position: fixed;
+    background-color: white;
+    border: 2px dotted grey;
+    bottom: 0;
+    right: 0;
 }
 
 @media (max-width: 1300px) {
     .main-content {
 	margin: 10px 5px 10px 5px;
+    }
+    .radio-content {
+	display: none;
+	visibility: hidden;
     }
 }
 </style>
