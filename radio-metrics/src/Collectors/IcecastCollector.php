@@ -56,7 +56,10 @@ class IcecastCollector implements ICollector
                     throw new RuntimeException("Нет данных о слушателях");
                 }
 
-                throw new  RuntimeException("Ни один из стримов не имеет данных о треке и слушателях");
+                return new CollectorData(
+                    $payload['icestats']['source'][0]['title'],
+                    $payload['icestats']['source'][0]['listeners']
+                );
             }
 
 
