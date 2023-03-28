@@ -29,7 +29,7 @@ export default {
   name: 'Radio',
   data: function () {
     return {
-      title: 'Unknown artist - Unknown Track',
+      title: 'Unknown',
       listeners: 0,
       streamUrl: config.icecast_url + '/stream',
       m3uUrl: config.icecast_url + '/stream.m3u',
@@ -44,11 +44,21 @@ export default {
 
       axios.get(config.icecast_url + '/status-json.xsl')
         .then((response) => {
-          self.title = response.data.icestats.source.title;
-          self.listeners = response.data.icestats.source.listeners;
+          if (Array.isArray(response.data.icestats.source)) {
+            if (typeof response.data.icestats.source[1].stream_start !== 'undefined') {
+              self.title = 'Прямая трансляция';
+              self.listeners = response.data.icestats.source[1].listeners;
+            } else {
+              self.title = response.data.icestats.source[0].title;
+              self.listeners = response.data.icestats.source[0].listeners;
+            }
+        } else {
+            self.title = response.data.icestats.source.title;
+            self.listeners = response.data.icestats.source.listeners;
+          }
         })
         .catch(() => {
-          self.$buefy.toast.open('Произошла ошибка при запросе данных');
+          self.$buefy.toast.open('Произошла ошибка при запросе радио-данных');
         })
     },
     goToThread: function () {
@@ -57,11 +67,11 @@ export default {
     },
     togglePlay: function () {
       if (this.isPlaying) {
-	this.$refs.audioPlayer.pause();
-	this.isPlaying = false;
-	clearInterval(this.metadataInterval);
+        this.$refs.audioPlayer.pause();
+        this.isPlaying = false;
+        clearInterval(this.metadataInterval);
 
-	return;
+        return;
       }
 
       this.$refs.audioPlayer.play();

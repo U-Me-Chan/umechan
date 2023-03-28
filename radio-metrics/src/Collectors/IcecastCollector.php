@@ -40,12 +40,32 @@ class IcecastCollector implements ICollector
                 throw new RuntimeException("Нет данных о стриме");
             }
 
-            if (!isset($payload['icestats']['source']['listeners'])) {
-                throw new RuntimeException("Нет данных о слушателях");
+            if (is_array($payload['icestats']['source'])) {
+                if (isset($payload['icestats']['source'][1]['stream_start'])) {
+                    return new CollectorData(
+                        $payload['icestats']['source'][1]['server_name'],
+                        $payload['icestats']['source'][1]['listeners']
+                    );
+                }
+
+                if (!isset($payload['icestats']['source'][0]['title'])) {
+                    throw new RuntimeException("Нет данных о воспроизводимом треке");
+                }
+
+                if (!isset($payload['icestats']['source'][0]['listeners'])) {
+                    throw new RuntimeException("Нет данных о слушателях");
+                }
+
+                throw new  RuntimeException("Ни один из стримов не имеет данных о треке и слушателях");
             }
+
 
             if (!isset($payload['icestats']['source']['title'])) {
                 throw new RuntimeException("Нет данных о воспроизводимом треке");
+            }
+
+            if (!isset($payload['icestats']['source']['listeners'])) {
+                throw new RuntimeException("Нет данных о слушателях");
             }
 
             return new CollectorData($payload['icestats']['source']['title'], $payload['icestats']['source']['listeners']);
