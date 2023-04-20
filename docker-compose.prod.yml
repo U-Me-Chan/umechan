@@ -34,6 +34,7 @@ services:
       - PHINX_PASSWORD=${MYSQL_PASSWORD}
       - ADMINISTATOR_KEY=${ADMINISTRATOR_KEY}
       - DEFAULT_NAME=${DEFAULT_NAME}
+      - RADIO_CHAN_THREAD_ID=${RADIO_CHAN_THREAD_ID}
     volumes:
       - './logs:/var/log'
   filestore:

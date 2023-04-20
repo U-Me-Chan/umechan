@@ -10,23 +10,18 @@ use PK\Exceptions\Board\BoardNotFound;
 
 class BoardsFetcher
 {
-    /** @var BoardRepository */
-    private $repository;
-
-    /** @var Medoo */
-    private $db;
-
-    public function __construct(BoardRepository $repository, Medoo $db)
-    {
-        $this->repository = $repository;
-        $this->db = $db;
+    public function __construct(
+        private BoardRepository $repository,
+        private Medoo $db,
+        private int $radio_thread_id
+    ) {
     }
 
     public function __invoke(Request $req)
     {
         try {
             $boards = $this->repository->fetch();
-        } catch (BoardNotFound $e) {
+        } catch (BoardNotFound) {
             return (new Response([], 404))->setException(new BoardNotFound('Нет досок, создайте хотя бы одну'));
         }
 
@@ -62,7 +57,10 @@ class BoardsFetcher
                   'boards.tag'
               ],
               [
-                  'AND' => ['boards.tag[!]' => $exclude_tags],
+                  'AND' => [
+                      'boards.tag[!]' => $exclude_tags,
+                      'posts.id[!]'   => $this->radio_thread_id
+                  ],
                   'LIMIT' => [$offset, $limit],
                   'ORDER' => ['posts.timestamp' => 'DESC']
               ]
