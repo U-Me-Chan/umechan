@@ -34,6 +34,7 @@ services:
       - PHINX_DATABASE=${MYSQL_DATABASE}
       - PHINX_USER=${MYSQL_USERNAME}
       - PHINX_PASSWORD=${MYSQL_PASSWORD}
+      - RADIO_CHAN_THREAD_ID=${RADIO_CHAN_THREAD_ID}
     volumes:
       - './api:/var/www/html'
   filestore:

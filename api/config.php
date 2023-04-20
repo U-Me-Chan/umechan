@@ -7,6 +7,7 @@ return [
         'username' => $_ENV['MYSQL_USERNAME'],
         'password' => $_ENV['MYSQL_PASSWORD']
     ],
-    'maintenance_key' => $_ENV['ADMINISTRATOR_KEY'],
-    'default_name'    => $_ENV['DEFAULT_NAME']
+    'maintenance_key'      => $_ENV['ADMINISTRATOR_KEY'],
+    'default_name'         => $_ENV['DEFAULT_NAME'],
+    'radio_chan_thread_id' => $_ENV['RADIO_CHAN_THREAD_ID']
 ];

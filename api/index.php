@@ -48,7 +48,7 @@ $app['db'] = function ($app) {
 $board_repo = new BoardRepository($app['db']);
 $post_repo  = new PostRepository($app['db']);
 
-$app['router']->addRoute('GET', '/board/all', new BoardsFetcher($board_repo, $app['db']));
+$app['router']->addRoute('GET', '/board/all', new BoardsFetcher($board_repo, $app['db'], $config['radio_chan_thread_id']));
 $app['router']->addRoute('GET', '/board/{tag}', new PostBoardFetcher($board_repo, $post_repo));
 
 $app['router']->addRoute('GET', '/post/{id:[0-9]+}', new PostFetcher($post_repo));
