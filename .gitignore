@@ -6,6 +6,7 @@ api/vendor/*
 filestore/vendor/*
 radio-metrics/vendor/*
 radio-metrics/logs/*
+radio-metrics/local.env.php
 frontend/node_modules/*
 logs/*
 .env
