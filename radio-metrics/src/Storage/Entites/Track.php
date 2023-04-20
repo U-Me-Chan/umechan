@@ -48,6 +48,11 @@ class Track extends AEntity
         $this->estimate = $this->estimate + $listeners;
     }
 
+    public function getName(): string
+    {
+        return $this->track;
+    }
+
     private function __construct(
         private int $id,
         private string $track,

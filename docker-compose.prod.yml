@@ -57,6 +57,11 @@ services:
         - MYSQL_USERNAME=${MYSQL_USERNAME}
         - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         - RADIO_API_URL=${RADIO_API_URL}
+        - RADIO_CHAN_API_URL=${DOMAIN}
+        - RADIO_CHAN_THREAD_ID=${RADIO_CHAN_THREAD_ID}
+        - RADIO_CHAN_POSTER_KEY=${RADIO_CHAN_POSTER_KEY}
+        - RADIO_DISCORD_HOOK_URL=${RADIO_DISCORD_HOOK_URL}
+        - RADIO_LOG_LEVEL=${RADIO_LOG_LEVEL}
     container_name: umechan-radio-metrics
     restart: always
     depends_on:
