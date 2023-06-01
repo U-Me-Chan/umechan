@@ -46,7 +46,7 @@ if (isset($_ENV['DB_STUB']) && $_ENV['DB_STUB'] == true) {
 }
 
 $sender = new SenderProvider($log);
-$sender->attach(new ChanSender($_ENV['RADIO_CHAN_API_URL'], $_ENV['RADIO_CHAN_THREAD_ID'], $_ENV['RADIO_CHAN_POSTER_KEY']));
+#$sender->attach(new ChanSender($_ENV['RADIO_CHAN_API_URL'], $_ENV['RADIO_CHAN_THREAD_ID'], $_ENV['RADIO_CHAN_POSTER_KEY']));
 $sender->attach(new DiscordWebHookSender($_ENV['RADIO_DISCORD_HOOK_URL']));
 
 try {
