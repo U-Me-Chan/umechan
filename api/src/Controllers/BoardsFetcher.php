@@ -59,7 +59,7 @@ class BoardsFetcher
               [
                   'OR' => [
                       'boards.tag[!]'      => $exclude_tags,
-                      'posts.parent_id' => $this->radio_thread_id
+                      'posts.parent_id[!]' => $this->radio_thread_id
                   ],
                   'LIMIT' => [$offset, $limit],
                   'ORDER' => ['posts.timestamp' => 'DESC']
