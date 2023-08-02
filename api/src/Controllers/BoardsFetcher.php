@@ -31,7 +31,7 @@ class BoardsFetcher
             $results['boards'][] = $board->toArray();
         }
 
-        $exclude_tags = $req->getParams('exclude_tags') ? $req->getParams('exclude_tags') : ['test', 'fap'];
+        $exclude_tags = $req->getParams('exclude_tags') ? $req->getParams('exclude_tags') : ['tes', 'fap'];
         $limit        = $req->getParams('limit') ? $req->getParams('limit') : 20;
         $offset       = $req->getParams('offset') ? $req->getParams('offset') : 0;
 
