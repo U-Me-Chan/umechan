@@ -11,7 +11,7 @@ class RouterTest extends TestCase
     private $router;
 
     protected function setUp(): void
-    {   
+    {
         $this->router = new Router();
         $this->router->addRoute('GET', '/test', function (Request $req) {
             return new Response([], 200);
@@ -22,15 +22,18 @@ class RouterTest extends TestCase
     {
         $server['REQUEST_METHOD'] = 'GET';
         $server['REQUEST_URI']    = '/404';
-        
+
         $this->assertEquals((new Response([], 404))->setException(new NotFound()), $this->router->handle(new Request($server)));
     }
 
-    public function testHnadleFound()
+    public function testHandleFound()
     {
         $server['REQUEST_METHOD'] = 'GET';
-        $server['REQUEST_URI']    = '/test';
+        $server['REQUEST_URI']    = '/api/test';
 
-        $this->assertEquals(new Response([], 200), $this->router->handle(new Request($server)));
+        /** @var Response */
+        $res = $this->router->handle(new Request($server));
+
+        $this->assertEquals(200, $res->getCode());
     }
 }

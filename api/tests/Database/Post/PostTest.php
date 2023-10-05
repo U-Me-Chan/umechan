@@ -10,6 +10,7 @@ class PostTest extends TestCase
         $post = new Post(0, '', '', 'https://files.catbox.moe/bbaeya.png
 https://files.catbox.moe/bbaeya.jpe
 https://files.catbox.moe/bbaeya.jpeg http://youtu.be/tesu
+https://youtu.be/M8EsxRh0zOc?si=bTXCyU5bqKP5ODxQ
 [![](http://filestore.scheoble.xyz/files/thumb.621956dd1738c.gif)](http://filestore.scheoble.xyz/files/621956dd1738c.jpg)
 https://pbs.twimg.com/media/E7BQtpkX0AYEzb0?format=jpg&name=large
 https://sun9-69.userapi.com/impg/K_6WAH0Cm-ZFiygwA77J8iX0MMI58sMm0sVXiw/_N27D23mMG0.jpg?size=1280x720&quality=96&sign=4940c663c545fb6cdeac518f21449500&type=album
@@ -24,17 +25,21 @@ https://pbs.twimg.com/media/E7BQtpkX0AYEzb0?format=jpg&name=large', 1, 1, null, 
             'message' => 'https://files.catbox.moe/bbaeya.png
 https://files.catbox.moe/bbaeya.jpe
 https://files.catbox.moe/bbaeya.jpeg http://youtu.be/tesu
+https://youtu.be/M8EsxRh0zOc?si=bTXCyU5bqKP5ODxQ
 [![](http://filestore.scheoble.xyz/files/thumb.621956dd1738c.gif)](http://filestore.scheoble.xyz/files/621956dd1738c.jpg)
 https://pbs.twimg.com/media/E7BQtpkX0AYEzb0?format=jpg&name=large
 https://sun9-69.userapi.com/impg/K_6WAH0Cm-ZFiygwA77J8iX0MMI58sMm0sVXiw/_N27D23mMG0.jpg?size=1280x720&quality=96&sign=4940c663c545fb6cdeac518f21449500&type=album
 https://pbs.twimg.com/media/E7BQtpkX0AYEzb0?format=jpg&name=large',
-            'truncated_message' => '
+            'truncated_message' => <<<EOT
+
 
  
 
 
 
-',
+
+
+EOT,
             'timestamp' => 1,
             'board_id' => 1,
             'parent_id' => null,
@@ -71,9 +76,14 @@ https://pbs.twimg.com/media/E7BQtpkX0AYEzb0?format=jpg&name=large',
                     [
                         'link' => 'https://youtu.be/tesu',
                         'preview' => 'https://i1.ytimg.com/vi/tesu/hqdefault.jpg'
+                    ],
+                    [
+                        'link' => 'https://youtu.be/M8EsxRh0zOc',
+                        'preview' => 'https://i1.ytimg.com/vi/M8EsxRh0zOc/hqdefault.jpg'
                     ]
                 ]
-            ]
+            ],
+            'is_verify' => false
         ], $post->toArray());
     }
 }
