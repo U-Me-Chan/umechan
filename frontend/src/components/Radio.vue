@@ -69,14 +69,12 @@ export default {
       if (this.isPlaying) {
         this.$refs.audioPlayer.pause();
         this.isPlaying = false;
-        clearInterval(this.metadataInterval);
 
         return;
       }
 
       this.$refs.audioPlayer.play();
       this.isPlaying = true;
-      this.metadataInterval = setInterval(() => this.updateMetadata(), 5000);
 
       return;
     },
@@ -86,7 +84,7 @@ export default {
     }
   },
   created: function () {
-    this.updateMetadata();
+    this.metadataInterval = setInterval(() => this.updateMetadata(), 5000);
   },
 }
 </script>
