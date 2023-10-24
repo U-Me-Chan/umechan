@@ -35,6 +35,21 @@ class BoardsFetcher
         $limit        = $req->getParams('limit') ? $req->getParams('limit') : 20;
         $offset       = $req->getParams('offset') ? $req->getParams('offset') : 0;
 
+        $conditions = [
+            'AND' => [
+                'boards.tag[!]' => $exclude_tags
+            ],
+            'LIMIT' => [$offset, $limit],
+            'ORDER' => ['posts.timestamp' => 'DESC']
+        ];
+
+        if ($req->getParams('query')) {
+            $conditions['AND']['OR'] = [
+                'posts.subject[~]' => "%{$req->getParams('query')}%",
+                'posts.message[~]' => "%{$req->getParams('query')}%"
+            ];
+        }
+
         $results['posts'] = array_map(function ($post) {
             $post['is_verify'] = ($post['is_verify'] === 'yes' ? true : false);
             return $post;
@@ -56,13 +71,7 @@ class BoardsFetcher
                   'posts.is_verify',
                   'boards.tag'
               ],
-              [
-                  'AND' => [
-                      'boards.tag[!]'      => $exclude_tags,
-                  ],
-                  'LIMIT' => [$offset, $limit],
-                  'ORDER' => ['posts.timestamp' => 'DESC']
-              ]
+              $conditions
           )
         );
 
