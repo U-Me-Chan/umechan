@@ -4,15 +4,11 @@ namespace PK\Database\Board;
 
 class Board
 {
-    private $id;
-    private $tag;
-    private $name;
-
-    public function __construct(int $id, string $tag, string $name)
-    {
-        $this->id   = $id;
-        $this->tag  = $tag;
-        $this->name = $name;
+    public function __construct(
+        private int $id,
+        private string $tag,
+        private string $name
+    ) {
     }
 
     public static function fromState(array $state): self

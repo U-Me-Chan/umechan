@@ -5,7 +5,6 @@ namespace PK\Controllers;
 use PK\Database\PostRepository;
 use PK\Database\BoardRepository;
 use PK\Database\Post\Post;
-use PK\Database\Board\Board;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Exceptions\Post\PostNotFound;

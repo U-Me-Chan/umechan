@@ -5,35 +5,33 @@ namespace PK\Controllers;
 use Medoo\Medoo;
 use PK\Http\Request;
 use PK\Http\Response;
-use PK\Database\BoardRepository;
-use PK\Exceptions\Board\BoardNotFound;
+use PK\Boards\BoardStorage;
 
 class BoardsFetcher
 {
     public function __construct(
-        private BoardRepository $repository,
-        private Medoo $db,
-        private int $radio_thread_id
+        private BoardStorage $board_repo,
+        private Medoo $db
     ) {
     }
 
-    public function __invoke(Request $req)
+    /**
+     * Обрабатывает запрос списка досок и последних постов
+     *
+     * @param Request $req
+     *
+     * @return Response
+     */
+    public function __invoke(Request $req): Response
     {
-        try {
-            $boards = $this->repository->fetch();
-        } catch (BoardNotFound) {
-            return (new Response([], 404))->setException(new BoardNotFound('Нет досок, создайте хотя бы одну'));
-        }
+        $results['boards'] = $this->board_repo->find();
 
-        $results = [];
-
-        foreach ($boards as $board) {
-            $results['boards'][] = $board->toArray();
-        }
-
+        /** @var array */
         $exclude_tags = $req->getParams('exclude_tags') ? $req->getParams('exclude_tags') : ['und', 'fap'];
-        $limit        = $req->getParams('limit') ? $req->getParams('limit') : 20;
-        $offset       = $req->getParams('offset') ? $req->getParams('offset') : 0;
+        /** @var int */
+        $limit = $req->getParams('limit') ? $req->getParams('limit') : 20;
+        /** @var int */
+        $offset = $req->getParams('offset') ? $req->getParams('offset') : 0;
 
         $conditions = [
             'AND' => [

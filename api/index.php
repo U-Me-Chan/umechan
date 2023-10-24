@@ -27,7 +27,7 @@ require_once "vendor/autoload.php";
 
 $config = require "config.php";
 
-/** @var array */
+/** @var array|Application */
 $app = new Application($config);
 
 $app['request'] = new Request($_SERVER, $_POST, $_FILES);
@@ -48,17 +48,17 @@ $app['db'] = function ($app) {
 $board_repo = new BoardRepository($app['db']);
 $post_repo  = new PostRepository($app['db']);
 
-$app['router']->addRoute('GET', '/board/all', new BoardsFetcher($board_repo, $app['db'], $config['radio_chan_thread_id']));
-$app['router']->addRoute('GET', '/board/{tag}', new PostBoardFetcher($board_repo, $post_repo));
-
-$app['router']->addRoute('GET', '/post/{id:[0-9]+}', new PostFetcher($post_repo));
-$app['router']->addRoute('POST', '/post', new PostCreator($post_repo, $board_repo));
-$app['router']->addRoute('DELETE', '/post/{id:[0-9]+}', new PostDeleter($post_repo));
-
-$r = $app['router'];
-
 $board_storage = new BoardStorage($app['db']);
 $post_storage = new PostStorage($app['db'], $board_storage);
+
+/** @var Router */
+$r = $app['router'];
+
+$r->addRoute('GET', '/board/all', new BoardsFetcher($board_storage, $app['db']));
+$r->addRoute('GET', '/board/{tag}', new PostBoardFetcher($board_storage, $post_storage));
+$r->addRoute('GET', '/post/{id:[0-9]+}', new PostFetcher($post_repo));
+$r->addRoute('POST', '/post', new PostCreator($post_repo, $board_repo));
+$r->addRoute('DELETE', '/post/{id:[0-9]+}', new PostDeleter($post_repo));
 
 $r->addRoute('GET', '/v2/board', new GetBoardList($board_storage));
 $r->addRoute('GET', '/v2/board/{tags:[a-z\+]+}', new GetThreadList($post_storage));
