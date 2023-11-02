@@ -36,7 +36,7 @@ export default {
       files: [],
       count: 0,
       current: 1,
-      perPage: 20
+      perPage: 6
     }
   },
   created: function  () {
