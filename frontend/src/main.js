@@ -55,7 +55,7 @@ const routes = [
       component: () => import('./components/Board.vue')
     },
     {
-      path: '/files',
+      path: '/file/all',
       component: () => import('./components/Files.vue')
     }
 ]
