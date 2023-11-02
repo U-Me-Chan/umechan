@@ -58,7 +58,6 @@ export default {
           }
         })
         .catch(() => {
-          self.$buefy.toast.open('Произошла ошибка при запросе радио-данных');
         })
     },
     goToThread: function () {

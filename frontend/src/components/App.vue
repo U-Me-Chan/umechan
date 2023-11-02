@@ -79,7 +79,6 @@ export default {
       var self = this;
 
       axios.get(config.chan_url + '/v2/board').then((response) => {
-        self.$buefy.toast.open('Обновляю счётчики...');
         self.boards = response.data.payload.boards;
         bus.tags = self.boards.map(function (board) {
           return board.tag;

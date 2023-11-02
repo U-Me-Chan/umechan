@@ -53,6 +53,10 @@ const routes = [
     {
       path: '/board/:tag',
       component: () => import('./components/Board.vue')
+    },
+    {
+      path: '/files',
+      component: () => import('./components/Files.vue')
     }
 ]
 

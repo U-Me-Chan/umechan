@@ -45,6 +45,7 @@ services:
     restart: always
     environment:
       - STATIC_URL=${STATIC_URL}
+      - ADMINISTRATOR_KEY=${ADMINISTRATOR_KEY}
     volumes:
       - './filestore:/var/www/html'
       - './data/files:/var/www/html/files'
