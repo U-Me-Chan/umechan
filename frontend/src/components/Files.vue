@@ -1,9 +1,5 @@
 <template>
 <div class="file-list">
-  <div class="admin-panel">
-    <input type="text" :value="admin_key" placeholder="admin_key">
-  </div>
-
   <h1>Files</h1>
 
   <b-pagination
@@ -19,9 +15,7 @@
   </b-pagination>
 
   <div class="files">
-    <div class="file card" v-for="file in files" :key="file">
-      <a :href="file.original" target="_blank"><img :src="file.thumbnail"></a>
-    </div>
+    <File :name="file.name" :original="file.original" :thumbnail="file.thumbnail" v-for="file in files" :key="file.name"/>
   </div>
 </div>
 </template>
@@ -29,10 +23,14 @@
 <script>
 import axios from 'axios'
 import { bus } from '../bus'
+import File from './File.vue'
 
 const config = require('../../config')
 
 export default {
+  components: {
+    File
+  },
   data: function () {
     return {
       files: [],
@@ -63,6 +61,13 @@ export default {
         console.log(error)
         bus.$emit('app.loader', [false])
       })
+    },
+    getThreadLinksByFile: function (name) {
+      axios.get(config.filestore_url + '/files/' + name).then((response) => {
+	return response.data.post_ids
+      }).catch((error) => {
+	console.log(error)
+      })
     }
   }
 }
@@ -79,27 +84,5 @@ h1 {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-}
-
-img {
-    width: 200px;
-}
-
-.file {
-    display: flex;
-    flex-direction: column;
-}
-
-.admin-panel {
-    position: fixed;
-    right:0;
-    bottom: 250px;
-    background-color: white;
-    border: 1px dotted grey;
-}
-
-.card {
-    margin: 10px;
-    padding: 5px;
 }
 </style>

@@ -16,7 +16,8 @@
     ],
     "require": {
         "ridouchire/rweb": "dev-master",
-        "ext-imagick": "*"
+        "ext-imagick": "*",
+        "catfan/medoo": "^2.1"
     },
     "autoload": {
         "psr-4": {

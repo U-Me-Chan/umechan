@@ -46,6 +46,10 @@ services:
     environment:
       - STATIC_URL=${STATIC_URL}
       - ADMINISTRATOR_KEY=${ADMINISTRATOR_KEY}
+      - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USERNAME=${MYSQL_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - './filestore:/var/www/html'
       - './data/files:/var/www/html/files'
