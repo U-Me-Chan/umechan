@@ -3,12 +3,15 @@
   <a :href="original" target="_blank"><img :src="thumbnail"></a>
   <a href="#" v-for="id in postIds" :key="id" @click="selectThread(id)">Post #{{id}}</a>
   <span v-if="postIds.length === 0">Нет постов</span>
+  <span @click="deleteFile()">delete</span>
 </div>
 </template>
 
 <script>
 const axios = require('axios')
 const config = require('../../config')
+
+import { bus } from '../bus'
 
 export default {
   name: 'File',
@@ -34,6 +37,20 @@ export default {
     },
     selectThread: function (id) {
       this.$router.push('/thread/' + id)
+    },
+    deleteFile: function () {
+      var key = prompt('Admin key', ['']);
+
+      axios.delete(config.filestore_url + '/files/' + this.name, {
+        data: {},
+        headers: {
+          'Key': key
+        }
+      }).then((response) => {
+        bus.$emit('files.file.deleted', [response])
+      }).catch((error) => {
+        console.log(error)
+      })
     }
   },
   created: function () {

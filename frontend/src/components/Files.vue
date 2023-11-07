@@ -40,12 +40,17 @@ export default {
     }
   },
   created: function  () {
-    this.getFiles()
+    this.getFiles((this.current - 1) * this.perPage)
+
+    var self = this
+
+    bus.$on('files.file.deleted', function () {
+      self.getFiles((self.current - 1) * self.perPage)
+    })
   },
   methods: {
-    getFiles: function () {
+    getFiles: function (offset) {
       var self = this
-      var offset = (this.current - 1) * this.perPage
       bus.$emit('app.loader', [true])
 
       axios.get(config.filestore_url + '/files', {

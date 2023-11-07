@@ -18,7 +18,7 @@ class GetFile implements IController
     public function __invoke(Request $req, array $vars = []): Response
     {
         if (!is_file(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . "{$vars['id']}")) {
-            return new Response('', 400);
+            return new Response('', Response::HTTP_NOT_FOUND);
         }
 
         $data = [];

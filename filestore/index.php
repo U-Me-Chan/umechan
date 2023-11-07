@@ -1,5 +1,6 @@
 <?php
 
+use IH\Controllers\DeleteFile;
 use Medoo\Medoo;
 use Rweb\App;
 use Rweb\Middlewares\Router;
@@ -30,6 +31,7 @@ $r->addRoute('GET', '/filestore', new Index());
 $r->addRoute('GET', '/filestore/files', new GetFilelist($_ENV['STATIC_URL'], $_ENV['ADMINISTRATOR_KEY']));
 $r->addRoute('GET', '/filestore/files/{id:[0-9a-z\.]+}', new GetFile($_ENV['STATIC_URL'], $db));
 $r->addRoute('POST', '/filestore', new UploadFile($_ENV['STATIC_URL']));
+$r->addRoute('DELETE', '/filestore/files/{id:[0-9a-z\.]+}', new DeleteFile($_ENV['ADMINISTRATOR_KEY']));
 
 $app->addMiddleware($r);
 
