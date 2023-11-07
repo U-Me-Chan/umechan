@@ -40,18 +40,23 @@ export default {
     }
   },
   created: function  () {
-    this.getFiles((this.current - 1) * this.perPage)
+    this.getFiles(this.current)
 
     var self = this
 
     bus.$on('files.file.deleted', function () {
-      self.getFiles((self.current - 1) * self.perPage)
+      self.getFiles(self.current)
     })
   },
   methods: {
-    getFiles: function (offset) {
+    getFiles: function (page) {
       var self = this
       bus.$emit('app.loader', [true])
+
+      var offset = page - 1
+      offset = offset * this.perPage
+
+      console.log(offset)
 
       axios.get(config.filestore_url + '/files', {
         params: {
@@ -65,13 +70,6 @@ export default {
       }).catch((error) => {
         console.log(error)
         bus.$emit('app.loader', [false])
-      })
-    },
-    getThreadLinksByFile: function (name) {
-      axios.get(config.filestore_url + '/files/' + name).then((response) => {
-	return response.data.post_ids
-      }).catch((error) => {
-	console.log(error)
       })
     }
   }
