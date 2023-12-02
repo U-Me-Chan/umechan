@@ -16,7 +16,7 @@
   <footer class="footer">
     <div class="content has-text-centered">
       <p>
-	<strong>U III E</strong> 2011-2022
+	<strong>U III E</strong> 2011-2077
       </p>
     </div>
   </footer>
