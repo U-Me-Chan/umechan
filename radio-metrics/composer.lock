@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3aab4027cc276f4533a5264546143dbd",
+    "content-hash": "e6ed655d261749d2606bc07bab5a8a2a",
     "packages": [
         {
             "name": "cakephp/core",
@@ -311,6 +311,52 @@
                 }
             ],
             "time": "2023-01-20T09:30:24+00:00"
+        },
+        {
+            "name": "flofaber/mphpd",
+            "version": "v1.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FloFaber/MphpD.git",
+                "reference": "8576c63056a7c38e40312c146c06daa26434bbfe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FloFaber/MphpD/zipball/8576c63056a7c38e40312c146c06daa26434bbfe",
+                "reference": "8576c63056a7c38e40312c146c06daa26434bbfe",
+                "shasum": ""
+            },
+            "require": {
+                "ext-sockets": "*",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "erusev/parsedown": "^1.7",
+                "phpdocumentor/reflection-docblock": "^5.3",
+                "phpunit/phpunit": "9.5.27"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "FloFaber\\MphpD\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Florian Faber",
+                    "email": "contact@flofaber.com"
+                }
+            ],
+            "description": "A PHP library for the Music Player Daemon",
+            "support": {
+                "issues": "https://github.com/FloFaber/MphpD/issues",
+                "source": "https://github.com/FloFaber/MphpD/tree/v1.2.4"
+            },
+            "time": "2023-12-06T14:29:31+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",

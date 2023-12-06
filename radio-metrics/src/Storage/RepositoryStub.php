@@ -11,7 +11,7 @@ class RepositoryStub
     public function findOne(AEntity $entity) // костыль, но что поделать
     {
         if ($entity instanceof Track) {
-            return Track::draft('test');
+            throw new \RuntimeException();
         }
 
         if ($entity instanceof Record) {

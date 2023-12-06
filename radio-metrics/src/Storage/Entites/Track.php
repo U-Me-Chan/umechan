@@ -53,13 +53,43 @@ class Track extends AEntity
         return $this->track;
     }
 
+    public function setDuration(int $duration): void
+    {
+        $this->duration = $duration;
+    }
+
+    public function setPath(string $path): void
+    {
+        $this->path = $path;
+    }
+
+    public function setArtist(string $artist): void
+    {
+        $this->artist = $artist;
+    }
+
+    public function setTitle(string $title): void
+    {
+        $this->title = $title;
+    }
+
+    public function setMpdTrackId(string $mpd_track_id): void
+    {
+        $this->mpd_track_id = $mpd_track_id;
+    }
+
     private function __construct(
         private int $id,
         private string $track,
         private int $first_playing,
         private int $last_playing,
         private int $play_count,
-        private int $estimate
+        private int $estimate,
+        private ?string $path = null,
+        private ?int $duration = null,
+        private ?string $artist = null,
+        private ?string $title = null,
+        private ?int $mpd_track_id = null
     ) {
     }
 }

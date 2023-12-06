@@ -7,7 +7,8 @@
         "catfan/medoo": "^2.1",
         "robmorgan/phinx": "^0.13.4",
         "symfony/yaml": "^6.2",
-        "monolog/monolog": "^3.3"
+        "monolog/monolog": "^3.3",
+        "flofaber/mphpd": "^1.2"
     },
     "license": "MIT",
     "autoload": {

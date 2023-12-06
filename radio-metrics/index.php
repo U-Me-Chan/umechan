@@ -2,13 +2,15 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+use FloFaber\MphpD\Filter;
+use FloFaber\MphpD\MPDException;
+use FloFaber\MphpD\MphpD;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use React\EventLoop\Loop;
 use Medoo\Medoo;
 use Ridouchire\RadioMetrics\Collectors\IcecastCollector;
 use Ridouchire\RadioMetrics\SenderProvider;
-use Ridouchire\RadioMetrics\Senders\ChanSender;
 use Ridouchire\RadioMetrics\Senders\DiscordWebHookSender;
 use Ridouchire\RadioMetrics\DTOs\CollectorData;
 use Ridouchire\RadioMetrics\Storage\Repository;
@@ -46,7 +48,6 @@ if (isset($_ENV['DB_STUB']) && $_ENV['DB_STUB'] == true) {
 }
 
 $sender = new SenderProvider($log);
-#$sender->attach(new ChanSender($_ENV['RADIO_CHAN_API_URL'], $_ENV['RADIO_CHAN_THREAD_ID'], $_ENV['RADIO_CHAN_POSTER_KEY']));
 $sender->attach(new DiscordWebHookSender($_ENV['RADIO_DISCORD_HOOK_URL']));
 
 try {
@@ -55,10 +56,22 @@ try {
     $log->error('Не могу запустить клиент доступа к источнику данных', [$e->getMessage()]);
 }
 
+$mphpd = new MphpD([
+    'host' => '192.168.88.168',
+    'port' => 6600,
+    'timeout' => 5
+]);
+
+try {
+    $mphpd->connect();
+} catch (MPDException $e) {
+    echo $e->getMessage() . PHP_EOL;
+}
+
 $listeners = 0;
 $last_track    = '';
 
-Loop::addPeriodicTimer(1, function () use ($collector, $repo, $log, $sender, &$listeners, &$last_track) {
+Loop::addPeriodicTimer(1, function () use ($collector, $repo, $log, $sender, $mphpd, &$listeners, &$last_track) {
     $log->debug('Запрашиваем данные');
 
     try {
@@ -98,6 +111,16 @@ Loop::addPeriodicTimer(1, function () use ($collector, $repo, $log, $sender, &$l
         $sender->send($track, $data->getListeners());
     }
 
+    $_track_data = $mphpd->player()->current_song();
+
+    if ($_track_data) {
+        $track->setDuration($_track_data['time']);
+        $track->setPath($_track_data['file']);
+        $track->setArtist($_track_data['artist']);
+        $track->setTitle($_track_data['title']);
+        $track->setMpdTrackId($_track_data['id']);
+    }
+
     $listeners  = $data->getListeners();
     $last_track = $data->getTrack();
 
@@ -106,5 +129,5 @@ Loop::addPeriodicTimer(1, function () use ($collector, $repo, $log, $sender, &$l
     $record = Record::draft($track_id, $listeners);
     $repo->save($record);
 
-    $log->debug('Текущие данные', ['track' => $last_track, 'listeners' => $listeners]);
+    $log->debug('Текущие данные', ['track' => $last_track, 'listeners' => $listeners, $track]);
 });
