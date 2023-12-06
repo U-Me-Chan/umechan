@@ -132,7 +132,7 @@ class Post implements \JsonSerializable
             foreach ($matches[4] as $id) {
                 $youtubes[$id] = [
                     'link' => "https://youtu.be/{$id}",
-                    'preview' => "http://i1.ytimg.com/vi/{$id}/hqdefault.jpg"
+                    'preview' => "https://i1.ytimg.com/vi/{$id}/hqdefault.jpg"
                 ];
             }
         }
