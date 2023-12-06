@@ -56,22 +56,10 @@ try {
     $log->error('Не могу запустить клиент доступа к источнику данных', [$e->getMessage()]);
 }
 
-$mphpd = new MphpD([
-    'host' => '192.168.88.168',
-    'port' => 6600,
-    'timeout' => 5
-]);
-
-try {
-    $mphpd->connect();
-} catch (MPDException $e) {
-    echo $e->getMessage() . PHP_EOL;
-}
-
 $listeners = 0;
 $last_track    = '';
 
-Loop::addPeriodicTimer(1, function () use ($collector, $repo, $log, $sender, $mphpd, &$listeners, &$last_track) {
+Loop::addPeriodicTimer(1, function () use ($collector, $repo, $log, $sender, &$listeners, &$last_track) {
     $log->debug('Запрашиваем данные');
 
     try {
@@ -111,7 +99,21 @@ Loop::addPeriodicTimer(1, function () use ($collector, $repo, $log, $sender, $mp
         $sender->send($track, $data->getListeners());
     }
 
+    $mphpd = new MphpD([
+        'host' => '192.168.88.168',
+        'port' => 6600,
+        'timeout' => 5
+    ]);
+
+    try {
+        $mphpd->connect();
+    } catch (MPDException $e) {
+        echo $e->getMessage() . PHP_EOL;
+    }
+
     $_track_data = $mphpd->player()->current_song();
+
+    $mphpd->disconnect();
 
     if ($_track_data) {
         $track->setDuration($_track_data['time']);
