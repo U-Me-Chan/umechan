@@ -4,9 +4,9 @@ paths:
 
 environments:
     default_migration_table: phinxlog_metrics
-    default_database: development
+    default_database: production
 
-    development:
+    production:
         adapter: mysql
         host: '%%PHINX_HOSTNAME%%'
         name: '%%PHINX_DATABASE%%'
@@ -15,3 +15,7 @@ environments:
         port: 3306
         charset: utf8
         collation: utf8_unicode_ci
+    development:
+      adapter: sqlite
+      name: test
+      suffix: ".db"

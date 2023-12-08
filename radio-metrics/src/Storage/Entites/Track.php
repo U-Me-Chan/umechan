@@ -6,20 +6,29 @@ use Ridouchire\RadioMetrics\Storage\AEntity;
 
 class Track extends AEntity
 {
-    public static function draft(string $track = ''): self
-    {
-        return new self(0, $track, time(), time(), 0, 0);
+    public static function draft(
+        string $artist,
+        string $title,
+        int $duration = 0,
+        string $path = '',
+        int $mpd_track_id = 0
+    ): self {
+        return new self(0, $artist, $title, time(), time(), 0, 0, $path, $duration, $mpd_track_id);
     }
 
     public static function fromArray(array $state): self
     {
         return new self(
             $state['id'],
-            $state['track'],
+            $state['artist'],
+            $state['title'],
             $state['first_playing'],
             $state['last_playing'],
             $state['play_count'],
-            $state['estimate']
+            $state['estimate'],
+            $state['path'],
+            $state['duration'],
+            $state['mpd_track_id']
         );
     }
 
@@ -38,57 +47,66 @@ class Track extends AEntity
         $this->play_count = $this->play_count + 1;
     }
 
-    public function togglePlaying(): void
-    {
-        $this->last_playing = time();
-    }
-
     public function bumpEstimate(int $listeners): void
     {
         $this->estimate = $this->estimate + $listeners;
     }
 
+    public function togglePlaying(): void
+    {
+        $this->last_playing = time();
+    }
+
     public function getName(): string
     {
-        return $this->track;
+        return "{$this->artist} - {$this->title}";
     }
 
-    public function setDuration(int $duration): void
+    public function getArtist(): string
     {
-        $this->duration = $duration;
+        return $this->artist;
     }
 
-    public function setPath(string $path): void
+    public function getTitle(): string
     {
-        $this->path = $path;
+        return $this->title;
     }
 
-    public function setArtist(string $artist): void
+    public function getMpdTrackId(): int
     {
-        $this->artist = $artist;
+        return $this->mpd_track_id;
     }
 
-    public function setTitle(string $title): void
+    public function getId(): int
     {
-        $this->title = $title;
+        return $this->id;
     }
 
-    public function setMpdTrackId(string $mpd_track_id): void
+    public function getDuration(): int
     {
-        $this->mpd_track_id = $mpd_track_id;
+        return $this->duration;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function getPlayCount(): int
+    {
+        return $this->play_count;
     }
 
     private function __construct(
         private int $id,
-        private string $track,
+        private string $artist,
+        private string $title,
         private int $first_playing,
         private int $last_playing,
         private int $play_count,
         private int $estimate,
         private ?string $path = null,
         private ?int $duration = null,
-        private ?string $artist = null,
-        private ?string $title = null,
         private ?int $mpd_track_id = null
     ) {
     }

@@ -90,4 +90,9 @@ class ChanSender implements ISender
 
         return $text;
     }
+
+    public function getName(): string
+    {
+        return 'ChanSender';
+    }
 }

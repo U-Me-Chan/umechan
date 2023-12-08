@@ -33,11 +33,26 @@ class Record extends AEntity
         return get_object_vars($this);
     }
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getTrackId(): int
+    {
+        return $this->track_id;
+    }
+
+    public function getListeners(): int
+    {
+        return $this->listeners;
+    }
+
     private function __construct(
-        public int $id,
-        public int $track_id,
-        public int $listeners,
-        public int $timestamp
+        private int $id,
+        private int $track_id,
+        private int $listeners,
+        private int $timestamp
     ) {
     }
 }

@@ -2,11 +2,10 @@
 
 namespace Ridouchire\RadioMetrics\Collectors;
 
+use RuntimeException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Ridouchire\RadioMetrics\ICollector;
-use Ridouchire\RadioMetrics\DTOs\CollectorData;
-use RuntimeException;
 
 class IcecastCollector implements ICollector
 {
@@ -18,7 +17,7 @@ class IcecastCollector implements ICollector
         ]);
     }
 
-    public function getData(): CollectorData
+    public function getData(): array
     {
         /** @var Response */
         $response = $this->client->request('GET', $this->url);
@@ -42,10 +41,10 @@ class IcecastCollector implements ICollector
 
             if (is_array($payload['icestats']['source'])) {
                 if (isset($payload['icestats']['source'][1]['stream_start'])) {
-                    return new CollectorData(
-                        $payload['icestats']['source'][1]['server_name'],
-                        $payload['icestats']['source'][1]['listeners']
-                    );
+                    return [
+                        'title'     => $payload['icestats']['source'][1]['server_name'],
+                        'listeners' => $payload['icestats']['source'][1]['listeners']
+                    ];
                 }
 
                 if (!isset($payload['icestats']['source'][0]['title'])) {
@@ -56,10 +55,10 @@ class IcecastCollector implements ICollector
                     throw new RuntimeException("Нет данных о слушателях");
                 }
 
-                return new CollectorData(
-                    $payload['icestats']['source'][0]['title'],
-                    $payload['icestats']['source'][0]['listeners']
-                );
+                return [
+                    'title'     => $payload['icestats']['source'][0]['title'],
+                    'listeners' =>  $payload['icestats']['source'][0]['listeners']
+                ];
             }
 
 
@@ -71,7 +70,10 @@ class IcecastCollector implements ICollector
                 throw new RuntimeException("Нет данных о слушателях");
             }
 
-            return new CollectorData($payload['icestats']['source']['title'], $payload['icestats']['source']['listeners']);
+            return [
+                'title'     => $payload['icestats']['source']['title'],
+                'listeners' => $payload['icestats']['source']['listeners']
+            ];
         }
 
         throw new RuntimeException("Источник данных не отвечает");

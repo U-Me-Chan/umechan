@@ -45,4 +45,9 @@ class DiscordWebHookSender implements ISender
             throw new \RuntimeException("Произошла ошибка при отправке данных о воспроизводимом треке в Discord-канал");
         }
     }
+
+    public function getName(): string
+    {
+        return 'DiscordWebHookSender';
+    }
 }

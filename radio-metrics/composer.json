@@ -13,7 +13,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Ridouchire\\RadioMetrics\\": "src/"
+          "Ridouchire\\RadioMetrics\\": "src/"
         }
     },
     "authors": [
