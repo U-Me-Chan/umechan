@@ -24,11 +24,11 @@ class MpdCollector implements ICollector
 
     public function getData(): array
     {
-        $this->mphpd->connect();
+        if (!$this->mphpd->connected) {
+            $this->mphpd->connect();
+        }
 
         $data = $this->mphpd->player()->current_song();
-
-        $this->mphpd->disconnect();
 
         if (!$data) {
             throw new RuntimeException();
