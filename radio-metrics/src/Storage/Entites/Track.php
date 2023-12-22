@@ -104,7 +104,7 @@ class Track extends AEntity
         return $this->play_count;
     }
 
-    public function getHash(): string
+    public function getHash(): string|null
     {
         return $this->hash;
     }
