@@ -31,7 +31,11 @@ class MpdCollector implements ICollector
         $data = $this->mphpd->player()->current_song();
 
         if (!$data) {
-            throw new RuntimeException();
+            if (!empty($this->mphpd->get_last_error())) {
+                throw new RuntimeException($this->mphpd->get_last_error()['message']);
+            }
+
+            throw new RuntimeException("Неизвестная ошибка");
         }
 
         return $data;

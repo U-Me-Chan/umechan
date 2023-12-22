@@ -12,6 +12,7 @@ use Ridouchire\RadioMetrics\Storage\RecordRepository;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
 use Ridouchire\RadioMetrics\Tests\DatabaseTestCase;
 use Ridouchire\RadioMetrics\TickHandler;
+use Ridouchire\RadioMetrics\Utils\Md5Hash;
 
 class TickHandlerTest extends DatabaseTestCase
 {
@@ -42,6 +43,10 @@ class TickHandlerTest extends DatabaseTestCase
             'listeners' => 1
         ]);
 
+        /** @var Md5Hash|MockObject */
+        $md5hash = $this->createMock(Md5Hash::class);
+        $md5hash->method('get')->willReturn(md5('test'));
+
         $senderProvider = new SenderProvider($logger);
         $senderProvider->attach(new DummySender());
         $this->trackRepo = new TrackRepository($this->db);
@@ -53,7 +58,8 @@ class TickHandlerTest extends DatabaseTestCase
             $icecastCollector,
             $senderProvider,
             $this->trackRepo,
-            $this->recordRepo
+            $this->recordRepo,
+            $md5hash
         );
     }
 

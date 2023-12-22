@@ -92,6 +92,10 @@ class TrackRepository implements IRepository
             $conditions['mpd_track_id'] = $filters['mpd_track_id'];
         }
 
+        if (isset($filters['hash'])) {
+            $conditions['hash'] = $filters['hash'];
+        }
+
         if (empty($conditions)) {
             throw new \InvalidArgumentException("Список условий пуст");
         }

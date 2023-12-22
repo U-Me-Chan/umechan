@@ -15,6 +15,7 @@ use Ridouchire\RadioMetrics\Storage\RecordRepository;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
 use Ridouchire\RadioMetrics\TickHandler;
 use Ridouchire\RadioMetrics\Utils\Environment;
+use Ridouchire\RadioMetrics\Utils\Md5Hash;
 
 if (file_exists(__DIR__ . '/local.env.php')) {
     require_once __DIR__ . '/local.env.php';
@@ -67,6 +68,6 @@ $mpdCollector     = new MpdCollector($env->mpd_hostname, $env->mpd_port);
 $trackRepo  = new TrackRepository($db);
 $recordRepo = new RecordRepository($db);
 
-$tickHandler = new TickHandler($logger, $mpdCollector, $icecastCollector, $senderProvider, $trackRepo, $recordRepo);
+$tickHandler = new TickHandler($logger, $mpdCollector, $icecastCollector, $senderProvider, $trackRepo, $recordRepo, new Md5Hash($env->mpd_database_path));
 
 Loop::addPeriodicTimer(1, $tickHandler);

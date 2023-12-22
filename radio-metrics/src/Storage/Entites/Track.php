@@ -9,11 +9,12 @@ class Track extends AEntity
     public static function draft(
         string $artist,
         string $title,
+        string $hash,
+        string $path,
         int $duration = 0,
-        string $path = '',
         int $mpd_track_id = 0
     ): self {
-        return new self(0, $artist, $title, time(), time(), 0, 0, $path, $duration, $mpd_track_id);
+        return new self(0, $artist, $title, time(), time(), 0, 0, $path, $duration, $mpd_track_id, $hash);
     }
 
     public static function fromArray(array $state): self
@@ -28,7 +29,8 @@ class Track extends AEntity
             $state['estimate'],
             $state['path'],
             $state['duration'],
-            $state['mpd_track_id']
+            $state['mpd_track_id'],
+            $state['hash']
         );
     }
 
@@ -40,6 +42,11 @@ class Track extends AEntity
     public function jsonSerialize(): array
     {
         return get_object_vars($this);
+    }
+
+    public function setHash(string $hash): void
+    {
+        $this->hash = $hash;
     }
 
     public function bumpPlayCount(): void
@@ -97,6 +104,11 @@ class Track extends AEntity
         return $this->play_count;
     }
 
+    public function getHash(): string
+    {
+        return $this->hash;
+    }
+
     private function __construct(
         private int $id,
         private string $artist,
@@ -107,7 +119,8 @@ class Track extends AEntity
         private int $estimate,
         private ?string $path = null,
         private ?int $duration = null,
-        private ?int $mpd_track_id = null
+        private ?int $mpd_track_id = null,
+        private ?string $hash = null
     ) {
     }
 }

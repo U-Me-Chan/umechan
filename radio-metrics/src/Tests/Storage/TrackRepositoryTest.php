@@ -9,17 +9,19 @@ use Ridouchire\RadioMetrics\Tests\DatabaseTestCase;
 class TrackRepositoryTest extends DatabaseTestCase
 {
     private TrackRepository $repo;
+    private string $hash = '';
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->repo = new TrackRepository($this->db);
+        $this->hash = md5('test');
     }
 
     public function testSave(): void
     {
-        $track = Track::draft('Foo', 'Bar', 123, 'Music/Non Stop', 1122);
+        $track = Track::draft('Foo', 'Bar', $this->hash, 'Music/Non Stop', 123, 1122);
 
         $id = $this->repo->save($track);
 
@@ -40,6 +42,7 @@ class TrackRepositoryTest extends DatabaseTestCase
         $this->assertEquals(123, $track->getDuration());
         $this->assertEquals('Music/Non Stop', $track->getPath());
         $this->assertEquals(1122, $track->getMpdTrackId());
+        $this->assertEquals($this->hash, $track->getHash());
 
         $this->expectException(EntityNotFound::class);
 
@@ -90,12 +93,13 @@ class TrackRepositoryTest extends DatabaseTestCase
             'estimate'      => 1,
             'path'          => 'Music/Non Stop',
             'duration'      => 123,
-            'mpd_track_id'  => 1122
+            'mpd_track_id'  => 1122,
+            'hash'          => 'test'
         ])));
 
         $this->expectException(InvalidArgumentException::class);
 
-        $this->repo->delete(Track::draft('', ''));
+        $this->repo->delete(Track::draft('', '', 'test', 'test'));
         $this->repo->delete(Record::draft(1, 1));
     }
 }

@@ -70,6 +70,7 @@ services:
         - RADIO_LOG_LEVEL=${RADIO_LOG_LEVEL}
         - MPD_HOSTNAME=${MPD_HOSTNAME}
         - MPD_PORT=${MPD_PORT}
+        - MPD_DATABASE_PATH=${MPD_DATABASE_PATH}
     container_name: umechan-radio-metrics
     restart: always
     env_file:
