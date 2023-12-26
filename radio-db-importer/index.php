@@ -72,36 +72,37 @@ Loop::addPeriodicTimer(1, function () use ($mphpd, $db, $logger, $mpd_database_p
 
         $track_data = $db->get('tracks', '*', ['hash' => $hash]);
 
-        if ($track_data !== false) {
-            $logger->debug('Файл уже добавлен: ' . $file['file']);
+        $logger->debug('Файл уже добавлен: ' . $file['file']);
 
-            if (empty($track_data['file'])) {
-                $logger->info('Файл без пути, обновляю для ' . $file['file']);
+        if (!$track_data) {
+            $logger->info('Добавляю файл: ' . $file['file']);
 
-                $db->update('tracks', [
-                    'path' => $file['file']
-                ], [
-                    'hash' => $hash
-                ]);
-
-            }
+            $db->insert('tracks', [
+                'artist'        => $file['artist'],
+                'title'         => $file['title'],
+                'duration'      => $file['time'],
+                'hash'          => $hash,
+                'estimate'      => 0,
+                'first_playing' => time(),
+                'last_playing'  => time(),
+                'play_count'    => 0,
+                'path'          => $file['file']
+            ]);
 
             continue;
         }
 
-        $logger->info('Добавляю файл: ' . $file['file']);
+        if (empty($track_data['file'])) {
+            $logger->info('Файл без пути, обновляю для ' . $file['file']);
 
-        $db->insert('tracks', [
-            'artist'        => $file['artist'],
-            'title'         => $file['title'],
-            'duration'      => $file['time'],
-            'hash'          => $hash,
-            'estimate'      => 0,
-            'first_playing' => time(),
-            'last_playing'  => time(),
-            'play_count'    => 0,
-            'path'          => $file['file']
-        ]);
+            $db->update('tracks', [
+                'path' => $file['file']
+            ], [
+                'hash' => $hash
+            ]);
+
+            continue;
+        }
     }
 
     $num++;
