@@ -70,10 +70,20 @@ Loop::addPeriodicTimer(1, function () use ($mphpd, $db, $logger, $mpd_database_p
 
         $hash = md5_file($mpd_database_path . '/' . $file['file']);
 
-        if ($db->get('tracks', '*', ['hash' => $hash])) {
+        $track_data = $db->get('tracks', '*', ['hash' => $hash]);
+
+        if ($track_data) {
             $logger->debug('Файл уже добавлен: ' . $file['file']);
 
-            continue;
+            if (empty($track_data['file'])) {
+                $logger->debug('Файл без пути, обновляю для ' . $file['file']);
+
+                $db->update('tracks', [
+                    'path' => $file['file']
+                ], [
+                    'hash' => $hash
+                ]);
+            }
         }
 
         $logger->debug('Добавляю файл: ' . $file['file']);
