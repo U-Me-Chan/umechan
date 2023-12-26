@@ -83,7 +83,10 @@ Loop::addPeriodicTimer(1, function () use ($mphpd, $db, $logger, $mpd_database_p
                 ], [
                     'hash' => $hash
                 ]);
+
             }
+
+            continue;
         }
 
         $logger->debug('Добавляю файл: ' . $file['file']);
