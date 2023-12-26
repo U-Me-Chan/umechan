@@ -103,19 +103,6 @@ class TickHandler
         $this->logger->debug('Пытаемся найти композицию в БД');
 
         try {
-            $track =  $this->trackRepository->findOne(['mpd_track_id' => $mpd_track_data['id']]);
-
-            if ($track->getHash() == null) {
-                $track->setHash($this->md5Hash->get($track->getPath()));
-            }
-
-            $this->logger->debug('Нашли композицию в БД по MPD songid');
-
-            return $track;
-        } catch (EntityNotFound) {
-        }
-
-        try {
              $track = $this->trackRepository->findOne([
                  'hash' => $this->md5Hash->get($mpd_track_data['file'])
              ]);
