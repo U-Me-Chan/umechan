@@ -14,7 +14,7 @@ $_ENV['MPD_HOSTNAME'] = '192.168.88.168';
 $_ENV['MPD_PORT'] = 6600;
 
 $logger = new Logger('log');
-$logger->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-db-importer.log', Level::Debug));
+$logger->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-db-importer.log', Level::Info));
 $logger->info('Запуск');
 
 $mphpd = new MphpD([
@@ -76,7 +76,7 @@ Loop::addPeriodicTimer(1, function () use ($mphpd, $db, $logger, $mpd_database_p
             $logger->debug('Файл уже добавлен: ' . $file['file']);
 
             if (empty($track_data['file'])) {
-                $logger->debug('Файл без пути, обновляю для ' . $file['file']);
+                $logger->info('Файл без пути, обновляю для ' . $file['file']);
 
                 $db->update('tracks', [
                     'path' => $file['file']
@@ -89,7 +89,7 @@ Loop::addPeriodicTimer(1, function () use ($mphpd, $db, $logger, $mpd_database_p
             continue;
         }
 
-        $logger->debug('Добавляю файл: ' . $file['file']);
+        $logger->info('Добавляю файл: ' . $file['file']);
 
         $db->insert('tracks', [
             'artist'        => $file['artist'],
