@@ -92,7 +92,7 @@ Loop::addPeriodicTimer(1, function () use ($mphpd, $db, $logger, $mpd_database_p
             continue;
         }
 
-        if (empty($track_data['file'])) {
+        if (empty($track_data['path'])) {
             $logger->info('Файл без пути, обновляю для ' . $file['file']);
 
             $db->update('tracks', [
