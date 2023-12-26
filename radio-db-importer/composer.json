@@ -1,0 +1,21 @@
+{
+    "name": "ridouchire/radio-db-importer",
+    "require": {
+        "react/event-loop": "^1.5",
+        "catfan/medoo": "^2.1",
+        "monolog/monolog": "^3.5",
+        "flofaber/mphpd": "^1.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Ridouchire\\RadioDbImporter\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ridouchire",
+            "email": "ridouchire@gmail.com"
+        }
+    ]
+}

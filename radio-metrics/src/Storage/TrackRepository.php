@@ -67,9 +67,10 @@ class TrackRepository implements IRepository
     /**
      * Выполняет поиск композиции
      *
-     * @param array $filters                Список фильтров
-     * @param int   $filters[$id]           Идентификатор трека
-     * @param int   $filters[$mpd_track_id] Идентификатор трека в MPD
+     * @param array  $filters                Список фильтров
+     * @param int    $filters[$id]           Идентификатор трека
+     * @param int    $filters[$mpd_track_id] Идентификатор трека в MPD
+     * @param string $filters[$hash]         Контрольная сумма файла
      *
      * @throws InvalidArgumentException Если список фильтров пустов
      * @throws EntityNotFound           Если композиции не найдено

@@ -53,6 +53,27 @@ services:
     volumes:
       - './data/files:/var/www/html/files'
       - './logs:/var/log'
+  radio-db-importer:
+    build:
+      dockerfile: images/Dockerfile.radio-db-importer
+      context: .
+      args:
+        - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+        - MYSQL_USERNAME=${MYSQL_USERNAME}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - MPD_HOSTNAME=${MPD_HOSTNAME}
+        - MPD_PORT=${MPD_PORT}
+        - MPD_DATABASE_PATH=${MPD_DATABASE_PATH}
+    container_name: umechan-radio-db-importer
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - '.env'
+    volumes:
+      - '/home/ridouchire/Music:/var/lib/music'
+      - './logs/:/db-importer/logs'
   radio-metrics:
     build:
       dockerfile: images/Dockerfile.radio-metrics
@@ -83,7 +104,7 @@ services:
       - PHINX_USER=${MYSQL_USERNAME}
       - PHINX_PASSWORD=${MYSQL_PASSWORD}
     volumes:
-      - './logs:/usr/local/share/metrics/logs'
+      - './logs:/metrics/logs'
       - '/home/ridouchire/Music:/var/lib/music'
   nginx:
     build:

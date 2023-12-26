@@ -4,6 +4,7 @@ data/dumps/*
 data/grafana/*
 api/vendor/*
 filestore/vendor/*
+radio-db-importer/vendor/*
 radio-metrics/vendor/*
 radio-metrics/logs/*
 radio-metrics/local.env.php
