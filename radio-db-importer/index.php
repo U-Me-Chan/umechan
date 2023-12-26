@@ -87,7 +87,7 @@ Loop::addPeriodicTimer(1, function () use ($mphpd, $db, $logger, $mpd_database_p
             'first_playing' => time(),
             'last_playing'  => time(),
             'play_count'    => 0,
-            'path'          => $file['path']
+            'path'          => $file['file']
         ]);
     }
 
