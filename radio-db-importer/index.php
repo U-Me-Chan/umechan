@@ -72,7 +72,7 @@ Loop::addPeriodicTimer(1, function () use ($mphpd, $db, $logger, $mpd_database_p
 
         $track_data = $db->get('tracks', '*', ['hash' => $hash]);
 
-        if ($track_data) {
+        if ($track_data !== false) {
             $logger->debug('Файл уже добавлен: ' . $file['file']);
 
             if (empty($track_data['file'])) {
