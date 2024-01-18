@@ -17,6 +17,6 @@ final class GetTrackList
     {
         list($tracks, $count) = $this->track_repo->findMany($req->getParams());
 
-        return new Response(['tracks' => $tracks, $count]);
+        return new Response(['tracks' => $tracks, 'count' => $count]);
     }
 }
