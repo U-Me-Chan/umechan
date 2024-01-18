@@ -2,7 +2,6 @@
 
 namespace PK\Controllers;
 
-use Medoo\Medoo;
 use PK\Database\PostRepository;
 use PK\Http\Request;
 use PK\Http\Response;
@@ -33,14 +32,15 @@ class PostDeleter
         }
 
         if (hash_equals($req->getParams('password'), $post->getPassword())) {
-            $post->subject = '⬛⬛⬛⬛⬛⬛⬛⬛⬛';
-            $post->poster = '⬛⬛⬛⬛⬛⬛⬛⬛⬛';
-            $post->message = '⬛⬛⬛⬛⬛⬛⬛⬛⬛';
-            $post->message = <<<EOT
+            $post->setSubject('⬛⬛⬛⬛⬛⬛⬛⬛⬛');
+            $post->setPoster('⬛⬛⬛⬛⬛⬛⬛⬛⬛');
+            $message = '⬛⬛⬛⬛⬛⬛⬛⬛⬛';
+            $message = <<<EOT
 {$post->message}
 
 Данные удалены пользователем
 EOT;
+            $post->setMessage($message);
 
             $this->repository->update($post);
 
