@@ -24,6 +24,8 @@ use PK\Posts\Controllers\DeletePost;
 use PK\Passports\Controllers\CreatePassport;
 use PK\Passports\Controllers\GetPassportList;
 use PK\Passports\PassportStorage;
+use PK\Tracks\Controllers\GetTrackList;
+use PK\Tracks\TrackRepository;
 
 require_once "vendor/autoload.php";
 
@@ -56,6 +58,8 @@ $post_storage = new PostStorage($app['db'], $board_storage);
 
 $passport_storage = new PassportStorage($app['db']);
 
+$tracks_repo = new TrackRepository($app['db']);
+
 /** @var Router */
 $r = $app['router'];
 
@@ -76,5 +80,7 @@ $r->addRoute('DELETE', '/v2/post/{id:[0-9]+}', new DeletePost($post_storage, $co
 
 $r->addRoute('GET', '/v2/passport', new GetPassportList($passport_storage));
 $r->addRoute('POST', '/v2/passport', new CreatePassport($passport_storage, $app['config']['default_name']));
+
+$r->addRoute('GET', '/radio/tracks', new GetTrackList($tracks_repo));
 
 $app->run();

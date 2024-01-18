@@ -3,6 +3,7 @@ data/files/*
 data/dumps/*
 data/grafana/*
 api/vendor/*
+api/.phpunit.result.cache
 filestore/vendor/*
 radio-db-importer/vendor/*
 radio-metrics/vendor/*
