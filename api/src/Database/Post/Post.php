@@ -143,6 +143,21 @@ class Post
         $this->updated_at = $timestamp;
     }
 
+    public function setSubject(string $subject): void
+    {
+        $this->subject = $subject;
+    }
+
+    public function setMessage(string $message): void
+    {
+        $this->message = $message;
+    }
+
+    public function setPoster(string $poster): void
+    {
+        $this->poster = $poster;
+    }
+
     public function toArray(): array
     {
         list($media, $trun_message) = $this->getMediaAndTruncatedMessage();
