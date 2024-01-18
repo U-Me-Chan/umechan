@@ -41,7 +41,7 @@ class TrackRepository
             $conditions['AND']['title[~]'] = "%{$filters['title']}%";
         }
 
-        $count = $this->db->select('track', '*', $conditions);
+        $count = $this->db->select('tracks', '*', $conditions);
 
         if ($count == 0) {
             return [$tracks, 0];
