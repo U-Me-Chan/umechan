@@ -36,7 +36,7 @@ class PostDeleter
             $post->setPoster('⬛⬛⬛⬛⬛⬛⬛⬛⬛');
             $message = '⬛⬛⬛⬛⬛⬛⬛⬛⬛';
             $message = <<<EOT
-{$post->message}
+{$message}
 
 Данные удалены пользователем
 EOT;
