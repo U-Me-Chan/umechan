@@ -33,7 +33,16 @@ class PostDeleter
         }
 
         if (hash_equals($req->getParams('password'), $post->getPassword())) {
-            $this->repository->delete($vars['id']);
+            $post->subject = '⬛⬛⬛⬛⬛⬛⬛⬛⬛';
+            $post->poster = '⬛⬛⬛⬛⬛⬛⬛⬛⬛';
+            $post->message = '⬛⬛⬛⬛⬛⬛⬛⬛⬛';
+            $post->message = <<<EOT
+{$post->message}
+
+Данные удалены пользователем
+EOT;
+
+            $this->repository->update($post);
 
             return new Response([], 204);
         }

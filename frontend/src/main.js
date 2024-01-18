@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './components/App.vue'
 import VueRouter from 'vue-router'
+import VueCookie from 'vue-cookie'
 import {
   Toast,
   Sidebar,
@@ -9,7 +10,9 @@ import {
   Modal,
   Input,
   Field,
+  Select,
   Tag,
+  Table,
   Switch,
   Collapse,
   Pagination,
@@ -22,6 +25,7 @@ import {
 import 'buefy/dist/buefy.css'
 
 Vue.config.productionTip = true
+Vue.use(VueCookie)
 Vue.use(Toast)
 Vue.use(Sidebar)
 Vue.use(Menu)
@@ -29,6 +33,8 @@ Vue.use(Button)
 Vue.use(Modal)
 Vue.use(Input)
 Vue.use(Field)
+Vue.use(Select)
+Vue.use(Table)
 Vue.use(Tag)
 Vue.use(Switch)
 Vue.use(Collapse)
@@ -57,6 +63,14 @@ const routes = [
     {
       path: '/file/all',
       component: () => import('./components/Files.vue')
+    },
+    {
+      path: '/radio/tracks',
+      component: () => import('./components/Tracks.vue')
+    },
+    {
+      path: '/admin/delete-post/:id',
+      component: () => import('./components/DeletePost.vue')
     }
 ]
 

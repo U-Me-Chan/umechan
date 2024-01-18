@@ -39,7 +39,15 @@ export default {
       this.$router.push('/thread/' + id)
     },
     deleteFile: function () {
-      var key = prompt('Admin key', ['']);
+      var key = ''
+
+      if (this.$cookie.get('admin_key') !== null) {
+	key = this.$cookie.get('admin_key')
+      } else {
+	key = prompt('Admin key', [''])
+      }
+
+      var self = this
 
       axios.delete(config.filestore_url + '/files/' + this.name, {
         data: {},
@@ -50,6 +58,8 @@ export default {
         bus.$emit('files.file.deleted', [response])
       }).catch((error) => {
         console.log(error)
+
+        self.$buefy.toast.open('Произошла ошибка при удалении файла')
       })
     }
   },

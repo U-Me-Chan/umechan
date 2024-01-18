@@ -56,8 +56,6 @@ export default {
       var offset = page - 1
       offset = offset * this.perPage
 
-      console.log(offset)
-
       axios.get(config.filestore_url + '/files', {
         params: {
           offset: offset,

@@ -11,6 +11,10 @@
     </div>
 
     <Radio class="column radio-content"/>
+
+    <div class="column auth-panel">
+      <AuthPanel/>
+    </div>
   </div>
 
   <footer class="footer">
@@ -27,13 +31,14 @@
 import axios from 'axios'
 import { bus} from '../bus'
 import Radio from './Radio.vue'
+import AuthPanel from './AuthPanel.vue'
 
 const config = require('../../config')
 
 export default {
   name: 'App',
   components: {
-    Radio
+    Radio, AuthPanel
   },
   data: function () {
     return {
@@ -89,6 +94,9 @@ export default {
         console.log(error);
         self.isLoading = false;
       })
+    },
+    saveAdminKey: function () {
+      
     }
   }
 }
@@ -150,6 +158,11 @@ p {
 	margin: 10px 5px 10px 5px;
     }
     .radio-content {
+	display: none;
+	visibility: hidden;
+    }
+
+    .auth-panel {
 	display: none;
 	visibility: hidden;
     }

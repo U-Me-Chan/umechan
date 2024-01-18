@@ -11,6 +11,7 @@
   </a>
 
   <b-button v-if="isShowButtons" type="is-text" size="is-small" @click="isFormVisible = !isFormVisible">Ответить</b-button>
+  <b-button type="is-text" size="is-small" @click="deletePost(id, $event)">Удалить</b-button>
   <b-modal v-model="isFormVisible">
     <Form v-if="isFormVisible"
           :parent_id="!parentId ? id : parentId"
@@ -54,6 +55,11 @@ export default {
       event.preventDefault();
 
       this.$router.push('/thread/' + id);
+    },
+    deletePost: function (id, event) {
+      event.preventDefault();
+
+      this.$router.push('/admin/delete-post/' + id);
     }
   },
   data: function () {
