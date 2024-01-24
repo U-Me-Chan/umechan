@@ -3,9 +3,7 @@
 namespace PK\Passports;
 
 use Medoo\Medoo;
-use PDOStatement;
 use PK\Passports\Passport\Passport;
-use RuntimeException;
 
 class PassportStorage
 {
@@ -31,16 +29,23 @@ class PassportStorage
         return [$passports, $count];
     }
 
+    public function findOne(array $filters = []): Passport
+    {
+        if (empty($filters)) {
+            throw new \InvalidArgumentException();
+        }
+    }
+
     public function save(Passport $passport): void
     {
         try {
             $this->db->insert('passports', $passport->toArray());
         } catch (\PDOException $e) {
             if ($e->getCode() == 23000) {
-                throw new RuntimeException("Нельзя использовать такое имя или пароль");
+                throw new \RuntimeException("Нельзя использовать такое имя или пароль");
             }
 
-            throw new RuntimeException("Произошла ошибка, обратитесь к администратору");
+            throw new \RuntimeException("Произошла ошибка, обратитесь к администратору");
         }
     }
 }

@@ -12,7 +12,7 @@
 
     <Radio class="column radio-content"/>
 
-    <div class="column auth-panel">
+    <div class="auth-panel">
       <AuthPanel/>
     </div>
   </div>

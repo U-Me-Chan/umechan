@@ -82,6 +82,10 @@ export default {
         {
           field: 'estimate',
           label: 'Оценка'
+        },
+        {
+          field: 'path',
+          label: 'Путь'
         }
       ]
     }
