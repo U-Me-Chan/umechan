@@ -49,9 +49,10 @@ class TrackRepository
 
         $track_datas = $this->db->select('tracks', '*', array_merge($conditions, $limiting, ['ORDER' => $sorting]));
 
-        foreach ($track_datas as $track_data) {
-            $tracks[] = Track::fromArray($track_data);
-        }
+        /** @var array [Track] */
+        $tracks = array_map(function (array $track_data) {
+            return Track::fromArray($track_data);
+        }, $track_datas);
 
         return [$tracks, $count];
     }

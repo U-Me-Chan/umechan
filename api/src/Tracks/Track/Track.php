@@ -2,23 +2,48 @@
 
 namespace PK\Tracks\Track;
 
-use InvalidArgumentException;
 use PK\Base\Timestamp;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(title: 'Track')]
 class Track implements \JsonSerializable
 {
-    private function __construct(
-        private int $id,
-        private string $artist,
-        private string $title,
-        private string $path,
-        private Timestamp $first_playing,
-        private Timestamp $last_playing,
-        private int $duration = 0,
-        private int $play_count = 0,
-        private int $estimate = 0,
-        private ?string $hash = null
-    ) {
+    /**
+     * Создаёт черновик композиции
+     *
+     * @param string $artist   Исполнитель
+     * @param string $title    Название
+     * @param string $path     Путь до файла
+     * @param int    $duration Длительность в секундах
+     *
+     * @return self
+     */
+    public static function draft(string $artist, string $title, string $path, int $duration = 0): self
+    {
+        return new self(0, $artist, $title, $path, Timestamp::draft(), Timestamp::draft(), $duration);
+    }
+
+    /**
+     * Создаёт композицию из состояния в виде ассоциативного хеша
+     *
+     * @param array $state Состояние
+     *
+     * @return self
+     */
+    public static function fromArray(array $state): self
+    {
+        return new self(
+            $state['id'],
+            $state['artist'],
+            $state['title'],
+            $state['path'],
+            Timestamp::fromInt($state['first_playing']),
+            Timestamp::fromInt($state['last_playing']),
+            $state['duration'],
+            $state['play_count'],
+            $state['estimate'],
+            $state['hash']
+        );
     }
 
     /**
@@ -63,44 +88,6 @@ class Track implements \JsonSerializable
     }
 
     /**
-     * Создаёт черновик композиции
-     *
-     * @param string $artist   Исполнитель
-     * @param string $title    Название
-     * @param string $path     Путь до файла
-     * @param int    $duration Длительность в секундах
-     *
-     * @return self
-     */
-    public static function draft(string $artist, string $title, string $path, int $duration = 0): self
-    {
-        return new self(0, $artist, $title, $path, Timestamp::draft(), Timestamp::draft(), $duration);
-    }
-
-    /**
-     * Создаёт композицию из состояния в виде ассоциативного хеша
-     *
-     * @param array $state Состояние
-     *
-     * @return self
-     */
-    public static function fromArray(array $state): self
-    {
-        return new self(
-            $state['id'],
-            $state['artist'],
-            $state['title'],
-            $state['path'],
-            Timestamp::fromInt($state['first_playing']),
-            Timestamp::fromInt($state['last_playing']),
-            $state['duration'],
-            $state['play_count'],
-            $state['estimate'],
-            $state['hash']
-        );
-    }
-
-    /**
      * Возвращает представление информации о композиции в виде ассоциативного хеша для последующей сериализации в JSON
      *
      * @return array
@@ -129,5 +116,29 @@ class Track implements \JsonSerializable
             'estimate'      => $this->estimate,
             'hash'          => $this->hash
         ];
+    }
+
+    private function __construct(
+        #[OA\Property(description: 'Идентификатор композиции')]
+        private int $id,
+        #[OA\Property(description: 'Имя исполнителя')]
+        private string $artist,
+        #[OA\Property(description: 'Имя композиции')]
+        private string $title,
+        #[OA\Property(description: 'Относительный путь до файла')]
+        private string $path,
+        #[OA\Property(description: 'Unixtime-метка добавления', type: 'integer')]
+        private Timestamp $first_playing,
+        #[OA\Property(description: 'Unixtime-метка последнего воспроизведения', type: 'integer')]
+        private Timestamp $last_playing,
+        #[OA\Property(description: 'Длительность в секундах')]
+        private int $duration = 0,
+        #[OA\Property(description: 'Количество воспроизведений')]
+        private int $play_count = 0,
+        #[OA\Property(description: 'Оценка')]
+        private int $estimate = 0,
+        #[OA\Property(description: 'Хеш-сумма')]
+        private ?string $hash = null
+    ) {
     }
 }

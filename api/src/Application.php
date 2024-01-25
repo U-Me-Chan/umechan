@@ -3,7 +3,10 @@
 namespace PK;
 
 use Pimple\Container;
+use OpenApi\Attributes as OA;
 
+#[OA\Info(title: 'Pissykaka API', version: '0.1.0')]
+#[OA\Server(url: 'https://scheoble.xyz')]
 class Application extends Container
 {
     public static $app;

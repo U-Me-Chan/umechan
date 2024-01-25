@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+  title: 'Pissykaka API'
+  version: 0.1.0
+servers:
+  -
+    url: 'https://scheoble.xyz'
+paths:
+  /api/v2/passport:
+    get:
+      description: 'Возвращает список зарегистрированных имён'
+      operationId: 07175dfd3830799b57d7a7e3b43b6252
+      responses:
+        '200':
+          description: 'Ответ содержит список имён и их количество'
+          content:
+            application/json:
+              schema:
+                title: 'Схема ответа'
+                properties:
+                  payload: { properties: { count: { title: 'Количество имён', type: integer }, passports: { type: array, items: { $ref: '#/components/schemas/Passport' } } }, type: object }
+                  version: { type: string }
+                  error: {  }
+                type: object
+    post:
+      operationId: 75fab80c232e7cdd36ff2a973b4a5ac2
+      parameters:
+        -
+          name: name
+          in: query
+          required: true
+          allowEmptyValue: false
+          schema:
+            type: string
+        -
+          name: key
+          in: query
+          required: true
+          allowEmptyValue: false
+          schema:
+            type: string
+      responses:
+        '201':
+          description: 'Успешный ответ'
+          content:
+            application/json:
+              schema: {  }
+        '400':
+          description: 'Если не переданы параметры запроса или они пусты'
+        '409':
+          description: 'Если в качестве значения для поля name или key использовано стандартное имя автора'
+  '/api/v2/post/{id}':
+    get:
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Идентификатор нити'
+          required: true
+          allowEmptyValue: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Успешный ответ'
+          content:
+            application/json:
+              schema:
+                title: 'Схема ответа'
+                properties:
+                  payload: { properties: { thread_data: { $ref: '#/components/schemas/Post' } }, type: object }
+                  error: { type: object, nullable: true }
+                type: object
+        '404':
+          description: 'Ответ при отсутствии запрашиваемой нити'
+  /api/radio/tracks:
+    get:
+      description: 'Возвращает список композиций на радиостанции'
+      operationId: 1fe9f114114583fd3ed8132209b1c76f
+      responses:
+        '200':
+          description: 'Ответ содержит список композиция и их количество'
+          content:
+            application/json:
+              schema:
+                title: 'Схема ответа'
+                properties:
+                  payload: { properties: { count: { title: 'Количество композиций', type: integer }, tracks: { type: array, items: { $ref: '#/components/schemas/Track' } } }, type: object }
+                type: object
+components:
+  schemas:
+    Board:
+      title: Board
+      properties:
+        id:
+          description: 'Идентификатор доски'
+          type: integer
+        tag:
+          description: 'Тег доски'
+          type: string
+        name:
+          description: 'Имя доски'
+          type: string
+        threads_count:
+          description: 'Количество тредов на доске'
+          type: integer
+        new_posts_count:
+          description: 'Количество новых постов за сутки'
+          type: integer
+      type: object
+    Passport:
+      title: Passport
+      properties:
+        name:
+          description: 'Зарегистрированное имя'
+          type: string
+      type: object
+    Post:
+      title: Post
+      properties:
+        id:
+          description: 'Идентификатор поста'
+          type: integer
+        poster:
+          description: 'Автор поста'
+          type: string
+        subject:
+          description: 'Тема поста'
+          type: string
+        message:
+          description: 'Оригинальное сообщение'
+          type: string
+        timestamp:
+          description: 'Unixtime-метка создания поста'
+          type: integer
+        board:
+          $ref: '#/components/schemas/Board'
+        parent_id:
+          description: 'Идентификатор родительского поста'
+          type: integer
+          nullable: true
+        updated_at:
+          description: 'Unixtime-метка последнего ответа на пост'
+          type: integer
+        is_verify:
+          description: 'Верифицирован ли автор поста?'
+          type: boolean
+        replies_count:
+          description: 'Количество ответов на пост'
+          type: integer
+        replies:
+          description: 'Ответы на пост'
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        board_id:
+          description: 'Идентификатор доски'
+          type: integer
+        datetime:
+          description: 'Текстовое представление времени создания поста в формате YYYY-MM-DD hh:ii:ss'
+          type: string
+        truncated_message:
+          description: 'Очищенное от вложений сообщение поста'
+          type: string
+      type: object
+    Track:
+      title: Track
+      properties:
+        id:
+          description: 'Идентификатор композиции'
+          type: integer
+        artist:
+          description: 'Имя исполнителя'
+          type: string
+        title:
+          description: 'Имя композиции'
+          type: string
+        path:
+          description: 'Относительный путь до файла'
+          type: string
+        first_playing:
+          description: 'Unixtime-метка добавления'
+          type: integer
+        last_playing:
+          description: 'Unixtime-метка последнего воспроизведения'
+          type: integer
+        duration:
+          description: 'Длительность в секундах'
+          type: integer
+        play_count:
+          description: 'Количество воспроизведений'
+          type: integer
+        estimate:
+          description: Оценка
+          type: integer
+        hash:
+          description: Хеш-сумма
+          type: string
+          nullable: true
+      type: object

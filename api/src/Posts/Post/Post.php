@@ -3,7 +3,27 @@
 namespace PK\Posts\Post;
 
 use PK\Boards\Board\Board;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    title: 'Post',
+    properties: [
+        'id'                => new OA\Property(property: 'id', type: 'integer', description: 'Идентификатор поста'),
+        'poster'            => new OA\Property(property: 'poster', type: 'string', description: 'Автор поста'),
+        'subject'           => new OA\Property(property: 'subject', type: 'string', description: 'Тема поста'),
+        'message'           => new OA\Property(property: 'message', type: 'string', description: 'Оригинальное сообщение'),
+        'timestamp'         => new OA\Property(property: 'timestamp', type: 'integer', description: 'Unixtime-метка создания поста'),
+        'board'             => new OA\Property(property: 'board', type: 'object', ref: '#/components/schemas/Board'),
+        'parent_id'         => new OA\Property(property: 'parent_id', type: 'integer', nullable: true, description: 'Идентификатор родительского поста'),
+        'updated_at'        => new OA\Property(property: 'updated_at', type: 'integer', description: 'Unixtime-метка последнего ответа на пост'),
+        'is_verify'         => new OA\Property(property: 'is_verify', type: 'boolean', description: 'Верифицирован ли автор поста?'),
+        'replies_count'     => new OA\Property(property: 'replies_count', type: 'integer', description: 'Количество ответов на пост'),
+        'replies'           => new OA\Property(property: 'replies', type: 'array', description: 'Ответы на пост', items: new OA\Items(ref: '#/components/schemas/Post')),
+        'board_id'          => new OA\Property(property: 'board_id', type: 'integer', description: 'Идентификатор доски'),
+        'datetime'          => new OA\Property(property: 'datetime', type: 'string', description: 'Текстовое представление времени создания поста в формате YYYY-MM-DD hh:ii:ss'),
+        'truncated_message' => new OA\Property(property: 'truncated_message' , type: 'string', description: 'Очищенное от вложений сообщение поста')
+    ]
+)]
 class Post implements \JsonSerializable
 {
     public static function draft(
@@ -89,7 +109,7 @@ class Post implements \JsonSerializable
     ) {
     }
 
-
+    ##TODO: вынести в отдельное решение
     public function getMediaAndTruncatedMessage(): array
     {
         $message = $this->message;
