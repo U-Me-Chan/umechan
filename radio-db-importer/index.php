@@ -10,9 +10,6 @@ use React\EventLoop\Loop;
 
 require_once "vendor/autoload.php";
 
-$_ENV['MPD_HOSTNAME'] = '192.168.88.168';
-$_ENV['MPD_PORT'] = 6600;
-
 $logger = new Logger('log');
 $logger->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-db-importer.log', Level::Info));
 $logger->info('Запуск');
