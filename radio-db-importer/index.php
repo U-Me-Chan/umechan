@@ -100,6 +100,16 @@ Loop::addPeriodicTimer(1, function () use ($mphpd, $db, $logger, $mpd_database_p
 
             continue;
         }
+
+        if ($track_data['path'] !== $file['file']) {
+            $logger->info('Файл был перемещён, обновляю путь для ' . $file['file']);
+
+            $db->update('tracks', [
+                'path' => $file['file']
+            ], [
+                'hash' => $hash
+            ]);
+        }
     }
 
     $num++;
