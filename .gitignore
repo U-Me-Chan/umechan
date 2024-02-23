@@ -10,6 +10,8 @@ radio-metrics/vendor/*
 radio-metrics/logs/*
 radio-metrics/local.env.php
 radio-metrics/test.db
+radio-scheduler/vendor/*
+radio-scheduler/logs/*
 frontend/node_modules/*
 logs/*
 .env
