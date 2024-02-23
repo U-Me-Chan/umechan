@@ -15,7 +15,7 @@ $_ENV['MPD_HOSTNAME'] = '192.168.88.159';
 $_ENV['MPD_PORT']     = 6600;
 
 $log = new Logger('log');
-$log->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-scheduler.log', Level::Debug));
+$log->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-scheduler.log', Level::Info));
 $log->info('Запуск');
 
 $mphpd = new MphpD([
