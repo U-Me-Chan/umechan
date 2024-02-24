@@ -63,6 +63,7 @@ class Weekday implements IRotation
 
             default:
                 $this->log->debug('WeekdayStrategy: Время ещё не пришло');
+
                 break;
         }
 

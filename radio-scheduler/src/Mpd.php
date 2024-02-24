@@ -42,28 +42,36 @@ class Mpd
      */
     public function cropQueue(): bool
     {
-        /** @var array */
-        $queued_songs = $this->getConnection()->queue()->search(new Filter('file', 'contains', '/'));
+        $queue_count = $this->getQueueCount();
 
-        if ($queued_songs == false) {
+        if ($queue_count == 0) {
+            $this->log->info('MPD: очередь пуста');
+
             return false;
         }
 
-        if (sizeof($queued_songs) == 0) {
-            return false;
+        /** @var array|false */
+        $current_song_data = $this->getConnection()->player()->current_song();
+
+        if ($current_song_data == false) {
+            $this->log->info('MPD: нет воспроизводимого трека');
         }
 
         /** @var int */
-        $current_song_position = $this->getConnection()->player()->current_song()['pos'];
+        $current_song_position = $current_song_data['pos'];
 
         /** @var bool */
         $res = $this->getConnection()->queue()->move($current_song_position, 0);
+
+        $this->log->debug('MPD: Перемещаю текущий трек в начало очереди');
 
         if (!$res) {
             throw new \RuntimeException("MPD: ошибка при перемещении текущего трека в начало очереди");
         }
 
-        $res = $this->getConnection()->queue()->delete([1, sizeof($queued_songs)]);
+        $res = $this->getConnection()->queue()->delete([1, $queue_count]);
+
+        $this->log->debug('MPD: Очищаю очередь');
 
         if (!$res) {
             throw new \RuntimeException("MPD: ошибка очистки очереди");
@@ -72,13 +80,27 @@ class Mpd
         return $res;
     }
 
+    private function getQueueCount(): int
+    {
+        /** @var array */
+        $queued_songs = $this->getConnection()->queue()->search(new Filter('file', 'contains', '/'));
+
+        if ($queued_songs == false) {
+            return 0;
+        }
+
+        return sizeof($queued_songs);
+    }
+
     private function getConnection(): MphpD
     {
         if (!$this->mphpd->connected) {
+            $this->log->info('MPD: Выполняю подключение к серверу');
+
             try {
                 $this->mphpd->connect();
             } catch (MPDException $e) {
-                $this->log->error($e->getMessage(), ['error' => $this->mphpd->get_last_error()]);
+                $this->log->error('MPD: произошла ошибка при подключении к серверу: ' . $e->getMessage(), ['error' => $this->mphpd->get_last_error()]);
             }
         }
 
