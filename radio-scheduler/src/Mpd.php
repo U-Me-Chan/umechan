@@ -18,7 +18,8 @@ class Mpd
     ) {
         $this->mphpd = new Mphpd([
             'host' => $hostname,
-            'port' => $port
+            'port' => $port,
+            'timeout' => 10
         ]);
     }
 
@@ -43,6 +44,10 @@ class Mpd
     {
         /** @var array */
         $queued_songs = $this->getConnection()->queue()->search(new Filter('file', 'contains', '/'));
+
+        if ($queued_songs == false) {
+            return false;
+        }
 
         if (sizeof($queued_songs) == 0) {
             return false;

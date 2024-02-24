@@ -30,6 +30,14 @@ $weekday_strategy = new Weekday($mpd, $log);
 
 $strategy_master = new RotationMaster($weekday_strategy);
 
-Loop::addPeriodicTimer(1, function () use ($strategy_master) {
-    $strategy_master->execute();
+Loop::addPeriodicTimer(1, function () use ($strategy_master, $log) {
+    try {
+        $strategy_master->execute();
+    } catch (\Throwable $e) {
+        $log->error('MainLoop: произошла ошибка при исполнении стратегии ротации', [
+            'error' => $e->getMessage(),
+            'file'  => $e->getFile(),
+            'line'  => $e->getLine()
+        ]);
+    }
 });

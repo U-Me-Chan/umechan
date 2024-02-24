@@ -78,8 +78,13 @@ class Weekday implements IRotation
 
         $pls = $this->getSchema()[$day_part][$key];
 
-        $this->mpd->cropQueue();
-        $this->mpd->addToQueue($pls);
+        if (!$this->mpd->cropQueue()) {
+            throw new \RuntimeException("WeekdayStrategy: произошла ошибка при очистке очереди");
+        }
+
+        if (!$this->mpd->addToQueue($pls)) {
+            throw new \RuntimeException("WeekdayStrategy: произошла ошибка при добавлении директории в очередь");
+        }
 
         $this->log->info("WeekdayStrategy: Ставлю {$pls}");
     }
