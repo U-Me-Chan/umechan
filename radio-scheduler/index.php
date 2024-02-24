@@ -11,7 +11,7 @@ use Ridouchire\RadioScheduler\RotationStrategies\Weekday;
 require_once __DIR__ . '/vendor/autoload.php';
 
 $log = new Logger('log');
-$log->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-scheduler.log', Level::Debug));
+$log->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-scheduler.log', Level::Info));
 $log->info('Запуск');
 
 $mpd = new Mpd($log, $_ENV['MPD_HOSTNAME'], $_ENV['MPD_PORT']);
