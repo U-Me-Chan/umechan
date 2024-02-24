@@ -18,12 +18,6 @@ $log = new Logger('log');
 $log->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-scheduler.log', Level::Info));
 $log->info('Запуск');
 
-$mphpd = new MphpD([
-    'host' => $_ENV['MPD_HOSTNAME'],
-    'port' => $_ENV['MPD_PORT'],
-    'timeout' => 5
-]);
-
 $mpd = new Mpd($log, $_ENV['MPD_HOSTNAME'], $_ENV['MPD_PORT']);
 
 $weekday_strategy = new Weekday($mpd, $log);
