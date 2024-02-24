@@ -24,6 +24,50 @@ class Mpd
     }
 
     /**
+     * Возвращает список треков
+     *
+     * @param string $dir   Относительный путь директории
+     * @param int    $start Начальный индекс
+     * @param int    $end   Конечный индекс
+     *
+     * @throws \RuntimeException
+     *
+     * @return array
+     */
+    public function getTracks(string $dir, int $start, int $end): array
+    {
+        /** @var array|false */
+        $track_datas = $this->mphpd->db()->search(new Filter('file', 'contains', "{$dir}/"), '', [$start, $end]);
+
+        if ($track_datas === false) {
+            throw new \RuntimeException("MPD: нет такого трека: {$dir}:{$start}:{$end}");
+        }
+
+        return $track_datas;
+    }
+
+    /**
+     * Возвращает количество композиций в директории
+     *
+     * @param string $dir Относительный путь
+     *
+     * @throws RuntimeException
+     *
+     * @return int
+     */
+    public function getCountSongsInDirectory(string $pls): int
+    {
+        /** @var array|false */
+        $pls_data = $this->getConnection()->db()->count(new Filter('file', 'contains', "{$pls}/"));
+
+        if (!$pls_data) {
+            throw new \RuntimeException("MPD: ошибка при попытке подсчёта количества композиций в {$pls}");
+        }
+
+        return $pls_data['songs'];
+    }
+
+    /**
      * Пуста ли очередь?
      *
      * @return bool
@@ -90,7 +134,12 @@ class Mpd
         return $res;
     }
 
-    private function getQueueCount(): int
+    /**
+     * Возвращает количество композиций в очереди
+     *
+     * @return int
+     */
+    public function getQueueCount(): int
     {
         /** @var array */
         $queued_songs = $this->getConnection()->queue()->search(new Filter('file', 'contains', '/'));

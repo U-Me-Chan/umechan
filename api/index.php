@@ -75,7 +75,7 @@ $r->addRoute('GET', '/v2/board/{tags:[a-z\+]+}', new GetThreadList($post_storage
 $r->addRoute('GET', '/v2/post/{id:[0-9]+}', new GetThread($post_storage));
 $r->addRoute('POST', '/v2/post', new CreateThread($board_storage, $post_storage));
 $r->addRoute('PUT', '/v2/post/{id:[0-9]+}', new CreateReply($post_storage));
-$r->addRoute('PATCH', 'v2/post/{id:[0-9]+}', new UpdatePost($post_storage, $config['maintenance_key']));
+$r->addRoute('PATCH', '/v2/post/{id:[0-9]+}', new UpdatePost($post_storage, $config['maintenance_key']));
 $r->addRoute('DELETE', '/v2/post/{id:[0-9]+}', new DeletePost($post_storage, $config['maintenance_key']));
 
 $r->addRoute('GET', '/v2/passport', new GetPassportList($passport_storage));

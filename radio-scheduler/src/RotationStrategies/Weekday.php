@@ -8,6 +8,8 @@ use Ridouchire\RadioScheduler\Mpd;
 
 class Weekday implements IRotation
 {
+    public const NAME = 'Weekday';
+
     private const DAY     = 'day';
     private const NIGHT   = 'night';
     private const MORNING = 'morning';
@@ -102,6 +104,7 @@ class Weekday implements IRotation
                 'Pop Retro',
                 'Korean Pop',
                 'Japan Pop',
+                'Japan Rock',
                 'Ru Angst',
                 'Pop Ru'
             ],

@@ -12,8 +12,9 @@ use PK\Http\Response;
 
 class Router
 {
-    private $route_collector;
     private const PREFIX = '/api';
+
+    private RouteCollector $route_collector;
 
     public function __construct()
     {

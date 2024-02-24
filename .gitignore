@@ -12,6 +12,7 @@ radio-metrics/local.env.php
 radio-metrics/test.db
 radio-scheduler/vendor/*
 radio-scheduler/logs/*
+radio-scheduler/config.local.php
 frontend/node_modules/*
 logs/*
 .env
