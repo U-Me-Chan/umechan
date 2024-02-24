@@ -58,7 +58,16 @@ class Mpd
 
         /** @var bool */
         $res = $this->getConnection()->queue()->move($current_song_position, 0);
+
+        if (!$res) {
+            throw new \RuntimeException("MPD: ошибка при перемещении текущего трека в начало очереди");
+        }
+
         $res = $this->getConnection()->queue()->delete([1, sizeof($queued_songs)]);
+
+        if (!$res) {
+            throw new \RuntimeException("MPD: ошибка очистки очереди");
+        }
 
         return $res;
     }
