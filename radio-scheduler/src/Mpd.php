@@ -24,6 +24,16 @@ class Mpd
     }
 
     /**
+     * Пуста ли очередь?
+     *
+     * @return bool
+     */
+    public function isEmptyQueue(): bool
+    {
+        return $this->getQueueCount() == 0 ? true : false;
+    }
+
+    /**
      * Добавляет в очередь файл/директорию по указанному относительному пути
      *
      * @param string $uri Относительный путь до файла/директории
