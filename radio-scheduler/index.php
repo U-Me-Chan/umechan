@@ -1,6 +1,5 @@
 <?php
 
-use FloFaber\MphpD\MphpD;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
@@ -10,9 +9,6 @@ use Ridouchire\RadioScheduler\RotationMaster;
 use Ridouchire\RadioScheduler\RotationStrategies\Weekday;
 
 require_once __DIR__ . '/vendor/autoload.php';
-
-$_ENV['MPD_HOSTNAME'] = '192.168.88.159';
-$_ENV['MPD_PORT']     = 6600;
 
 $log = new Logger('log');
 $log->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-scheduler.log', Level::Info));
