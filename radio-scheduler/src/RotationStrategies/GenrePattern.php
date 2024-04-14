@@ -79,7 +79,6 @@ class GenrePattern implements IRotation
             ],
             [
                 'Pop',
-                'Korean Pop',
                 'Pop Ru',
                 'Pop Retro'
             ],
@@ -103,7 +102,7 @@ class GenrePattern implements IRotation
             ],
             [
                 'DnB Atmosphere',
-                'DnB Luquid',
+                'DnB Liquid',
                 'Breakcore and Lolicore',
                 'Digital Resistance'
             ],
@@ -112,10 +111,6 @@ class GenrePattern implements IRotation
                 'Chill Electronica',
                 'Chill Hop',
                 'Slowave'
-            ],
-            [
-                'Pop Ru',
-                'Ru Angst'
             ]
         ];
     }
