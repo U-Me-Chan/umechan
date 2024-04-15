@@ -81,7 +81,7 @@ class NewInGenre implements IRotation
         $track_paths = $this->db->select('tracks', 'path', [
             'path[~]' => "{$genre}/%",
             'ORDER' => [
-                'play_count' => 'DESC'
+                'play_count' => 'ASC'
             ],
             'LIMIT' => [0, 10]
         ]);
