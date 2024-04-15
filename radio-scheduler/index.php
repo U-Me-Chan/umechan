@@ -1,5 +1,6 @@
 <?php
 
+use Medoo\Medoo;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
@@ -7,7 +8,10 @@ use React\EventLoop\Loop;
 use Ridouchire\RadioScheduler\Mpd;
 use Ridouchire\RadioScheduler\RotationMaster;
 use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
-use Ridouchire\RadioScheduler\RotationStrategies\Weekday;
+use Ridouchire\RadioScheduler\RotationStrategies\NewInGenre;
+use Ridouchire\RadioScheduler\RotationStrategies\TopInGenre;
+use Ridouchire\RadioScheduler\TickHandler;
+use Ridouchire\RadioScheduler\Utils\TickCounter;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -21,46 +25,34 @@ $log->info('Запуск');
 
 $mpd = new Mpd($log, $_ENV['MPD_HOSTNAME'], $_ENV['MPD_PORT']);
 
-$weekday_strategy       = new Weekday($mpd, $log);
-$genre_pattern_strategy = new GenrePattern($mpd, $log);
+$db = new Medoo([
+    'database_type' => 'mysql',
+    'database_name' => $_ENV['MYSQL_DATABASE'],
+    'server'        => $_ENV['MYSQL_HOSTNAME'],
+    'username'      => $_ENV['MYSQL_USERNAME'],
+    'password'      => $_ENV['MYSQL_PASSWORD'],
+    'charset'       => 'utf8mb4',
+    'collation'     => 'utf8mb4_unicode_ci'
+]);
 
-$strategy_master = new RotationMaster();
-$strategy_master->addStrategy($weekday_strategy);
+$genre_pattern_strategy = new GenrePattern($mpd, $log);
+$top_in_genre_strategy  = new TopInGenre($db, $mpd, $log);
+$new_in_genre_straregy  = new NewInGenre($db, $mpd, $log);
+
+$strategy_master = new RotationMaster($log);
+
+$strategy_master->addStrategy($top_in_genre_strategy);
+$strategy_master->addStrategy($new_in_genre_straregy);
 $strategy_master->addStrategy($genre_pattern_strategy);
 
-$current_strategy = Weekday::NAME;
+$tickHanlder = new TickHandler($strategy_master);
 
-Loop::addPeriodicTimer(1, function () use (&$current_strategy, $strategy_master, $log, $mpd) {
-    /** @var int */
-    $day_week = date('w', time() + (60 * 60 * 4));
+TickCounter::create(0);
 
-    if (($day_week == 0 || $day_week == 6) &&
-        $current_strategy == Weekday::NAME
-    ) {
-        $mpd->cropQueue();
+Loop::addPeriodicTimer(1, function () use ($tickHanlder, $log, $mpd) {
+    $tickHanlder();
 
-        $log->info('MainLoop: текущая стратегия ротации: ' . GenrePattern::NAME);
-
-        $current_strategy = GenrePattern::NAME;
-    } else if ((in_array($day_week, range(1, 5))) &&
-               $current_strategy == GenrePattern::NAME
-    ) {
-        $mpd->cropQueue();
-
-        $log->info('MainLoop: текущая стратегия ротации: ' . Weekday::NAME);
-
-        $current_strategy = Weekday::NAME;
-    }
-
-    try {
-        $strategy_master->execute($current_strategy);
-    } catch (\Throwable $e) {
-        $log->error('MainLoop: произошла ошибка при исполнении стратегии ротации', [
-            'error' => $e->getMessage(),
-            'file'  => $e->getFile(),
-            'line'  => $e->getLine()
-        ]);
-    }
+    TickCounter::tick();
 
     if ($mpd->isEmptyQueue()) {
         $log->error('MainLoop: очередь воспроизведения пуста');

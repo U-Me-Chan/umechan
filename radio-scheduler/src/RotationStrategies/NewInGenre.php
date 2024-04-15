@@ -2,6 +2,7 @@
 
 namespace Ridouchire\RadioScheduler\RotationStrategies;
 
+use Medoo\Medoo;
 use Monolog\Logger;
 use Ridouchire\RadioScheduler\GenreSchemas\Day;
 use Ridouchire\RadioScheduler\GenreSchemas\Evening;
@@ -10,20 +11,21 @@ use Ridouchire\RadioScheduler\GenreSchemas\Night;
 use Ridouchire\RadioScheduler\IRotation;
 use Ridouchire\RadioScheduler\Mpd;
 
-class GenrePattern implements IRotation
+class NewInGenre implements IRotation
 {
-    public const NAME = 'GenrePattern';
+    public const NAME = 'TopInGenre';
 
     public function __construct(
+        private Medoo $db,
         private Mpd $mpd,
-        private Logger $log
+        private Logger $logger
     ) {
     }
 
     public function execute(int $timestamp = 0): void
     {
         if ($this->mpd->getQueueCount() > 1) {
-            $this->log->debug('GenrePatternStrategy: очередь ещё не подошла к концу');
+            $this->logger->debug(self::NAME . ': очередь ещё не подошла к концу');
 
             return;
         }
@@ -41,13 +43,13 @@ class GenrePattern implements IRotation
             case 3:
             case 4:
             case 5:
-                $pls_list = Night::getRandomPattern();
+                $genre = Night::getRandom();
 
                 break;
             case 6:
             case 7:
             case 8:
-                $pls_list = Morning::getRandomPattern();
+                $genre = Morning::getRandom();
 
                 break;
             case 9:
@@ -60,7 +62,7 @@ class GenrePattern implements IRotation
             case 16:
             case 17:
             case 18:
-                $pls_list = Day::getRandomPattern();
+                $genre = Day::getRandom();
 
                 break;
             case 19:
@@ -68,7 +70,7 @@ class GenrePattern implements IRotation
             case 21:
             case 22:
             case 23:
-                $pls_list = Evening::getRandomPattern();
+                $genre = Evening::getRandom();
                 break;
             default:
                 throw new \RuntimeException("Неизвестный час: {$hour}");
@@ -76,40 +78,24 @@ class GenrePattern implements IRotation
                 break;
         }
 
-        shuffle($pls_list);
+        $track_paths = $this->db->select('tracks', 'path', [
+            'path[~]' => "{$genre}/%",
+            'ORDER' => [
+                'play_count' => 'DESC'
+            ],
+            'LIMIT' => [0, 10]
+        ]);
 
-        $this->log->info('GenrePatternStrategy: ставлю ' . implode(',', $pls_list));
+        $this->logger->debug(implode(',', $track_paths));
 
-        $track_paths = array_map(function (string $pls) {
-            $count = $this->mpd->getCountSongsInDirectory($pls);
-
-            $start = random_int(0, $count);
-            $end   = $start + 1;
-
-            if ($start == $count) {
-                $end   = $count;
-                $start = $count - 1;
-            }
-
-            /** @var array */
-            $_tracks = $this->mpd->getTracks($pls, $start, $end);
-
-            if (empty($_tracks)) {
-                throw new \RuntimeException("GenrePatternStrategy: ошибка при получении данных трека для плейлиста {$pls}");
-            }
-
-            /** @var array */
-            $track = reset($_tracks);
-
-            return $track['file'];
-        }, $pls_list);
+        shuffle($track_paths);
 
         $this->mpd->cropQueue();
 
-        array_walk($track_paths, function (string $path) {
-            $this->log->info("GenrePatternStrategy: ставлю в очередь файл {$path}");
+        foreach ($track_paths as $path) {
+            $this->logger->info(self::NAME . ": ставлю в очередь файл {$path}");
 
             $this->mpd->addToQueue($path);
-        });
+        }
     }
 }
