@@ -32,9 +32,11 @@ class RotationMaster
         /** @var IRotation */
         $strategy = $this->strategies[$strategy_name];
 
-        $this->current_strategy = $strategy::NAME;
+        if ($strategy::NAME !== $this->current_strategy) {
+            $this->log->info('Текущая стратегия: ' . $strategy_name);
+        }
 
-        $this->log->info('Текущая стратегия: ' . $strategy_name);
+        $this->current_strategy = $strategy::NAME;
 
         $strategy->execute();
     }
