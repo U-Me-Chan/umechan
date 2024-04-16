@@ -13,7 +13,7 @@ use Ridouchire\RadioScheduler\Mpd;
 
 class NewInGenre implements IRotation
 {
-    public const NAME = 'TopInGenre';
+   public const NAME = 'NewInGenre';
 
     public function __construct(
         private Medoo $db,
