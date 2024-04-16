@@ -17,8 +17,8 @@ class TopInGenreTest extends TestCase
             $this->assertEquals('tracks', $args[0]);
 
             $this->assertEquals('path', $args[1]);
-            $this->assertArrayHasKey('path', $args[2]);
-            $this->assertMatchesRegularExpression('/^[\w\s]+\/%$/', $args[2]['path']);
+            $this->assertArrayHasKey('path[~]', $args[2]);
+            $this->assertMatchesRegularExpression('/^[\w\s]+\/%$/', $args[2]['path[~]']);
 
             $this->assertArrayHasKey('ORDER', $args[2]);
             $this->assertArrayHasKey('estimate', $args[2]['ORDER']);

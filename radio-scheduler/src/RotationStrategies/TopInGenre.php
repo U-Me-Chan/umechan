@@ -81,7 +81,7 @@ class TopInGenre implements IRotation
 
         $track_paths = $this->db->select('tracks', 'path', [
             'path[~]' => "{$genre}/%",
-            'last_playing[<]' => time() - (60 * 60 * 8),
+            'last_playing[<]' => time() - (60 * 60 * 4),
             'ORDER' => [
                 'estimate' => 'DESC'
             ],
