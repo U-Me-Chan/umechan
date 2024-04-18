@@ -7,6 +7,7 @@ use Monolog\Handler\StreamHandler;
 use React\EventLoop\Loop;
 use Ridouchire\RadioMetrics\Collectors\IcecastCollector;
 use Ridouchire\RadioMetrics\Collectors\MpdCollector;
+use Ridouchire\RadioMetrics\Http\Controllers\EstimateTrack;
 use Ridouchire\RadioMetrics\SenderProvider;
 use Ridouchire\RadioMetrics\Senders\DiscordWebHookSender;
 use Ridouchire\RadioMetrics\Senders\DummySender;
@@ -14,6 +15,9 @@ use Ridouchire\RadioMetrics\Storage\DbConnector;
 use Ridouchire\RadioMetrics\Storage\RecordRepository;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
 use Ridouchire\RadioMetrics\TickHandler;
+use Ridouchire\RadioMetrics\Http\Controllers\GetInfo;
+use Ridouchire\RadioMetrics\Http\Router;
+use Ridouchire\RadioMetrics\Utils\Container;
 use Ridouchire\RadioMetrics\Utils\Environment;
 use Ridouchire\RadioMetrics\Utils\Md5Hash;
 
@@ -68,6 +72,16 @@ $mpdCollector     = new MpdCollector($env->mpd_hostname, $env->mpd_port);
 $trackRepo  = new TrackRepository($db);
 $recordRepo = new RecordRepository($db);
 
-$tickHandler = new TickHandler($logger, $mpdCollector, $icecastCollector, $senderProvider, $trackRepo, $recordRepo, new Md5Hash($env->mpd_database_path));
+$cache = new Container();
+
+$tickHandler = new TickHandler($logger, $mpdCollector, $icecastCollector, $senderProvider, $trackRepo, $recordRepo, new Md5Hash($env->mpd_database_path), $cache);
 
 Loop::addPeriodicTimer(1, $tickHandler);
+
+$r = new Router();
+$r->addRoute('GET', '/metrics/info', new GetInfo($cache));
+$r->addRoute('POST', '/metrics/tracks/{id}', new EstimateTrack($trackRepo, $cache));
+
+$http = new React\Http\HttpServer($r);
+$socket = new React\Socket\SocketServer('0.0.0.0:8080');
+$http->listen($socket);

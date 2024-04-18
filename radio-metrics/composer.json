@@ -8,12 +8,15 @@
         "robmorgan/phinx": "^0.13.4",
         "symfony/yaml": "^6.2",
         "monolog/monolog": "^3.3",
-        "flofaber/mphpd": "^1.2"
+        "flofaber/mphpd": "^1.2",
+        "react/http": "^1.10",
+        "nikic/fast-route": "^1.3"
     },
     "license": "MIT",
     "autoload": {
         "psr-4": {
-          "Ridouchire\\RadioMetrics\\": "src/"
+          "Ridouchire\\RadioMetrics\\": "src/",
+          "Ridouchire\\RadioMetrics\\Tests\\": "tests/"
         }
     },
     "authors": [

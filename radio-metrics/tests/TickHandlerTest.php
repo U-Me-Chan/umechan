@@ -12,6 +12,7 @@ use Ridouchire\RadioMetrics\Storage\RecordRepository;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
 use Ridouchire\RadioMetrics\Tests\DatabaseTestCase;
 use Ridouchire\RadioMetrics\TickHandler;
+use Ridouchire\RadioMetrics\Utils\Container;
 use Ridouchire\RadioMetrics\Utils\Md5Hash;
 
 class TickHandlerTest extends DatabaseTestCase
@@ -59,7 +60,8 @@ class TickHandlerTest extends DatabaseTestCase
             $senderProvider,
             $this->trackRepo,
             $this->recordRepo,
-            $md5hash
+            $md5hash,
+            new Container()
         );
     }
 

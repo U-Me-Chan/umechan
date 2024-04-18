@@ -2,5 +2,5 @@
 
 rm -f test.db
 ./vendor/bin/phinx migrate -e development
-./vendor/bin/phpunit src
+./vendor/bin/phpunit tests
 rm -f test.db

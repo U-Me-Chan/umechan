@@ -11,8 +11,8 @@ use Ridouchire\RadioMetrics\Storage\Entites\Record;
 use Ridouchire\RadioMetrics\Storage\Entites\Track;
 use Ridouchire\RadioMetrics\Storage\RecordRepository;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
+use Ridouchire\RadioMetrics\Utils\Container;
 use Ridouchire\RadioMetrics\Utils\Md5Hash;
-use RuntimeException;
 
 class TickHandler
 {
@@ -25,7 +25,8 @@ class TickHandler
         private SenderProvider $senderProvider,
         private TrackRepository $trackRepository,
         private RecordRepository $recordRepository,
-        private Md5Hash $md5Hash
+        private Md5Hash $md5Hash,
+        private Container $cache
     ) {
         $this->last_track = null;
     }
@@ -38,7 +39,7 @@ class TickHandler
             $this->logger->debug('Запрашиваю данные о текущем треке у MPD');
 
             $track_data = $this->mpdCollector->getData();
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->logger->error("Не могу получить данные о треке из MPD", [$e->getMessage()]);
 
             return;
@@ -46,6 +47,8 @@ class TickHandler
 
         /** @var Track */
         $track = $this->getTrack($track_data);
+
+        $this->cache->current_track = $track->toArray();
 
         if ($this->last_track == null) {
             $this->logger->debug('Кеширую данные');
@@ -61,7 +64,7 @@ class TickHandler
 
             $listeners_data = $this->icecastCollector->getData();
             $listeners = $listeners_data['listeners'];
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->logger->error("Произошла ошибка при запросе данных из Icecast", [$e->getMessage()]);
 
             return;

@@ -13,7 +13,7 @@ class DatabaseTestCase extends TestCase
     {
         $this->db = new Medoo([
             'type'     => 'sqlite',
-            'database' => __DIR__ . '/../../test.db'
+            'database' => __DIR__ . '/../test.db'
         ]);
     }
 }

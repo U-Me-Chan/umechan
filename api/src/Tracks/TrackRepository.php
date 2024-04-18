@@ -56,5 +56,43 @@ class TrackRepository
         return [$tracks, $count];
     }
 
+    public function findOne(array $filters = []): Track
+    {
+        $conditions = [];
 
+        if (isset($filters['id'])) {
+            $conditions['id'] = $filters['id'];
+        }
+
+        if (empty($conditions)) {
+            throw new \InvalidArgumentException();
+        }
+
+        $track_data = $this->db->get('tracks', '*', $conditions);
+
+        if (!$track_data) {
+            throw new \Exception();
+        }
+
+        return Track::fromArray($track_data);
+    }
+
+    public function save(Track $track): int
+    {
+        if ($track->id == 0) {
+            throw new \InvalidArgumentException();
+        }
+
+        $track_data = $track->toArray();
+        unset($track_data['id']);
+
+        $this->db->update('tracks', $track_data, ['id' => $track->id]);
+
+        return $track->id;
+    }
+
+    public function delete(Track $track): bool
+    {
+        throw new \Exception();
+    }
 }
