@@ -82,6 +82,8 @@ export default {
 pre {
     background-color: #f5f2f0;
     max-width: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 blockquote {
