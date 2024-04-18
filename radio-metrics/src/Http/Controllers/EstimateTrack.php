@@ -21,19 +21,6 @@ final class EstimateTrack
         $body = $req->getBody()->getContents();
         $query_params = json_decode($body, true);
 
-        try {
-            $this->cache->last_time_estimate;
-        } catch (\Exception) {
-            $this->cache->last_time_estimate = time();
-        }
-
-        if ($this->cache->last_time_estimate < time() - 30) {
-            $res = Response::json(['status' => 'failed', 'reason' => 'timeout']);
-            $res = $res->withStatus(Response::STATUS_FORBIDDEN);
-
-            return $res;
-        }
-
         if (!isset($query_params['operator'])) {
             $res = Response::json(['status' => 'failed', 'reason' => 'operator not found']);
             $res = $res->withStatus(Response::STATUS_BAD_REQUEST);
@@ -76,8 +63,6 @@ final class EstimateTrack
         }
 
         $this->track_repo->save($track);
-
-        $this->cache->last_estimate = time() + (60 * 60 * 4);
 
         return Response::json(['status' => 'accepted', 'track' => $track->toArray()]);
     }
