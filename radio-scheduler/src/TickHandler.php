@@ -23,7 +23,7 @@ class TickHandler
 
         $strategy_name = $this->rotation_master->getCurrentStrategy();
 
-        if (TickCounter::getCount() >= (60 * 30)) {
+        if (TickCounter::getCount() >= (60 * 45)) {
             $strategy_name = $this->rotation_master->getRandomStrategy();
 
             TickCounter::create(1);
