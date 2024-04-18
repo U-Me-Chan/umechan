@@ -11,11 +11,11 @@
     </div>
     <span><input class="volume-slider" type="range" min="0" max="100" v-model="volume" @change="setVolume"></span>
   </div>
-    <div class="radio-meta">
-      <span>🎧: {{listeners}}</span>
-      <span>💜: coming soon</span>
-      <span>📋: coming soon</span>
-      <span>📝: <a href="#" @click="goToThread()">Обсудить</a></span>
+  <div class="radio-meta">
+    <span>Оценка: {{estimate }} </span>
+    <span><a href="#" @click="estimateTrack(track_id, 'plus')">💜: Нраица</a></span>
+    <span><a href="#" @click="estimateTrack(track_id, 'minus')">❌: Гавно</a></span>
+    <span><a href="#" @click="goToThread()"> 📝: Обсудить</a></span>
   </div>
   <br/>
 </div>
@@ -35,27 +35,38 @@ export default {
       m3uUrl: config.icecast_url + '/stream.m3u',
       isPlaying: false,
       metadataInterval: null,
-      volume: 20
+      volume: 20,
+      track_id: 0,
+      estimate: 0
     }
   },
   methods: {
+    estimateTrack: function (track_id, operator) {
+      if (this.isPlaying == false) {
+        this.$buefy.toast.open('Нельзя оценивать треки, если не слушаешь радио!');
+
+        return;
+      }
+
+      var self = this;
+
+      var data = {};
+      data['operator'] = operator;
+
+      axios.post(config.base_url + '/metrics/track/' + track_id, data, { 'headers': { 'Content-type': 'application/json' }}).then(() => {
+        self.$buefy.toast.open('Отправлено!');
+      }).catch ((error) => {
+        self.$buefy.toast.open(`Ошибка: ${error}`);
+      })
+    },
     updateMetadata: function() {
       var self = this;
 
-      axios.get(config.icecast_url + '/status-json.xsl')
+      axios.get(config.base_url + '/metrics/info')
         .then((response) => {
-          if (Array.isArray(response.data.icestats.source)) {
-            if (typeof response.data.icestats.source[1].stream_start !== 'undefined') {
-              self.title = 'Прямая трансляция';
-              self.listeners = response.data.icestats.source[1].listeners;
-            } else {
-              self.title = response.data.icestats.source[0].title;
-              self.listeners = response.data.icestats.source[0].listeners;
-            }
-        } else {
-            self.title = response.data.icestats.source.title;
-            self.listeners = response.data.icestats.source.listeners;
-          }
+          self.title = response.data.artist + ' - ' + response.data.title;
+          self.track_id = response.data.id;
+          self.estimate = response.data.estimate;
         })
         .catch(() => {
         })
@@ -83,6 +94,7 @@ export default {
     }
   },
   created: function () {
+    this.updateMetadata();
     this.metadataInterval = setInterval(() => this.updateMetadata(), 5000);
   },
 }
