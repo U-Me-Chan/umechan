@@ -83,7 +83,7 @@ class NewInGenre implements IRotation
             'ORDER' => [
                 'play_count' => 'ASC'
             ],
-            'LIMIT' => [0, 10]
+            'LIMIT' => [0, 5]
         ]);
 
         $this->logger->debug(implode(',', $track_paths));

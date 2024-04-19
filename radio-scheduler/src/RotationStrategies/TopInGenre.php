@@ -85,7 +85,7 @@ class TopInGenre implements IRotation
             'ORDER' => [
                 'estimate' => 'DESC'
             ],
-            'LIMIT' => [0, 10]
+            'LIMIT' => [0, 5]
         ]);
 
         $this->logger->debug(implode(',', $track_paths));
