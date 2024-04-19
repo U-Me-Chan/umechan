@@ -188,7 +188,6 @@ class GenrePatternTest extends TestCase
         ];
     }
 
-
     #[DataProvider('getEveningDatetimes')]
     public function testEvening(string $datetime): void
     {

@@ -11,9 +11,9 @@ use Ridouchire\RadioScheduler\GenreSchemas\Night;
 use Ridouchire\RadioScheduler\IRotation;
 use Ridouchire\RadioScheduler\Mpd;
 
-class TopInGenre implements IRotation
+class AverageInGenre implements IRotation
 {
-    public const NAME = 'TopInGenre';
+    public const NAME = 'AverageInGenre';
 
     public function __construct(
         private Medoo $db,
@@ -81,9 +81,9 @@ class TopInGenre implements IRotation
 
         $track_paths = $this->db->select('tracks', 'path', [
             'path[~]' => "{$genre}/%",
-            'last_playing[<]' => time() + (60 * 60 * 4),
+            'estimate[>=]' => Medoo::raw("(SELECT AVG(estimate) FROM tracks WHERE path LIKE '{$genre}/%')"),
             'ORDER' => [
-                'estimate' => 'DESC'
+                'last_playing' => 'ASC'
             ],
             'LIMIT' => [0, 10]
         ]);

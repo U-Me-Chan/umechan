@@ -5,6 +5,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Ridouchire\RadioScheduler\Mpd;
 use Ridouchire\RadioScheduler\RotationMaster;
+use Ridouchire\RadioScheduler\RotationStrategies\AverageInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
 use Ridouchire\RadioScheduler\RotationStrategies\NewInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\TopInGenre;
@@ -25,14 +26,14 @@ class TickHandlerTest extends TestCase
         $genre_pattern_strategy = $this->createMock(GenrePattern::class);
 
         /** @var TopInGenre|MockObject */
-        $top_in_genre_strategy = $this->createMock(TopInGenre::class);
+        $avg_in_genre_strategy = $this->createMock(AverageInGenre::class);
 
         /** @var NewInGenre|MockObject */
         $new_in_genre_strategy = $this->createMock(NewInGenre::class);
 
         $this->rotation_master = new RotationMaster($this->createMock(Logger::class));
         $this->rotation_master->addStrategy($genre_pattern_strategy);
-        $this->rotation_master->addStrategy($top_in_genre_strategy);
+        $this->rotation_master->addStrategy($avg_in_genre_strategy);
         $this->rotation_master->addStrategy($new_in_genre_strategy);
 
         $this->tick_handler = new TickHandler($this->rotation_master, $mpd);
@@ -45,7 +46,7 @@ class TickHandlerTest extends TestCase
         $c = $this->tick_handler;
         $c();
 
-        $this->assertContainsEquals($this->rotation_master->getCurrentStrategy(), [TopInGenre::NAME, GenrePattern::NAME, NewInGenre::NAME]);
+        $this->assertContainsEquals($this->rotation_master->getCurrentStrategy(), [AverageInGenre::NAME, GenrePattern::NAME, NewInGenre::NAME]);
 
         $strategy = $this->rotation_master->getCurrentStrategy();
 

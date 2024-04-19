@@ -3,7 +3,6 @@
 namespace Ridouchire\RadioScheduler;
 
 use Monolog\Logger;
-use Ridouchire\RadioScheduler\RotationType;
 
 class RotationMaster
 {
@@ -25,8 +24,12 @@ class RotationMaster
      */
     public function execute(string $strategy_name): void
     {
+        if (empty($this->strategies)) {
+            throw new \Exception("Нет стратегий");
+        }
+
         if (!isset($this->strategies[$strategy_name])) {
-            throw new \RuntimeException("RotationMaster: неизвестная стратегия: {$strategy_name}");
+            throw new \Exception("RotationMaster: неизвестная стратегия: {$strategy_name}");
         }
 
         /** @var IRotation */
