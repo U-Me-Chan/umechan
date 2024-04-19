@@ -12,7 +12,7 @@
     <span><input class="volume-slider" type="range" min="0" max="100" v-model="volume" @change="setVolume"></span>
   </div>
   <div class="radio-meta">
-    <span>Оценка: {{estimate }} </span>
+    <span>Оценка: {{ roundEstimate }} </span>
     <span><a href="#" @click="estimateTrack(track_id, 'plus')">💜: Нраица</a></span>
     <span><a href="#" @click="estimateTrack(track_id, 'minus')">❌: Гавно</a></span>
     <span><a href="#" @click="goToThread()"> 📝: Обсудить</a></span>
@@ -37,7 +37,13 @@ export default {
       metadataInterval: null,
       volume: 20,
       track_id: 0,
-      estimate: 0
+      estimate: 0,
+      duration: 1
+    }
+  },
+  computed: {
+    roundEstimate: function () {
+      return Math.round(this.estimate / this.duration);
     }
   },
   methods: {
@@ -67,6 +73,7 @@ export default {
           self.title = response.data.artist + ' - ' + response.data.title;
           self.track_id = response.data.id;
           self.estimate = response.data.estimate;
+          self.duration = response.data.duration;
         })
         .catch(() => {
         })
