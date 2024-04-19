@@ -55,7 +55,7 @@ class TickHandlerTest extends TestCase
 
         $this->assertEquals($strategy, $this->rotation_master->getCurrentStrategy());
 
-        TickCounter::create(60 * 31);
+        TickCounter::create(60 * 45);
 
         $c();
 
