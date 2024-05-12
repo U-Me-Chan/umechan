@@ -2,6 +2,7 @@
 
 namespace Ridouchire\RadioMetrics\Http\Controllers;
 
+use FloFaber\MphpD\MphpD;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
 use Ridouchire\RadioMetrics\Exceptions\EntityNotFound;
@@ -12,7 +13,8 @@ final class EstimateTrack
 {
     public function __construct(
         private TrackRepository $track_repo,
-        private Container $cache
+        private Container $cache,
+        private MphpD $mpd
     ) {
     }
 
@@ -21,13 +23,15 @@ final class EstimateTrack
         $body = $req->getBody()->getContents();
         $query_params = json_decode($body, true);
 
+        $client_addr = $req->getServerParams()['REMOTE_ADDR'];
+
         try {
-            $this->cache->last_time_estimate;
+            $last_time_estimate = $this->cache->$client_addr;
         } catch (\Exception) {
-            $this->cache->last_time_estimate = 0;
+            $last_time_estimate = 0;
         }
 
-        if ($this->cache->last_time_estimate >= (time() - 30)) {
+        if ($last_time_estimate >= (time() - 30)) {
             $res = Response::json(['status' => 'failed', 'reason' => 'timeout']);
             $res = $res->withStatus(Response::STATUS_FORBIDDEN);
 
@@ -77,7 +81,15 @@ final class EstimateTrack
 
         $this->track_repo->save($track);
 
-        $this->cache->last_time_estimate = time();
+        $this->cache->$client_addr = time();
+
+        if ($query_params['operator'] == 'minus') {
+            $res = $this->mpd->player()->next();
+
+            if ($res == false) {
+                return Response::json(['status' => 'failed', 'reason' => 'track not skipped']);
+            }
+        }
 
         return Response::json(['status' => 'accepted', 'track' => $track->toArray()]);
     }

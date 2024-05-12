@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+use FloFaber\MphpD\MphpD;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use React\EventLoop\Loop;
@@ -78,9 +79,17 @@ $tickHandler = new TickHandler($logger, $mpdCollector, $icecastCollector, $sende
 
 Loop::addPeriodicTimer(1, $tickHandler);
 
+$mpd = new MphpD([
+    'host'    => $env->mpd_hostname,
+    'port'    => $env->mpd_port,
+    'timeout' => 5
+]);
+
+$mpd->connect();
+
 $r = new Router();
 $r->addRoute('GET', '/metrics/info', new GetInfo($cache));
-$r->addRoute('POST', '/metrics/tracks/{id}', new EstimateTrack($trackRepo, $cache));
+$r->addRoute('POST', '/metrics/tracks/{id}', new EstimateTrack($trackRepo, $cache, $mpd));
 
 $http = new React\Http\HttpServer($r);
 $socket = new React\Socket\SocketServer('0.0.0.0:8080');

@@ -37,6 +37,10 @@ class Track implements \JsonSerializable
             throw new \InvalidArgumentException("Неизвестное свойство: {$name}");
         }
 
+        if ($name == 'id') {
+            throw new \InvalidArgumentException('Нельзя задать идентификатор композиции');
+        }
+
         if ($name == 'first_playing' || $name == 'last_playing') {
             $value = Timestamp::fromInt($value);
         }
