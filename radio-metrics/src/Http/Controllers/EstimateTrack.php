@@ -2,10 +2,10 @@
 
 namespace Ridouchire\RadioMetrics\Http\Controllers;
 
-use FloFaber\MphpD\MphpD;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
 use Ridouchire\RadioMetrics\Exceptions\EntityNotFound;
+use Ridouchire\RadioMetrics\Services\Mpd;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
 use Ridouchire\RadioMetrics\Utils\Container;
 
@@ -14,7 +14,7 @@ final class EstimateTrack
     public function __construct(
         private TrackRepository $track_repo,
         private Container $cache,
-        private MphpD $mpd
+        private Mpd $mpd
     ) {
     }
 
@@ -84,7 +84,7 @@ final class EstimateTrack
         $this->cache->$client_addr = time();
 
         if ($query_params['operator'] == 'minus') {
-            $res = $this->mpd->player()->next();
+            $res = $this->mpd->skipCurrentTrack();
 
             if ($res == false) {
                 return Response::json(['status' => 'failed', 'reason' => 'track not skipped']);

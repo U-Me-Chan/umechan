@@ -1,6 +1,6 @@
 <?php
 
-namespace Ridouchire\RadioScheduler;
+namespace Ridouchire\RadioMetrics\Services;
 
 use FloFaber\MphpD\MphpD;
 use FloFaber\MPDException;
@@ -21,6 +21,17 @@ class Mpd
             'port' => $port,
             'timeout' => 10
         ]);
+    }
+
+    public function skipCurrentTrack(): bool
+    {
+        $res = $this->getConnection()->player()->next();
+
+        if (!$res) {
+            $this->log->error('MPD: ошибка исполнения команды пропуска трека');
+        }
+
+        return $res;
     }
 
     /**
