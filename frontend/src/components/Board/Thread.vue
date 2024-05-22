@@ -9,7 +9,7 @@
   <div class="replies" v-if="replies.lenght !== 0">
     <span>Ответов: {{ repliesCount }}</span>
     <br>
-    <span v-if="repliesCount > 500" style="color: red">Тред не поднимется, достигнут лимит ответов</span>
+    <span v-if="repliesCount >= 500" style="color: red">Тред не поднимется, достигнут лимит ответов</span>
 
     <div class="card" :key="post.id" :ref="post.id" v-for="post in replies">
       <Meta :id="post.id" :poster="post.poster" :subject="post.subject" :datetime="post.datetime" :isVerify="post.is_verify" :parentId="post.parent_id"/>
