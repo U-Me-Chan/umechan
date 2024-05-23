@@ -68,7 +68,7 @@ final class EstimateTrack
 
                 break;
             case 'minus':
-                $track->decreaseEstimate($track->getDuration());
+                $track->decreaseEstimate($track->getDuration() * 2);
 
                 break;
 
