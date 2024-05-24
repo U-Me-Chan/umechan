@@ -13,7 +13,8 @@ class Night implements IGenreSchema
             'Chill Hop',
             'DnB Atmosphere',
             'DnB Liquid',
-            'House'
+            'House',
+            'Slowave'
         ];
     }
 
