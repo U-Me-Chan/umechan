@@ -1,6 +1,6 @@
 <?php
 
-namespace PK\Events;
+namespace PK\V1_Events;
 
 class Event
 {

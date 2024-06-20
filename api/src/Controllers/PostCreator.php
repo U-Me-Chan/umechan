@@ -3,7 +3,7 @@
 namespace PK\Controllers;
 
 use PK\Events\EventType;
-use PK\Events\Event;
+use PK\V1_Events\Event;
 use PK\Database\EventRepository;
 use PK\Database\PostRepository;
 use PK\Database\BoardRepository;

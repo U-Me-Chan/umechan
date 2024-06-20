@@ -2,6 +2,9 @@
 
 namespace PK\Posts\Controllers;
 
+use PK\Events\Event;
+use PK\Events\EventStorage;
+use PK\Events\EventType;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Posts\PostStorage;
@@ -10,7 +13,8 @@ use PK\Posts\Post\Post;
 final class DeletePost
 {
     public function __construct(
-        private PostStorage $storage,
+        private PostStorage $post_storage,
+        private EventStorage $event_storage,
         private string $key
     ) {
     }
@@ -31,7 +35,7 @@ final class DeletePost
 
         try {
             /** @var Post */
-            $post = $this->storage->findById($id);
+            $post = $this->post_storage->findById($id);
 
             $post->subject = '⬛⬛⬛⬛⬛⬛⬛⬛⬛';
             $post->poster = '⬛⬛⬛⬛⬛⬛⬛⬛⬛';
@@ -43,7 +47,14 @@ final class DeletePost
 Данные удалены по причине: {$reason}
 EOT;
 
-            $this->storage->save($post);
+            $this->post_storage->save($post);
+            $this->event_storage->save(Event::fromArray([
+                "id" => 0,
+                "event_type" => EventType::PostDeleted,
+                "timestamp" => time(),
+                "post_id" => $id,
+                "board_id" => null,
+            ]));
 
             return new Response([], 204);
         } catch (\OutOfBoundsException $e) {

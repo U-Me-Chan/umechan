@@ -2,6 +2,9 @@
 
 namespace PK\Posts\Controllers;
 
+use PK\Events\Event;
+use PK\Events\EventStorage;
+use PK\Events\EventType;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Posts\PostStorage;
@@ -10,7 +13,8 @@ use PK\Posts\Post\Post;
 final class CreateReply
 {
     public function __construct(
-        private PostStorage $storage
+        private PostStorage $post_storage,
+        private EventStorage $event_storage,
     ) {
     }
 
@@ -23,7 +27,7 @@ final class CreateReply
         }
 
         try {
-            $thread = $this->storage->findById($parent_id);
+            $thread = $this->post_storage->findById($parent_id);
         } catch (\OutOfBoundsException $e) {
             return new Response([], 404);
         }
@@ -38,13 +42,29 @@ final class CreateReply
             $post->subject = $req->getParams('subject');
         }
 
-        $id = $this->storage->save($post);
+        $id = $this->post_storage->save($post);
 
         if ($thread->replies_count < 500 && !$req->getParams('sage')) {
             $thread->updated_at = time();
 
-            $this->storage->save($thread);
+            $this->post_storage->save($thread);
+
+            $this->event_storage->save(Event::fromArray([
+                "id" => 0,
+                "event_type" => EventType::ThreadUpdateTriggered,
+                "timestamp" => time(),
+                "post_id" => $parent_id,
+                "board_id" => null,
+            ]));
         }
+
+        $this->event_storage->save(Event::fromArray([
+            "id" => 0,
+            "event_type" => EventType::PostCreated,
+            "timestamp" => time(),
+            "post_id" => $post->id,
+            "board_id" => null,
+        ]));
 
         return new Response(['post_id' => $id, 'password' => $post->password], 201);
     }
