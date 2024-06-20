@@ -1,7 +1,8 @@
 data/db/*
 data/files/*
-data/dumps/*
 data/grafana/*
+data/dumps/*
+!data/dumps/.gitkeep
 api/vendor/*
 api/.phpunit.result.cache
 filestore/vendor/*

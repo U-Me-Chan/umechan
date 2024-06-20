@@ -85,7 +85,7 @@ class AverageInGenre implements IRotation
             'ORDER' => [
                 'last_playing' => 'ASC'
             ],
-            'LIMIT' => [0, 5]
+            'LIMIT' => [0, random_int(5, 10)]
         ]);
 
         $this->logger->debug(implode(',', $track_paths));
