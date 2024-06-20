@@ -2,9 +2,9 @@
 
 namespace PK\Posts\Controllers;
 
-use PK\Events\Event;
+use PK\Events\Event\Event;
 use PK\Events\EventStorage;
-use PK\Events\EventType;
+use PK\Events\Event\EventType;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Posts\PostStorage;
@@ -60,7 +60,7 @@ final class CreateReply
 
         $this->event_storage->save(Event::fromArray([
             "id" => 0,
-            "event_type" => EventType::PostCreated,
+            "event_type" => EventType::PostCreated->name,
             "timestamp" => time(),
             "post_id" => $post->id,
             "board_id" => null,

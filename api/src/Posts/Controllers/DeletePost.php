@@ -2,9 +2,9 @@
 
 namespace PK\Posts\Controllers;
 
-use PK\Events\Event;
+use PK\Events\Event\Event;
 use PK\Events\EventStorage;
-use PK\Events\EventType;
+use PK\Events\Event\EventType;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Posts\PostStorage;
@@ -50,7 +50,7 @@ EOT;
             $this->post_storage->save($post);
             $this->event_storage->save(Event::fromArray([
                 "id" => 0,
-                "event_type" => EventType::PostDeleted,
+                "event_type" => EventType::PostDeleted->name,
                 "timestamp" => time(),
                 "post_id" => $id,
                 "board_id" => null,

@@ -2,8 +2,8 @@
 
 namespace PK\Controllers;
 
-use PK\Events\EventType;
-use PK\V1_Events\Event;
+use PK\Events\Event\EventType;
+use PK\Database\Event\Event;
 use PK\Database\EventRepository;
 use PK\Database\PostRepository;
 use PK\Http\Request;
@@ -46,7 +46,8 @@ EOT;
             $this->post_repository->update($post);
 
             $this->event_repository->save(Event::fromState([
-                "event_type" => EventType::PostDeleted,
+                "id" => 0,
+                "event_type" => EventType::PostDeleted->name,
                 "timestamp" => time(),
                 "post_id" => $post->getId(),
                 "board_id" => null,

@@ -2,8 +2,8 @@
 
 namespace PK\Controllers;
 
-use PK\Events\EventType;
-use PK\V1_Events\Event;
+use PK\Events\Event\EventType;
+use PK\Database\Event\Event;
 use PK\Database\EventRepository;
 use PK\Database\PostRepository;
 use PK\Database\BoardRepository;
@@ -48,7 +48,8 @@ class PostCreator
             $new_post_id = $this->post_repository->save($post);
 
             $this->event_repository->save(Event::fromState([
-                "event_type" => EventType::PostCreated,
+                "id" => 0,
+                "event_type" => EventType::PostCreated->name,
                 "timestamp" => time(),
                 "post_id" => $new_post_id,
                 "board_id" => null,
@@ -63,7 +64,8 @@ class PostCreator
                 $parent_post->setEstimate($parent_post->getEstimate() + 1);
 
                 $this->event_repository->save(Event::fromState([
-                    "event_type" => EventType::ThreadUpdateTriggered,
+                    "id" => 0,
+                    "event_type" => EventType::ThreadUpdateTriggered->name,
                     "timestamp" => time(),
                     "post_id" => $parent_post->getId(),
                     "board_id" => null,
@@ -97,14 +99,16 @@ class PostCreator
         $new_post_id = $this->post_repository->save($post);
 
         $this->event_repository->save(Event::fromState([
-            "event_type" => EventType::PostCreated,
+            "id" => 0,
+            "event_type" => EventType::PostCreated->name,
             "timestamp" => time(),
             "post_id" => $new_post_id,
             "board_id" => null,
         ]));
 
         $this->event_repository->save(Event::fromState([
-            "event_type" => EventType::BoardUpdateTriggered,
+            "id" => 0,
+            "event_type" => EventType::BoardUpdateTriggered->name,
             "timestamp" => time(),
             "post_id" => null,
             "board_id" => $board->getId(),

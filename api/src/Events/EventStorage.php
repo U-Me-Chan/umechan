@@ -3,7 +3,7 @@
 namespace PK\Events;
 
 use Medoo\Medoo;
-use PK\Events\Event;
+use PK\Events\Event\Event;
 
 class EventStorage
 {

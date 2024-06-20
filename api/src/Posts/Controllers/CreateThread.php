@@ -8,9 +8,9 @@ use PK\Posts\PostStorage;
 use PK\Posts\Post\Post;
 use PK\Boards\Board\Board;
 use PK\Boards\BoardStorage;
-use PK\Events\Event;
+use PK\Events\Event\Event;
 use PK\Events\EventStorage;
-use PK\Events\EventType;
+use PK\Events\Event\EventType;
 
 final class CreateThread
 {
@@ -53,7 +53,7 @@ final class CreateThread
 
         $this->event_storage->save(Event::fromArray([
             "id" => 0,
-            "event_type" => EventType::PostCreated,
+            "event_type" => EventType::PostCreated->name,
             "timestamp" => time(),
             "post_id" => $id,
             "board_id" => null,
@@ -61,7 +61,7 @@ final class CreateThread
 
         $this->event_storage->save(Event::fromArray([
             "id" => 0,
-            "event_type" => EventType::BoardUpdateTriggered,
+            "event_type" => EventType::BoardUpdateTriggered->name,
             "timestamp" => time(),
             "post_id" => null,
             "board_id" => $board->id,

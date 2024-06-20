@@ -1,6 +1,6 @@
 <?php
 
-namespace PK\Events;
+namespace PK\Events\Event;
 
 class Event implements \JsonSerializable
 {

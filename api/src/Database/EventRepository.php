@@ -2,7 +2,7 @@
 
 namespace PK\Database;
 
-use PK\V1_Events\Event;
+use PK\Database\Event\Event;
 use PK\Database\ARepository;
 use PK\Exceptions\Event\EventNotFound;
 
