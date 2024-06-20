@@ -24,6 +24,9 @@ final class UpdatePost
             return new Response([], 401);
         }
 
+        // todo: post update functionality
+        // todo: dont forget about event creation
+
         return new Response();
     }
 }
