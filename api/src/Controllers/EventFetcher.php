@@ -13,7 +13,7 @@ class EventFetcher
 
     public function __invoke(Request $req, array $vars)
     {
-        $timestamp = $vars["timestamp"];
+        $timestamp = $req->getParams('from_timestamp') ? $req->getParams('from_timestamp') : 0;
 
         try {
             $events = $this->repository->findFrom($timestamp);
