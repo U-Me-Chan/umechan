@@ -13,8 +13,7 @@ final class EstimateTrack
 {
     public function __construct(
         private TrackRepository $track_repo,
-        private Container $cache,
-        private Mpd $mpd
+        private Container $cache
     ) {
     }
 
@@ -82,14 +81,6 @@ final class EstimateTrack
         $this->track_repo->save($track);
 
         $this->cache->$client_addr = time();
-
-        if ($query_params['operator'] == 'minus') {
-            $res = $this->mpd->skipCurrentTrack();
-
-            if ($res == false) {
-                return Response::json(['status' => 'failed', 'reason' => 'track not skipped']);
-            }
-        }
 
         return Response::json(['status' => 'accepted', 'track' => $track->toArray()]);
     }

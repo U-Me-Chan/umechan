@@ -84,7 +84,7 @@ $mpd = new Mpd($logger, $env->mpd_hostname, $env->mpd_port);
 
 $r = new Router();
 $r->addRoute('GET', '/metrics/info', new GetInfo($cache));
-$r->addRoute('POST', '/metrics/tracks/{id}', new EstimateTrack($trackRepo, $cache, $mpd));
+$r->addRoute('POST', '/metrics/tracks/{id}', new EstimateTrack($trackRepo, $cache));
 
 $http = new React\Http\HttpServer($r);
 $socket = new React\Socket\SocketServer('0.0.0.0:8080');
