@@ -11,9 +11,9 @@ use Ridouchire\RadioScheduler\GenreSchemas\Night;
 use Ridouchire\RadioScheduler\IRotation;
 use Ridouchire\RadioScheduler\Mpd;
 
-class TopInGenre implements IRotation
+class ByEstimateInGenre implements IRotation
 {
-    public const NAME = 'TopInGenre';
+    public const NAME = 'ByEstimateInGenre';
 
     public function __construct(
         private Medoo $db,
@@ -79,14 +79,35 @@ class TopInGenre implements IRotation
                 break;
         }
 
-        $track_paths = $this->db->select('tracks', 'path', [
+        $track_paths = [];
+
+        $avg_track_paths = $this->db->select('tracks', 'path', [
+            'path[~]' => "{$genre}/%",
+            'estimate[>=]' => Medoo::raw("(SELECT AVG(estimate) FROM tracks WHERE path LIKE '{$genre}/%')"),
+            'ORDER' => [
+                'last_playing' => 'ASC'
+            ],
+            'LIMIT' => [0, random_int(5, 10)]
+        ]);
+
+        $new_track_path = $this->db->select('tracks', 'path', [
+            'path[~]' => "{$genre}/%",
+            'ORDER'   => [
+                'play_count' => 'ASC',
+            ],
+            'LIMIT' => [0, random_int(5, 10)]
+        ]);
+
+        $top_track_paths = $this->db->select('tracks', 'path', [
             'path[~]' => "{$genre}/%",
             'last_playing[<]' => time() + (60 * 60 * 12),
             'ORDER' => [
                 'estimate' => 'DESC'
             ],
-            'LIMIT' => [0, 5]
+            'LIMIT' => [0, random_int(5, 10)]
         ]);
+
+        $track_paths = array_merge($avg_track_paths, $new_track_path, $top_track_paths);
 
         $this->logger->debug(implode(',', $track_paths));
 

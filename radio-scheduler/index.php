@@ -9,6 +9,7 @@ use Ridouchire\RadioScheduler\Mpd;
 use Ridouchire\RadioScheduler\QueueCropper;
 use Ridouchire\RadioScheduler\RotationMaster;
 use Ridouchire\RadioScheduler\RotationStrategies\AverageInGenre;
+use Ridouchire\RadioScheduler\RotationStrategies\ByEstimateInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
 use Ridouchire\RadioScheduler\RotationStrategies\NewInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\TopInGenre;
@@ -37,17 +38,13 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-$genre_pattern_strategy = new GenrePattern($mpd, $log);
-$avg_in_genre_strategy  = new AverageInGenre($db, $mpd, $log);
-$new_in_genre_strategy  = new NewInGenre($db, $mpd, $log);
-#$top_in_genre_strategy  = new TopInGenre($db, $mpd, $log);
+$genre_pattern_strategy        = new GenrePattern($mpd, $log);
+$by_estimate_in_genre_strategy = new ByEstimateInGenre($db, $mpd, $log);
 
 $strategy_master = new RotationMaster($log);
 
-$strategy_master->addStrategy($avg_in_genre_strategy);
-$strategy_master->addStrategy($new_in_genre_strategy);
 $strategy_master->addStrategy($genre_pattern_strategy);
-#$strategy_master->addStrategy($top_in_genre_strategy);
+$strategy_master->addStrategy($by_estimate_in_genre_strategy);
 
 $tickHanlder = new TickHandler($strategy_master);
 $queue_cropper = new QueueCropper($mpd);
