@@ -13,13 +13,13 @@ class QueueCropper
 
     public function __invoke(int $timestamp): bool
     {
-        $time = date('Gi', $timestamp);
+        $time = date('Gis', $timestamp);
 
         switch($time) {
-            case '000':
-            case '600':
-            case '900':
-            case '1900':
+            case '00000':
+            case '60000':
+            case '90000':
+            case '190000':
                 return $this->mpd->cropQueue();
             default:
                 throw new Exception('Ещё не время');
