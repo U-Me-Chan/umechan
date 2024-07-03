@@ -19,7 +19,7 @@ class EventRepository extends ARepository
     public function fetch(): array
     {
         $events_data = $this->db->select(self::TABLE, $this->getFields(), [
-            "ORDER" => [self::TIMESTAMP => "ASC"],
+            "ORDER" => [self::TIMESTAMP => "DESC"],
         ]);
 
         if (!$events_data) {
@@ -50,7 +50,7 @@ class EventRepository extends ARepository
     {
         $events_data = $this->db->select(self::TABLE, $this->getFields(), [
             "timestamp[>=]" => $timestamp,
-            "ORDER" => [self::TIMESTAMP => "ASC"],
+            "ORDER" => [self::TIMESTAMP => "DESC"],
         ]);
 
         if (!$events_data) {

@@ -13,7 +13,7 @@ class EventStorage
     {
         $conditions = [
             'timestamp[>=]' => $from_timestamp,
-            'ORDER' => ['timestamp' => 'ASC'],
+            'ORDER' => ['timestamp' => 'DESC'],
         ];
 
         $limit = ['LIMIT' => [$offset, $limit]];
