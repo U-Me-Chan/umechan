@@ -5,10 +5,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Ridouchire\RadioScheduler\Mpd;
 use Ridouchire\RadioScheduler\RotationMaster;
-use Ridouchire\RadioScheduler\RotationStrategies\AverageInGenre;
+use Ridouchire\RadioScheduler\RotationStrategies\ByEstimateInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
-use Ridouchire\RadioScheduler\RotationStrategies\NewInGenre;
-use Ridouchire\RadioScheduler\RotationStrategies\TopInGenre;
 use Ridouchire\RadioScheduler\TickHandler;
 use Ridouchire\RadioScheduler\Utils\TickCounter;
 
@@ -25,16 +23,12 @@ class TickHandlerTest extends TestCase
         /** @var GenrePattern|MockObject */
         $genre_pattern_strategy = $this->createMock(GenrePattern::class);
 
-        /** @var TopInGenre|MockObject */
-        $avg_in_genre_strategy = $this->createMock(AverageInGenre::class);
-
-        /** @var NewInGenre|MockObject */
-        $new_in_genre_strategy = $this->createMock(NewInGenre::class);
+        /** @var ByEstimateInGenre|MockObject */
+        $by_estimate_in_genre_strategy = $this->createMock(ByEstimateInGenre::class);
 
         $this->rotation_master = new RotationMaster($this->createMock(Logger::class));
         $this->rotation_master->addStrategy($genre_pattern_strategy);
-        $this->rotation_master->addStrategy($avg_in_genre_strategy);
-        $this->rotation_master->addStrategy($new_in_genre_strategy);
+        $this->rotation_master->addStrategy($by_estimate_in_genre_strategy);
 
         $this->tick_handler = new TickHandler($this->rotation_master, $mpd);
     }
@@ -46,7 +40,7 @@ class TickHandlerTest extends TestCase
         $c = $this->tick_handler;
         $c();
 
-        $this->assertContainsEquals($this->rotation_master->getCurrentStrategy(), [AverageInGenre::NAME, GenrePattern::NAME, NewInGenre::NAME]);
+        $this->assertContainsEquals($this->rotation_master->getCurrentStrategy(), [GenrePattern::NAME, ByEstimateInGenre::NAME]);
 
         $strategy = $this->rotation_master->getCurrentStrategy();
 

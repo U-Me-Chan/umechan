@@ -4,8 +4,8 @@ use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Ridouchire\RadioScheduler\RotationMaster;
-use Ridouchire\RadioScheduler\RotationStrategies\AverageInGenre;
-use Ridouchire\RadioScheduler\RotationStrategies\TopInGenre;
+use Ridouchire\RadioScheduler\RotationStrategies\ByEstimateInGenre;
+use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
 
 class RotationMasterTest extends TestCase
 {
@@ -27,7 +27,7 @@ class RotationMasterTest extends TestCase
         $logger = $this->createMock(Logger::class);
 
         $rotation_master = new RotationMaster($logger);
-        $rotation_master->addStrategy($this->createMock(TopInGenre::class));
+        $rotation_master->addStrategy($this->createMock(GenrePattern::class));
 
         $this->expectException(\Exception::class);
 
@@ -39,15 +39,15 @@ class RotationMasterTest extends TestCase
         /** @var Logger|MockObject */
         $logger = $this->createMock(Logger::class);
         $logger->method('info')->willReturnCallback(function (string $message) {
-            $this->assertEquals('Текущая стратегия: ' . TopInGenre::NAME, $message);
+            $this->assertEquals('Текущая стратегия: ' . GenrePattern::NAME, $message);
         });
 
         $rotation_master = new RotationMaster($logger);
-        $rotation_master->addStrategy($this->createMock(TopInGenre::class));
+        $rotation_master->addStrategy($this->createMock(GenrePattern::class));
 
-        $rotation_master->execute(TopInGenre::NAME);
+        $rotation_master->execute(GenrePattern::NAME);
 
-        $this->assertEquals(TopInGenre::NAME, $rotation_master->getCurrentStrategy());
+        $this->assertEquals(GenrePattern::NAME, $rotation_master->getCurrentStrategy());
     }
 
     public function testGetRandomStrategy(): void
@@ -56,15 +56,15 @@ class RotationMasterTest extends TestCase
         $logger = $this->createMock(Logger::class);
 
         $rotation_master = new RotationMaster($logger);
-        $rotation_master->addStrategy($this->createMock(TopInGenre::class));
-        $rotation_master->addStrategy($this->createMock(AverageInGenre::class));
+        $rotation_master->addStrategy($this->createMock(GenrePattern::class));
+        $rotation_master->addStrategy($this->createMock(ByEstimateInGenre::class));
 
-        $rotation_master->execute(TopInGenre::NAME);
+        $rotation_master->execute(GenrePattern::NAME);
 
-        $this->assertContains($rotation_master->getRandomStrategy(), [TopInGenre::NAME, AverageInGenre::NAME]);
+        $this->assertContains($rotation_master->getRandomStrategy(), [GenrePattern::NAME, ByEstimateInGenre::NAME]);
 
         $rotation_master->execute($rotation_master->getRandomStrategy());
 
-        $this->assertNotEquals(TopInGenre::NAME, $rotation_master->getCurrentStrategy());
+        $this->assertNotEquals(GenrePattern::NAME, $rotation_master->getCurrentStrategy());
     }
 }

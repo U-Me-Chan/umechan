@@ -80,29 +80,35 @@ class GenrePattern implements IRotation
 
         $this->log->info('GenrePatternStrategy: ставлю ' . implode(',', $pls_list));
 
-        $track_paths = array_map(function (string $pls) {
-            $count = $this->mpd->getCountSongsInDirectory($pls);
+        $track_paths = [];
 
-            $start = random_int(0, $count);
-            $end   = $start + 1;
+        foreach ($pls_list as $pls) {
+            $limit = random_int(3, 5);
 
-            if ($start == $count) {
-                $end   = $count;
-                $start = $count - 1;
+            for ($i = 0; $i < $limit; $i++) {
+                $count = $this->mpd->getCountSongsInDirectory($pls);
+
+                $start = random_int(0, $count);
+                $end   = $start + 1;
+
+                if ($start == $count) {
+                    $end   = $count;
+                    $start = $count - 1;
+                }
+
+                /** @var array */
+                $_tracks = $this->mpd->getTracks($pls, $start, $end);
+
+                if (empty($_tracks)) {
+                    throw new \RuntimeException("GenrePatternStrategy: ошибка при получении данных трека для плейлиста {$pls}");
+                }
+
+                /** @var array */
+                $track = reset($_tracks);
+
+                $track_paths[] = $track['file'];
             }
-
-            /** @var array */
-            $_tracks = $this->mpd->getTracks($pls, $start, $end);
-
-            if (empty($_tracks)) {
-                throw new \RuntimeException("GenrePatternStrategy: ошибка при получении данных трека для плейлиста {$pls}");
-            }
-
-            /** @var array */
-            $track = reset($_tracks);
-
-            return $track['file'];
-        }, $pls_list);
+        }
 
         $this->mpd->cropQueue();
 
