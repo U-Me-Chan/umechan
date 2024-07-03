@@ -28,8 +28,8 @@ class EventRepository extends ARepository
 
         $events = [];
 
-        foreach ($events_data as $events_data) {
-            $events[] = Event::fromState($events_data);
+        foreach ($events_data as $event_data) {
+            $events[] = Event::fromState($event_data);
         }
 
         return $events;
@@ -46,11 +46,12 @@ class EventRepository extends ARepository
         return Event::fromState($event_data);
     }
 
-    public function findFrom(int $timestamp): array
+    public function findFrom(int $timestamp, int $offset, int $limit): array
     {
         $events_data = $this->db->select(self::TABLE, $this->getFields(), [
             "timestamp[>=]" => $timestamp,
             "ORDER" => [self::TIMESTAMP => "DESC"],
+            "LIMIT" => [$offset, $limit]
         ]);
 
         if (!$events_data) {
@@ -59,8 +60,8 @@ class EventRepository extends ARepository
 
         $events = [];
 
-        foreach ($events_data as $events_data) {
-            $events[] = Event::fromState($events_data);
+        foreach ($events_data as $event_data) {
+            $events[] = Event::fromState($event_data);
         }
 
         return $events;

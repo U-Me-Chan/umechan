@@ -2,7 +2,7 @@
 
 namespace PK\Database\Event;
 
-class Event
+class Event implements \JsonSerializable
 {
     public function __construct(
         private int $id,
@@ -48,11 +48,22 @@ class Event
     public function toArray(): array
     {
         return [
-            "id" => $this->id,
+            "id"         => $this->id,
             "event_type" => $this->event_type,
-            "timestamp" => $this->timestamp,
-            "post_id" => $this->post_id,
-            "board_id" => $$this->board_id,
+            "timestamp"  => $this->timestamp,
+            "post_id"    => $this->post_id,
+            "board_id"   => $this->board_id,
+        ];
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            "id"         => $this->id,
+            "event_type" => $this->event_type,
+            "timestamp"  => $this->timestamp,
+            "post_id"    => $this->post_id,
+            "board_id"   => $this->board_id,
         ];
     }
 }
