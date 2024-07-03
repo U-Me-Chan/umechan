@@ -6,6 +6,7 @@ use Monolog\Level;
 use Monolog\Logger;
 use React\EventLoop\Loop;
 use Ridouchire\RadioScheduler\Mpd;
+use Ridouchire\RadioScheduler\QueueCropper;
 use Ridouchire\RadioScheduler\RotationMaster;
 use Ridouchire\RadioScheduler\RotationStrategies\AverageInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
@@ -49,15 +50,24 @@ $strategy_master->addStrategy($genre_pattern_strategy);
 #$strategy_master->addStrategy($top_in_genre_strategy);
 
 $tickHanlder = new TickHandler($strategy_master);
+$queue_cropper = new QueueCropper($mpd);
 
 TickCounter::create(0);
 
-Loop::addPeriodicTimer(1, function () use ($tickHanlder, $log, $mpd) {
+Loop::addPeriodicTimer(1, function () use ($tickHanlder, $log, $mpd, $queue_cropper) {
     $tickHanlder();
 
     TickCounter::tick();
 
     if ($mpd->isEmptyQueue()) {
         $log->error('MainLoop: очередь воспроизведения пуста');
+    }
+
+    try {
+        if ($queue_cropper(time() + (60 * 60 * 4)) == false) {
+            $log->error('Ошибка при очищении очереди воспроизведения');
+        }
+    } catch (Exception) {
+        $log->debug('Время очищения очереди воспроизведения ещё не пришло');
     }
 });
