@@ -2,6 +2,9 @@
 
 namespace PK\Controllers;
 
+use PK\Events\Event\EventType;
+use PK\Database\Event\Event;
+use PK\Database\EventRepository;
 use PK\Database\PostRepository;
 use PK\Database\BoardRepository;
 use PK\Database\Post\Post;
@@ -14,7 +17,8 @@ class PostCreator
 {
     public function __construct(
         private PostRepository $post_repository,
-        private BoardRepository $board_repository
+        private BoardRepository $board_repository,
+        private EventRepository $event_repository,
     ) {
     }
 
@@ -43,6 +47,14 @@ class PostCreator
 
             $new_post_id = $this->post_repository->save($post);
 
+            $this->event_repository->save(Event::fromState([
+                "id" => 0,
+                "event_type" => EventType::PostCreated->name,
+                "timestamp" => time(),
+                "post_id" => $new_post_id,
+                "board_id" => null,
+            ]));
+
             $replies_count = $this->post_repository->getRepliesCount($parent_post->getId());
 
             if (!$req->getParams('sage') && $replies_count < 500) {
@@ -50,6 +62,14 @@ class PostCreator
                 $this->post_repository->update($parent_post); // bump thread
 
                 $parent_post->setEstimate($parent_post->getEstimate() + 1);
+
+                $this->event_repository->save(Event::fromState([
+                    "id" => 0,
+                    "event_type" => EventType::ThreadUpdateTriggered->name,
+                    "timestamp" => time(),
+                    "post_id" => $parent_post->getId(),
+                    "board_id" => null,
+                ]));
             }
 
             return new Response(['post_id' => $new_post_id, 'password' => $post->getPassword()], 201);
@@ -77,6 +97,22 @@ class PostCreator
         );
 
         $new_post_id = $this->post_repository->save($post);
+
+        $this->event_repository->save(Event::fromState([
+            "id" => 0,
+            "event_type" => EventType::PostCreated->name,
+            "timestamp" => time(),
+            "post_id" => $new_post_id,
+            "board_id" => null,
+        ]));
+
+        $this->event_repository->save(Event::fromState([
+            "id" => 0,
+            "event_type" => EventType::BoardUpdateTriggered->name,
+            "timestamp" => time(),
+            "post_id" => null,
+            "board_id" => $board->getId(),
+        ]));
 
         return new Response(['post_id' => $new_post_id, 'password' => $post->getPassword()], 201);
     }
