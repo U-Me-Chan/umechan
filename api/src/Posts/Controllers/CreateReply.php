@@ -51,7 +51,7 @@ final class CreateReply
 
             $this->event_storage->save(Event::fromArray([
                 "id" => 0,
-                "event_type" => EventType::ThreadUpdateTriggered,
+                "event_type" => EventType::ThreadUpdateTriggered->name,
                 "timestamp" => time(),
                 "post_id" => $parent_id,
                 "board_id" => null,
