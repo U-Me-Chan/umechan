@@ -5,7 +5,6 @@ namespace Ridouchire\RadioMetrics\Http\Controllers;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
 use Ridouchire\RadioMetrics\Exceptions\EntityNotFound;
-use Ridouchire\RadioMetrics\Services\Mpd;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
 use Ridouchire\RadioMetrics\Utils\Container;
 
