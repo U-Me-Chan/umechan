@@ -2,69 +2,60 @@
 
 namespace PK\Posts\Controllers;
 
-use PK\Events\Event\Event;
-use PK\Events\EventStorage;
+use Evenement\EventEmitter;
 use PK\Events\Event\EventType;
 use PK\Http\Request;
 use PK\Http\Response;
-use PK\Posts\PostStorage;
+use PK\Passports\IPassportRepository;
+use PK\Passports\Passport\Password;
+use PK\Posts\IPostRepository;
+use PK\Posts\Post\IsVerifyPoster;
 use PK\Posts\Post\Post;
+use PK\Posts\Post\Poster;
 
 final class CreateReply
 {
     public function __construct(
-        private PostStorage $post_storage,
-        private EventStorage $event_storage,
+        private IPostRepository $post_storage,
+        private IPassportRepository $passport_repo,
+        private EventEmitter $events
     ) {
     }
 
     public function __invoke(Request $req, array $vars): Response
     {
-        $parent_id = $vars['id'];
-
         if ($req->getParams('message') == null) {
-            return new Response([], 400);
+            return (new Response([], 400))->setException(new \InvalidArgumentException('Не передано сообщение'));
         }
 
         try {
-            $thread = $this->post_storage->findById($parent_id);
-        } catch (\OutOfBoundsException $e) {
-            return new Response([], 404);
+            $thread = $this->post_storage->findOne(['id' => $vars['id']]);
+        } catch (\OutOfBoundsException) {
+            return (new Response([], 404))->setException(new \OutOfBoundsException('Нет такой нити'));
         }
-
-        $post = Post::draft($thread->board, $parent_id, $req->getParams('message'));
 
         if ($req->getParams('poster')) {
-            $post->poster = $req->getParams('poster');
+            try {
+                /** @var Passport */
+                $passport = $this->passport_repo->findOne(['hash' => Password::draft($req->getParams('poster'))->toString()]);
+
+                $poster = Poster::draft($passport->name->toString(), IsVerifyPoster::YES);
+            } catch (\OutOfBoundsException) {
+                $poster = Poster::draft($req->getParams('poster'), IsVerifyPoster::NO);
+            }
+        } else {
+            $poster = Poster::draft('Anonymous', IsVerifyPoster::NO);
         }
 
-        if ($req->getParams('subject')) {
-            $post->subject = $req->getParams('subject');
-        }
+        $post = Post::draft($thread->board, $thread->id, $req->getParams('message'), $poster, $req->getParams('subject') ? $req->getParams('subject') : '');
 
         $id = $this->post_storage->save($post);
 
-        if ($thread->replies_count < 500 && !$req->getParams('sage')) {
-            $thread->updated_at = time();
+        $this->events->emit(EventType::PostCreated->value, ['post_id' => $id]);
 
-            $this->post_storage->save($thread);
-
-            $this->event_storage->save(Event::fromArray([
-                "id" => 0,
-                "event_type" => EventType::ThreadUpdateTriggered->name,
-                "timestamp" => time(),
-                "post_id" => $parent_id,
-                "board_id" => null,
-            ]));
+        if ($thread->replies_count <= 500 && !$req->getParams('sage')) {
+            $this->events->emit(EventType::ThreadUpdateTriggered->value, ['thread_id' => $thread->id]);
         }
-
-        $this->event_storage->save(Event::fromArray([
-            "id" => 0,
-            "event_type" => EventType::PostCreated->name,
-            "timestamp" => time(),
-            "post_id" => $post->id,
-            "board_id" => null,
-        ]));
 
         return new Response(['post_id' => $id, 'password' => $post->password], 201);
     }

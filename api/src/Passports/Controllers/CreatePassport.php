@@ -4,13 +4,13 @@ namespace PK\Passports\Controllers;
 
 use PK\Http\Request;
 use PK\Http\Response;
+use PK\Passports\IPassportRepository;
 use PK\Passports\Passport\Passport;
-use PK\Passports\PassportStorage;
 
 final class CreatePassport
 {
     public function __construct(
-        private PassportStorage $passport_repo,
+        private IPassportRepository $passport_repo,
         private string $default_name
     ) {
     }

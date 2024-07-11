@@ -4,18 +4,18 @@ namespace PK\Passports\Controllers;
 
 use PK\Http\Request;
 use PK\Http\Response;
-use Pk\Passports\PassportStorage;
+use PK\Passports\IPassportRepository;
 
 final class GetPassportList
 {
     public function __construct(
-        private PassportStorage $passport_repo
+        private IPassportRepository $passport_repo
     ) {
     }
 
     public function __invoke(Request $req): Response
     {
-        list($passports, $count) = $this->passport_repo->fetch();
+        list($passports, $count) = $this->passport_repo->findMany();
 
         return new Response([
             'passports' => $passports,

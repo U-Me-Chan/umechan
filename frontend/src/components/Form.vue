@@ -35,94 +35,105 @@ const axios  = require('axios');
 const formData = require('form-data');
 
 export default {
-    name: 'Form',
-    props: {
-        tag: {
-            type: String,
-        },
-        parent_id: {
-            type: [String, Boolean, Number],
-            default: false
-        },
-        message: {
-            type: String,
-            default: ''
-        }
+  name: 'Form',
+  props: {
+    tag: {
+      type: String,
     },
-    methods: {
-        init: function () {
-            this.subject = '';
-            this.message = '';
-            this.isSage = false;
-        },
-        uploadImage: function() {
-            var uploadData = new formData();
-            var self = this;
-
-            uploadData.append('image', this.file, 'name.jpg');
-
-            axios.post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data' }}).then((response) => {
-                var orig = response.data.original_file;
-                var thumb = response.data.thumbnail_file;
-
-                self.message = self.message + '\n' + `[![](${thumb})](${orig})`;
-                self.image = null;
-            }).catch((error) => {
-                self.$buefy.toast.open(`Произошла ошибка при отправке изображения: ${error}`);
-                self.image = null;
-            });
-        },
-        create: function () {
-            if (this.message.length == 0) {
-                this.$buefy.toast.open('Нельзя отправить пустое сообщение!');
-
-                return;
-            }
-
-            this.isLoading = true;
-
-            var self = this;
-
-            var data = {};
-            data['poster'] = this.poster;
-            data['subject'] = this.subject;
-            data['message'] = this.message;
-            data['tag'] = this.tag;
-
-            if (this.isSage == true) {
-                data['sage'] = true;
-            }
-
-            if (this.parent_id) {
-                data['parent_id'] = this.parent_id;
-            }
-
-            axios.post(config.chan_url + '/post', data).then((response) => {
-                self.$buefy.toast.open('Отправлено!');
-                self.init();
-
-                self.isLoading = false;
-
-                bus.$emit('form:success', [response.data]);
-            }).catch((error) => {
-                self.$buefy.toast.open(`Ошибка: ${error}`);
-            });
-        }
+    parent_id: {
+      type: [String, Boolean, Number],
+      default: false
     },
-    data: function () {
-        return {
-            poster: 'Anonymous',
-            subject: '',
-            isSage: false,
-            file: null,
-            isLoading: false
-        }
-    },
-    watch: {
-        'file': function () {
-            this.uploadImage();
-        }
+    message: {
+      type: String,
+      default: ''
     }
+  },
+  methods: {
+    init: function () {
+      this.subject = '';
+      this.message = '';
+      this.isSage = false;
+    },
+    uploadImage: function() {
+      var uploadData = new formData();
+      var self = this;
+      
+      uploadData.append('image', this.file, 'name.jpg');
+      
+      axios.post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data' }}).then((response) => {
+        var orig = response.data.original_file;
+        var thumb = response.data.thumbnail_file;
+	
+        self.message = self.message + '\n' + `[![](${thumb})](${orig})`;
+        self.image = null;
+      }).catch((error) => {
+        self.$buefy.toast.open(`Произошла ошибка при отправке изображения: ${error}`);
+        self.image = null;
+      });
+    },
+    create: function () {
+      if (this.message.length == 0) {
+        this.$buefy.toast.open('Нельзя отправить пустое сообщение!');
+	
+        return;
+      }
+      
+      this.isLoading = true;
+      
+      var self = this;
+      
+      var data = {};
+      data['poster'] = this.poster;
+      data['subject'] = this.subject;
+      data['message'] = this.message;
+      data['tag'] = this.tag;
+      
+      if (this.isSage == true) {
+        data['sage'] = true;
+      }
+      
+      if (this.parent_id) {
+        data['parent_id'] = this.parent_id;
+      }
+      
+      if (this.parent_id == false) {
+        axios.post(config.chan_url + '/v2/post', data).then((response) => {
+          self.$buefy.toast.open('Отправлено!');
+          self.init();
+          
+          self.isLoading = false;
+          
+          bus.$emit('form:success', [response.data]);
+        }).catch((error) => {
+          self.$buefy.toast.open(`Ошибка: ${error}`);
+        });
+      } else {
+        axios.put(config.chan_url + '/v2/post/' + this.parent_id, data).then((response) => {
+          self.$buefy.toast.open('Отправлено!');
+          self.init();
+
+          self.isLoading = false;
+
+          bus.$emit('form:success', [response.data]);
+        })
+      }
+    }
+  },
+  data: function () {
+    return {
+      poster: 'Anonymous',
+      subject: '',
+      isSage: false,
+      file: null,
+      isLoading: false
+    }
+  },
+  watch: {
+    'file': function () {
+      this.uploadImage();
+    }
+  }
 }
 
 </script>

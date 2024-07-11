@@ -24,7 +24,10 @@ class Request
 
         if (preg_match('/^application\/json.*/', $server['CONTENT_TYPE'])) {
             $postData = file_get_contents('php://input');
-            $post = json_decode($postData, true);
+
+            if (!empty($postData)) {
+                $post = json_decode($postData, true);
+            }
         }
 
         foreach ($server as $name => $value) {

@@ -4,12 +4,12 @@ namespace PK\Posts\Controllers;
 
 use PK\Http\Request;
 use PK\Http\Response;
-use PK\Posts\PostStorage;
+use PK\Posts\IPostRepository;
 
 final class GetThreadList
 {
     public function __construct(
-        private PostStorage $storage
+        private IPostRepository $post_repo
     ) {
     }
 
@@ -20,11 +20,7 @@ final class GetThreadList
 
         $tags = explode('+', $vars['tags']);
 
-        try {
-            list($posts, $count) = $this->storage->find($limit, $offset, $tags);
-        } catch (\OutOfBoundsException $e) {
-            return new Response([], 400);
-        }
+        list($posts, $count) = $this->post_repo->findMany(['board_tags' => $tags, 'limit' => $limit, 'offset' => $offset, 'parent_id' => null]);
 
         return new Response(['count' => $count, 'posts' => $posts]);
     }

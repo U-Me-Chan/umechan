@@ -5,12 +5,12 @@ namespace PK\Controllers;
 use Medoo\Medoo;
 use PK\Http\Request;
 use PK\Http\Response;
-use PK\Boards\BoardStorage;
+use PK\Boards\IBoardRepository;
 
 class BoardsFetcher
 {
     public function __construct(
-        private BoardStorage $board_repo,
+        private IBoardRepository $board_repo,
         private Medoo $db
     ) {
     }
@@ -24,14 +24,13 @@ class BoardsFetcher
      */
     public function __invoke(Request $req): Response
     {
-        $results['boards'] = $this->board_repo->find();
+        list($boards,) = $this->board_repo->findMany();
 
-        /** @var array */
+        $results['boards'] = $boards;
+
         $exclude_tags = $req->getParams('exclude_tags') ? $req->getParams('exclude_tags') : ['und', 'fap'];
-        /** @var int */
-        $limit = $req->getParams('limit') ? $req->getParams('limit') : 20;
-        /** @var int */
-        $offset = $req->getParams('offset') ? $req->getParams('offset') : 0;
+        $limit        = $req->getParams('limit') ? $req->getParams('limit') : 20;
+        $offset       = $req->getParams('offset') ? $req->getParams('offset') : 0;
 
         $conditions = [
             'AND' => [
