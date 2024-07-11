@@ -67,10 +67,6 @@ const routes = [
     {
       path: '/radio/tracks',
       component: () => import('./components/Tracks.vue')
-    },
-    {
-      path: '/admin/delete-post/:id',
-      component: () => import('./components/DeletePost.vue')
     }
 ]
 

@@ -11,10 +11,6 @@
     </div>
 
     <Radio class="column radio-content"/>
-
-    <div class="auth-panel">
-      <AuthPanel/>
-    </div>
   </div>
 
   <footer class="footer">
@@ -31,14 +27,13 @@
 import axios from 'axios'
 import { bus} from '../bus'
 import Radio from './Radio.vue'
-import AuthPanel from './AuthPanel.vue'
 
 const config = require('../../config')
 
 export default {
   name: 'App',
   components: {
-    Radio, AuthPanel
+    Radio
   },
   data: function () {
     return {
