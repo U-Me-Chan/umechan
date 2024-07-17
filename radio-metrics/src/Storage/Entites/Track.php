@@ -59,9 +59,21 @@ class Track extends AEntity
         $this->estimate = $this->estimate + $listeners;
     }
 
-    public function decreaseEstimate(int $value): void
+    public function decreaseEstimate(): void
     {
-        $this->estimate = $this->estimate - $value;
+        if ($this->estimate == 0) {
+            $this->estimate = -1;
+        }
+
+        if ($this->estimate == 2 || $this->estimate == 1) {
+            $this->estimate = 0;
+        }
+
+        if ($this->estimate < 0) {
+            return;
+        }
+
+        $this->estimate = ceil($this->estimate / 2);
     }
 
     public function togglePlaying(): void
