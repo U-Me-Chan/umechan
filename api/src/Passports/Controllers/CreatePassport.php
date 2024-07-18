@@ -46,7 +46,11 @@ final class CreatePassport
 
         $passport = Passport::draft($req->getParams('name'), $req->getParams('key'));
 
-        $this->passport_repo->save($passport);
+        try {
+            $this->passport_repo->save($passport);
+        } catch (\RuntimeException $e) {
+            return (new Response([], 400))->setException($e);
+        }
 
         return new Response([], 201);
     }

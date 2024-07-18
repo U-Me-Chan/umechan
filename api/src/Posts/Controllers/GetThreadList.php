@@ -20,7 +20,14 @@ final class GetThreadList
 
         $tags = explode('+', $vars['tags']);
 
-        list($posts, $count) = $this->post_repo->findMany(['board_tags' => $tags, 'limit' => $limit, 'offset' => $offset, 'parent_id' => null]);
+        list($posts, $count) = $this->post_repo->findMany(
+            [
+                'board_tags' => $tags,
+                'limit'      => $limit,
+                'offset'     => $offset,
+                'parent_id'  => null
+            ]
+        );
 
         return new Response(['count' => $count, 'posts' => $posts]);
     }

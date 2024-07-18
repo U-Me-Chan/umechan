@@ -47,7 +47,13 @@ final class CreateReply
             $poster = Poster::draft('Anonymous', IsVerifyPoster::NO);
         }
 
-        $post = Post::draft($thread->board, $thread->id, $req->getParams('message'), $poster, $req->getParams('subject') ? $req->getParams('subject') : '');
+        $post = Post::draft(
+            $thread->board,
+            $thread->id,
+            $req->getParams('message'),
+            $poster,
+            $req->getParams('subject') ? $req->getParams('subject') : ''
+        );
 
         $id = $this->post_storage->save($post);
 

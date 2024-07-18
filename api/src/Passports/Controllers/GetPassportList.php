@@ -2,7 +2,6 @@
 
 namespace PK\Passports\Controllers;
 
-use PK\Http\Request;
 use PK\Http\Response;
 use PK\Passports\IPassportRepository;
 
@@ -13,7 +12,7 @@ final class GetPassportList
     ) {
     }
 
-    public function __invoke(Request $req): Response
+    public function __invoke(): Response
     {
         list($passports, $count) = $this->passport_repo->findMany();
 
