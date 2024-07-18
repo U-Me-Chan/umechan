@@ -15,7 +15,7 @@ final class GetBoardList
 
     public function __invoke(Request $req): Response
     {
-        $exclude_tags = $req->getParams('exclude_tags') ? $req->getParams('exclude_tags') : ['fap', 'test'];
+        $exclude_tags = $req->getParams('exclude_tags') ? $req->getParams('exclude_tags') : ['fap', 'und'];
 
         foreach ($exclude_tags as $k => $tag) {
             if (empty($tag)) {
