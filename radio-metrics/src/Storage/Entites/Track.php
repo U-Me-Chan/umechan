@@ -54,26 +54,32 @@ class Track extends AEntity
         $this->play_count = $this->play_count + 1;
     }
 
-    public function bumpEstimate(int $listeners): void
+    public function increaseEstimate(int $value): void
     {
-        $this->estimate = $this->estimate + $listeners;
+        $this->estimate = $this->estimate + $value;
     }
 
     public function decreaseEstimate(): void
     {
-        if ($this->estimate == 0) {
-            $this->estimate = -1;
-        }
+        $estimate = (int) ceil($this->estimate / $this->duration);
 
-        if ($this->estimate == 2 || $this->estimate == 1) {
-            $this->estimate = 0;
-        }
+        if ($estimate == 0) {
+            $this->estimate = $this->estimate - $this->duration;
 
-        if ($this->estimate < 0) {
             return;
         }
 
-        $this->estimate = ceil($this->estimate / 2);
+        if ($estimate == 2 || $estimate == 1) {
+            $this->estimate = 0;
+
+            return;
+        }
+
+        if ($estimate < 0)  {
+            $this->estimate = ceil($this->estimate * 2);
+        } else {
+            $this->estimate = ceil($this->estimate / 2);
+        }
     }
 
     public function togglePlaying(): void
@@ -124,6 +130,11 @@ class Track extends AEntity
     public function getHash(): string|null
     {
         return $this->hash;
+    }
+
+    public function getEstimate(): int
+    {
+        return $this->estimate;
     }
 
     private function __construct(

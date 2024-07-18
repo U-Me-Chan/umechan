@@ -72,7 +72,7 @@ class TickHandler
 
         if ($listeners !== 0) {
             $this->logger->debug("Увеличиваю оценку трека", ['track' => $track->getName(), 'listeners' => $listeners]);
-            $track->bumpEstimate($listeners);
+            $track->increaseEstimate($listeners);
         }
 
         if ($track->getName() !== $this->last_track->getName()) {
