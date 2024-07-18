@@ -63,7 +63,7 @@ final class EstimateTrack
 
         switch ($query_params['operator']) {
             case 'plus':
-                $track->bumpEstimate($track->getDuration() * 3);
+                $track->increaseEstimate($track->getDuration() * 3);
 
                 break;
             case 'minus':
