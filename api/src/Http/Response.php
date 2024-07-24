@@ -4,8 +4,6 @@ namespace PK\Http;
 
 class Response
 {
-    private const API_VERSION = '1.0.0';
-
     private $data;
     private $code;
     private $headers;
@@ -28,7 +26,6 @@ class Response
     {
         $body = [
             'payload' => $this->data,
-            'version' => self::API_VERSION,
             'error'   => null
         ];
 

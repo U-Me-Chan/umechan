@@ -4,13 +4,13 @@ namespace PK\Passports\Controllers;
 
 use PK\Http\Request;
 use PK\Http\Response;
+use PK\Passports\IPassportRepository;
 use PK\Passports\Passport\Passport;
-use PK\Passports\PassportStorage;
 
 final class CreatePassport
 {
     public function __construct(
-        private PassportStorage $passport_repo,
+        private IPassportRepository $passport_repo,
         private string $default_name
     ) {
     }
@@ -46,7 +46,11 @@ final class CreatePassport
 
         $passport = Passport::draft($req->getParams('name'), $req->getParams('key'));
 
-        $this->passport_repo->save($passport);
+        try {
+            $this->passport_repo->save($passport);
+        } catch (\RuntimeException $e) {
+            return (new Response([], 400))->setException($e);
+        }
 
         return new Response([], 201);
     }

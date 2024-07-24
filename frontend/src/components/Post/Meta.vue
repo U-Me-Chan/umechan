@@ -11,7 +11,6 @@
   </a>
 
   <b-button v-if="isShowButtons" type="is-text" size="is-small" @click="isFormVisible = !isFormVisible">Ответить</b-button>
-  <b-button type="is-text" size="is-small" @click="deletePost(id, $event)">Удалить</b-button>
   <b-modal v-model="isFormVisible">
     <Form v-if="isFormVisible"
           :parent_id="!parentId ? id : parentId"

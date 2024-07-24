@@ -2,10 +2,10 @@
 
 namespace PK\Events\Event;
 
-enum EventType
+enum EventType: string
 {
-    case PostCreated;
-    case PostDeleted;
-    case BoardUpdateTriggered;
-    case ThreadUpdateTriggered;
+    case PostCreated           = 'PostCreated';
+    case PostDeleted           = 'PostDeleted';
+    case BoardUpdateTriggered  = 'BoardUpdateTriggered';
+    case ThreadUpdateTriggered = 'ThreadUpdateTriggered';
 }

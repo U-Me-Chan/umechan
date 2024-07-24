@@ -4,13 +4,12 @@ namespace PK\Posts\Controllers;
 
 use PK\Http\Request;
 use PK\Http\Response;
-use PK\Posts\PostStorage;
-use PK\Posts\Post\Post;
+use PK\Posts\IPostRepository;
 
 final class GetThread
 {
     public function __construct(
-        private PostStorage $storage
+        private IPostRepository $post_repo
     ) {
     }
 
@@ -19,11 +18,11 @@ final class GetThread
         $id = $vars['id'];
 
         try {
-            $post = $this->storage->findById($id);
-        } catch (\OutOfBoundsException $e) {
+            $thread = $this->post_repo->findOne(['id' => $id]);
+        } catch (\OutOfBoundsException) {
             return new Response([], 404);
         }
 
-        return new Response(['thread_data' => $post]);
+        return new Response(['thread_data' => $thread]);
     }
 }

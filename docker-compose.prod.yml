@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   db:
     image: mysql:8.3.0
@@ -142,7 +140,7 @@ services:
       - './data/files:/var/www/html/files'
       - './logs:/var/log/nginx'
     ports:
-      - '8000:80'
+      - '80:80'
   promtail:
     container_name: umechan-promtail
     image: grafana/promtail:latest
