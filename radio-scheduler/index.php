@@ -11,6 +11,7 @@ use Ridouchire\RadioScheduler\RotationMaster;
 use Ridouchire\RadioScheduler\RotationStrategies\AverageInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\ByEstimateInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
+use Ridouchire\RadioScheduler\RotationStrategies\JingleAndCommercialPattern;
 use Ridouchire\RadioScheduler\RotationStrategies\NewInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\TopInGenre;
 use Ridouchire\RadioScheduler\TickHandler;
@@ -38,8 +39,9 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-$genre_pattern_strategy        = new GenrePattern($mpd, $log);
-$by_estimate_in_genre_strategy = new ByEstimateInGenre($db, $mpd, $log);
+$genre_pattern_strategy                 = new GenrePattern($mpd, $log);
+$by_estimate_in_genre_strategy          = new ByEstimateInGenre($db, $mpd, $log);
+$jingle_and_commercial_pattern_strategy = new JingleAndCommercialPattern($db, $mpd, $log);
 
 $strategy_master = new RotationMaster($log);
 
@@ -51,7 +53,7 @@ $queue_cropper = new QueueCropper($mpd);
 
 TickCounter::create(0);
 
-Loop::addPeriodicTimer(1, function () use ($tickHanlder, $log, $mpd, $queue_cropper) {
+Loop::addPeriodicTimer(1, function () use ($tickHanlder, $log, $mpd, $queue_cropper, $jingle_and_commercial_pattern_strategy) {
     $tickHanlder();
 
     TickCounter::tick();
@@ -64,6 +66,8 @@ Loop::addPeriodicTimer(1, function () use ($tickHanlder, $log, $mpd, $queue_crop
         if ($queue_cropper(time() + (60 * 60 * 4)) == false) {
             $log->error('Ошибка при очищении очереди воспроизведения');
         }
+
+        $jingle_and_commercial_pattern_strategy->execute();
     } catch (Exception) {
         $log->debug('Время очищения очереди воспроизведения ещё не пришло');
     }
