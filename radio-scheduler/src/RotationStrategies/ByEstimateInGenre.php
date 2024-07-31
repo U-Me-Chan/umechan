@@ -4,12 +4,14 @@ namespace Ridouchire\RadioScheduler\RotationStrategies;
 
 use Medoo\Medoo;
 use Monolog\Logger;
+use Ridouchire\RadioScheduler\IRotation;
+use Ridouchire\RadioScheduler\Commercials;
+use Ridouchire\RadioScheduler\Jingles;
+use Ridouchire\RadioScheduler\Mpd;
 use Ridouchire\RadioScheduler\GenreSchemas\Day;
 use Ridouchire\RadioScheduler\GenreSchemas\Evening;
 use Ridouchire\RadioScheduler\GenreSchemas\Morning;
 use Ridouchire\RadioScheduler\GenreSchemas\Night;
-use Ridouchire\RadioScheduler\IRotation;
-use Ridouchire\RadioScheduler\Mpd;
 
 class ByEstimateInGenre implements IRotation
 {
@@ -17,6 +19,8 @@ class ByEstimateInGenre implements IRotation
 
     public function __construct(
         private Medoo $db,
+        private Jingles $jingles,
+        private Commercials $commercials,
         private Mpd $mpd,
         private Logger $logger
     ) {
@@ -80,6 +84,7 @@ class ByEstimateInGenre implements IRotation
         }
 
         $track_paths = [];
+        $track_count = random_int(3, 5);
 
         $avg_track_paths = $this->db->select('tracks', 'path', [
             'path[~]' => "{$genre}/%",
@@ -88,7 +93,7 @@ class ByEstimateInGenre implements IRotation
             'ORDER' => [
                 'last_playing' => 'ASC'
             ],
-            'LIMIT' => [0, random_int(5, 10)]
+            'LIMIT' => [0, $track_count]
         ]);
 
         $new_track_path = $this->db->select('tracks', 'path', [
@@ -96,7 +101,7 @@ class ByEstimateInGenre implements IRotation
             'ORDER'   => [
                 'play_count' => 'ASC',
             ],
-            'LIMIT' => [0, random_int(5, 10)]
+            'LIMIT' => [0, $track_count]
         ]);
 
         $top_track_paths = $this->db->select('tracks', 'path', [
@@ -105,7 +110,7 @@ class ByEstimateInGenre implements IRotation
             'ORDER' => [
                 'estimate' => 'DESC'
             ],
-            'LIMIT' => [0, random_int(5, 10)]
+            'LIMIT' => [0, $track_count]
         ]);
 
         $track_paths = array_merge($avg_track_paths, $new_track_path, $top_track_paths);
@@ -113,6 +118,15 @@ class ByEstimateInGenre implements IRotation
         $this->logger->debug(implode(',', $track_paths));
 
         shuffle($track_paths);
+
+        list($jingle_one, $jingle_two)          = $this->jingles->getJingles();
+        list($comm_one, $comm_two, $comm_three) = $this->commercials->getCommercials();
+
+        array_unshift($track_paths, $comm_three);
+        array_unshift($track_paths, $comm_two);
+        array_unshift($track_paths, $comm_one);
+        array_unshift($track_paths, $jingle_one);
+        array_push($track_paths, $jingle_two);
 
         $this->mpd->cropQueue();
 

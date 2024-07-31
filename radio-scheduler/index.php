@@ -5,6 +5,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use React\EventLoop\Loop;
+use Ridouchire\RadioScheduler\Commercials;
+use Ridouchire\RadioScheduler\Jingles;
 use Ridouchire\RadioScheduler\Mpd;
 use Ridouchire\RadioScheduler\QueueCropper;
 use Ridouchire\RadioScheduler\RotationMaster;
@@ -39,21 +41,23 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-$genre_pattern_strategy                 = new GenrePattern($mpd, $log);
-$by_estimate_in_genre_strategy          = new ByEstimateInGenre($db, $mpd, $log);
-$jingle_and_commercial_pattern_strategy = new JingleAndCommercialPattern($db, $mpd, $log);
+$jingles     = new Jingles($db);
+$commercials = new Commercials($db);
+
+$genre_pattern_strategy        = new GenrePattern($mpd, $jingles, $log);
+$by_estimate_in_genre_strategy = new ByEstimateInGenre($db, $jingles, $commercials, $mpd, $log);
 
 $strategy_master = new RotationMaster($log);
 
 $strategy_master->addStrategy($genre_pattern_strategy);
 $strategy_master->addStrategy($by_estimate_in_genre_strategy);
 
-$tickHanlder = new TickHandler($strategy_master);
+$tickHanlder   = new TickHandler($strategy_master);
 $queue_cropper = new QueueCropper($mpd);
 
 TickCounter::create(0);
 
-Loop::addPeriodicTimer(1, function () use ($tickHanlder, $log, $mpd, $queue_cropper, $jingle_and_commercial_pattern_strategy) {
+Loop::addPeriodicTimer(1, function () use ($tickHanlder, $log, $mpd, $queue_cropper) {
     $tickHanlder();
 
     TickCounter::tick();
@@ -66,8 +70,6 @@ Loop::addPeriodicTimer(1, function () use ($tickHanlder, $log, $mpd, $queue_crop
         if ($queue_cropper(time() + (60 * 60 * 4)) == false) {
             $log->error('Ошибка при очищении очереди воспроизведения');
         }
-
-        $jingle_and_commercial_pattern_strategy->execute();
     } catch (Exception) {
         $log->debug('Время очищения очереди воспроизведения ещё не пришло');
     }

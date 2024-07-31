@@ -8,6 +8,7 @@ use Ridouchire\RadioScheduler\GenreSchemas\Day;
 use Ridouchire\RadioScheduler\GenreSchemas\Evening;
 use Ridouchire\RadioScheduler\GenreSchemas\Morning;
 use Ridouchire\RadioScheduler\GenreSchemas\Night;
+use Ridouchire\RadioScheduler\Jingles;
 use Ridouchire\RadioScheduler\Mpd;
 use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
 
@@ -25,7 +26,14 @@ class GenrePatternTest extends TestCase
             $this->assertEquals('GenrePatternStrategy: очередь ещё не подошла к концу', $args[0]);
         });
 
-        $strategy = new GenrePattern($mpd, $logger);
+        /** @var Jingles|MockObject */
+        $jingles = $this->createMock(Jingles::class);
+        $jingles->method('getJingles')->willReturn([
+            'Jingles/1.mp3',
+            'Jingles/2.mp3'
+        ]);
+
+        $strategy = new GenrePattern($mpd, $jingles, $logger);
 
         $strategy->execute();
     }
@@ -57,7 +65,7 @@ class GenrePatternTest extends TestCase
             ];
         });
         $mpd->method('addToQueue')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], ['1.mp3', '2.mp3']);
+            $this->assertContains($args[0], ['1.mp3', '2.mp3', 'Jingles/1.mp3', 'Jingles/2.mp3']);
 
             return true;
         });
@@ -65,7 +73,14 @@ class GenrePatternTest extends TestCase
         /** @var Logger|MockObject */
         $logger = $this->createMock(Logger::class);
 
-        $strategy = new GenrePattern($mpd, $logger);
+        /** @var Jingles|MockObject */
+        $jingles = $this->createMock(Jingles::class);
+        $jingles->method('getJingles')->willReturn([
+            'Jingles/1.mp3',
+            'Jingles/2.mp3'
+        ]);
+
+        $strategy = new GenrePattern($mpd, $jingles, $logger);
 
         $strategy->execute(strtotime($datetime));
     }
@@ -110,7 +125,7 @@ class GenrePatternTest extends TestCase
             ];
         });
         $mpd->method('addToQueue')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], ['1.mp3', '2.mp3']);
+            $this->assertContains($args[0], ['1.mp3', '2.mp3', 'Jingles/1.mp3', 'Jingles/2.mp3']);
 
             return true;
         });
@@ -118,7 +133,14 @@ class GenrePatternTest extends TestCase
         /** @var Logger|MockObject */
         $logger = $this->createMock(Logger::class);
 
-        $strategy = new GenrePattern($mpd, $logger);
+        /** @var Jingles|MockObject */
+        $jingles = $this->createMock(Jingles::class);
+        $jingles->method('getJingles')->willReturn([
+            'Jingles/1.mp3',
+            'Jingles/2.mp3'
+        ]);
+
+        $strategy = new GenrePattern($mpd, $jingles, $logger);
 
         $strategy->execute(strtotime($datetime));
     }
@@ -159,7 +181,7 @@ class GenrePatternTest extends TestCase
             ];
         });
         $mpd->method('addToQueue')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], ['1.mp3', '2.mp3']);
+            $this->assertContains($args[0], ['1.mp3', '2.mp3', 'Jingles/1.mp3', 'Jingles/2.mp3']);
 
             return true;
         });
@@ -167,7 +189,14 @@ class GenrePatternTest extends TestCase
         /** @var Logger|MockObject */
         $logger = $this->createMock(Logger::class);
 
-        $strategy = new GenrePattern($mpd, $logger);
+        /** @var Jingles|MockObject */
+        $jingles = $this->createMock(Jingles::class);
+        $jingles->method('getJingles')->willReturn([
+            'Jingles/1.mp3',
+            'Jingles/2.mp3'
+        ]);
+
+        $strategy = new GenrePattern($mpd, $jingles, $logger);
 
         $strategy->execute(strtotime($datetime));
     }
@@ -215,7 +244,7 @@ class GenrePatternTest extends TestCase
             ];
         });
         $mpd->method('addToQueue')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], ['1.mp3', '2.mp3']);
+            $this->assertContains($args[0], ['1.mp3', '2.mp3', 'Jingles/1.mp3', 'Jingles/2.mp3']);
 
             return true;
         });
@@ -223,7 +252,14 @@ class GenrePatternTest extends TestCase
         /** @var Logger|MockObject */
         $logger = $this->createMock(Logger::class);
 
-        $strategy = new GenrePattern($mpd, $logger);
+        /** @var Jingles|MockObject */
+        $jingles = $this->createMock(Jingles::class);
+        $jingles->method('getJingles')->willReturn([
+            'Jingles/1.mp3',
+            'Jingles/2.mp3'
+        ]);
+
+        $strategy = new GenrePattern($mpd, $jingles, $logger);
 
         $strategy->execute(strtotime($datetime));
     }

@@ -8,6 +8,7 @@ use Ridouchire\RadioScheduler\GenreSchemas\Evening;
 use Ridouchire\RadioScheduler\GenreSchemas\Morning;
 use Ridouchire\RadioScheduler\GenreSchemas\Night;
 use Ridouchire\RadioScheduler\IRotation;
+use Ridouchire\RadioScheduler\Jingles;
 use Ridouchire\RadioScheduler\Mpd;
 
 class GenrePattern implements IRotation
@@ -16,6 +17,7 @@ class GenrePattern implements IRotation
 
     public function __construct(
         private Mpd $mpd,
+        private Jingles $jingles,
         private Logger $log
     ) {
     }
@@ -109,6 +111,11 @@ class GenrePattern implements IRotation
                 $track_paths[] = $track['file'];
             }
         }
+
+        list($jingle_one, $jingle_two) = $this->jingles->getJingles();
+
+        array_unshift($track_paths, $jingle_one);
+        array_push($track_paths, $jingle_two);
 
         $this->mpd->cropQueue();
 
