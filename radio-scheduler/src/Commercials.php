@@ -15,7 +15,7 @@ class Commercials
 
     public function getCommercials(int $count = 3): array
     {
-        return $this->db->get('tracks', 'path', [
+        return $this->db->select('tracks', 'path', [
             'path[~]' => self::COMMERICIALS_DIR . '/%',
             'ORDER'   => [
                 'last_playing' => 'ASC'
