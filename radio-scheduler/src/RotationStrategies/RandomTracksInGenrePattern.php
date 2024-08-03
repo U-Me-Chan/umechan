@@ -2,7 +2,9 @@
 
 namespace Ridouchire\RadioScheduler\RotationStrategies;
 
+use Medoo\Medoo;
 use Monolog\Logger;
+use Ridouchire\RadioScheduler\Commercials;
 use Ridouchire\RadioScheduler\GenreSchemas\Day;
 use Ridouchire\RadioScheduler\GenreSchemas\Evening;
 use Ridouchire\RadioScheduler\GenreSchemas\Morning;
@@ -11,21 +13,23 @@ use Ridouchire\RadioScheduler\IRotation;
 use Ridouchire\RadioScheduler\Jingles;
 use Ridouchire\RadioScheduler\Mpd;
 
-class GenrePattern implements IRotation
+class RandomTracksInGenrePattern implements IRotation
 {
-    public const NAME = 'GenrePattern';
+    public const NAME = 'RandomTracksInGenrePattern';
 
     public function __construct(
-        private Mpd $mpd,
+        private Medoo $db,
         private Jingles $jingles,
+        private Commercials $commercials,
+        private Mpd $mpd,
         private Logger $log
     ) {
     }
 
     public function execute(int $timestamp = 0): void
     {
-        if ($this->mpd->getQueueCount() > 1) {
-            $this->log->debug('GenrePatternStrategy: очередь ещё не подошла к концу');
+        if ($this->mpd->getQueueCount > 1) {
+            $this->log->debug(self::NAME . ': очередь ещё не подошла к концу');
 
             return;
         }
@@ -36,7 +40,7 @@ class GenrePattern implements IRotation
 
         $hour = date('G', $timestamp);
 
-        switch($hour) {
+                switch($hour) {
             case 0:
             case 1:
             case 2:
@@ -78,50 +82,25 @@ class GenrePattern implements IRotation
                 break;
         }
 
-        shuffle($pls_list);
+        $this->log->info(self::NAME . ': ставлю ' . implode(',', $pls_list));
 
-        $this->log->info('GenrePatternStrategy: ставлю ' . implode(',', $pls_list));
+        $track_count = random_int(9, 15);
 
-        $track_paths = [];
+        $track_paths = $this->db->rand('tracks', [
+            'path[~]' => $pls_list,
+            'LIMIT' => [0, $track_count]
+        ]);
 
-        foreach ($pls_list as $pls) {
-            $limit = random_int(3, 5);
+        list($jingle) = $this->jingles->getJingles(1);
+        list($comm_first, $comm_second, $comm_third) = $this->commercials->getCommercials();
 
-            for ($i = 0; $i < $limit; $i++) {
-                $count = $this->mpd->getCountSongsInDirectory($pls);
-
-                $start = random_int(0, $count);
-                $end   = $start + 1;
-
-                if ($start == $count) {
-                    $end   = $count;
-                    $start = $count - 1;
-                }
-
-                /** @var array */
-                $_tracks = $this->mpd->getTracks($pls, $start, $end);
-
-                if (empty($_tracks)) {
-                    throw new \RuntimeException("GenrePatternStrategy: ошибка при получении данных трека для плейлиста {$pls}");
-                }
-
-                /** @var array */
-                $track = reset($_tracks);
-
-                $track_paths[] = $track['file'];
-            }
-        }
-
-        list($jingle_one, $jingle_two) = $this->jingles->getJingles();
-
-        array_unshift($track_paths, $jingle_one);
-        array_push($track_paths, $jingle_two);
+        array_unshift($track_paths, $jingle);
+        array_push($track_paths, $comm_first, $comm_second, $comm_third);
 
         $this->mpd->cropQueue();
 
         array_walk($track_paths, function (string $path) {
-            $this->log->info("GenrePatternStrategy: ставлю в очередь файл {$path}");
-
+            $this->log->info(self::NAME . ': ' . "ставлю в очередь файл {$path}");
             $this->mpd->addToQueue($path);
         });
     }

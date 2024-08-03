@@ -7,6 +7,7 @@ use Ridouchire\RadioScheduler\Mpd;
 use Ridouchire\RadioScheduler\RotationMaster;
 use Ridouchire\RadioScheduler\RotationStrategies\ByEstimateInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
+use Ridouchire\RadioScheduler\RotationStrategies\RandomTracksInGenrePattern;
 use Ridouchire\RadioScheduler\TickHandler;
 use Ridouchire\RadioScheduler\Utils\TickCounter;
 
@@ -20,14 +21,14 @@ class TickHandlerTest extends TestCase
         /** @var Mpd|MockObject */
         $mpd = $this->createMock(Mpd::class);
 
-        /** @var GenrePattern|MockObject */
-        $genre_pattern_strategy = $this->createMock(GenrePattern::class);
-
         /** @var ByEstimateInGenre|MockObject */
         $by_estimate_in_genre_strategy = $this->createMock(ByEstimateInGenre::class);
 
+        /** @var RandomTracksInGenrePattern|MockObject */
+        $random_tracks_in_genre_pattern = $this->createMock(RandomTracksInGenrePattern::class);
+
         $this->rotation_master = new RotationMaster($this->createMock(Logger::class));
-        $this->rotation_master->addStrategy($genre_pattern_strategy);
+        $this->rotation_master->addStrategy($random_tracks_in_genre_pattern);
         $this->rotation_master->addStrategy($by_estimate_in_genre_strategy);
 
         $this->tick_handler = new TickHandler($this->rotation_master, $mpd);
@@ -40,7 +41,7 @@ class TickHandlerTest extends TestCase
         $c = $this->tick_handler;
         $c();
 
-        $this->assertContainsEquals($this->rotation_master->getCurrentStrategy(), [GenrePattern::NAME, ByEstimateInGenre::NAME]);
+        $this->assertContainsEquals($this->rotation_master->getCurrentStrategy(), [RandomTracksInGenrePattern::NAME, ByEstimateInGenre::NAME]);
 
         $strategy = $this->rotation_master->getCurrentStrategy();
 

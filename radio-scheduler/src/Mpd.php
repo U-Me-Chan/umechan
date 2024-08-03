@@ -2,8 +2,8 @@
 
 namespace Ridouchire\RadioScheduler;
 
+use FloFaber\MphpD\MPDException;
 use FloFaber\MphpD\MphpD;
-use FloFaber\MPDException;
 use FloFaber\MphpD\Filter;
 use Monolog\Logger;
 
