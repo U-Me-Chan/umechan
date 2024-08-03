@@ -10,12 +10,8 @@ use Ridouchire\RadioScheduler\Jingles;
 use Ridouchire\RadioScheduler\Mpd;
 use Ridouchire\RadioScheduler\QueueCropper;
 use Ridouchire\RadioScheduler\RotationMaster;
-use Ridouchire\RadioScheduler\RotationStrategies\AverageInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\ByEstimateInGenre;
-use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
-use Ridouchire\RadioScheduler\RotationStrategies\JingleAndCommercialPattern;
-use Ridouchire\RadioScheduler\RotationStrategies\NewInGenre;
-use Ridouchire\RadioScheduler\RotationStrategies\TopInGenre;
+use Ridouchire\RadioScheduler\RotationStrategies\RandomTracksInGenrePattern;
 use Ridouchire\RadioScheduler\TickHandler;
 use Ridouchire\RadioScheduler\Utils\TickCounter;
 
@@ -44,13 +40,13 @@ $db = new Medoo([
 $jingles     = new Jingles($db);
 $commercials = new Commercials($db);
 
-$genre_pattern_strategy        = new GenrePattern($mpd, $jingles, $log);
-$by_estimate_in_genre_strategy = new ByEstimateInGenre($db, $jingles, $commercials, $mpd, $log);
+$random_tracks_in_genre_pattern = new RandomTracksInGenrePattern($db, $jingles, $commercials, $mpd, $log);
+$by_estimate_in_genre_strategy  = new ByEstimateInGenre($db, $jingles, $commercials, $mpd, $log);
 
 $strategy_master = new RotationMaster($log);
 
-$strategy_master->addStrategy($genre_pattern_strategy);
 $strategy_master->addStrategy($by_estimate_in_genre_strategy);
+$strategy_master->addStrategy($random_tracks_in_genre_pattern);
 
 $tickHanlder   = new TickHandler($strategy_master);
 $queue_cropper = new QueueCropper($mpd);
