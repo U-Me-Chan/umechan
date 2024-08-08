@@ -119,14 +119,13 @@ class ByEstimateInGenre implements IRotation
 
         shuffle($track_paths);
 
-        list($jingle_one, $jingle_two)          = $this->jingles->getJingles();
+        list($jingle)                           = $this->jingles->getJingles(1);
         list($comm_one, $comm_two, $comm_three) = $this->commercials->getCommercials();
 
         array_unshift($track_paths, $comm_three);
         array_unshift($track_paths, $comm_two);
         array_unshift($track_paths, $comm_one);
-        array_unshift($track_paths, $jingle_one);
-        array_push($track_paths, $jingle_two);
+        array_push($track_paths, $jingle);
 
         $this->mpd->cropQueue();
 
