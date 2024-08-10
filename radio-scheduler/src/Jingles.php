@@ -15,11 +15,8 @@ class Jingles
 
     public function getJingles(int $count = 2): array
     {
-        return $this->db->select('tracks', 'path', [
+        return $this->db->rand('tracks', 'path', [
             'path[~]' => self::JINGLE_DIR . '/%',
-            'ORDER'   => [
-                'last_playing' => 'ASC'
-            ],
             'LIMIT' => [0, $count]
         ]);
     }

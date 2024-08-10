@@ -15,11 +15,8 @@ class Commercials
 
     public function getCommercials(int $count = 3): array
     {
-        return $this->db->select('tracks', 'path', [
+        return $this->db->rand('tracks', 'path', [
             'path[~]' => self::COMMERICIALS_DIR . '/%',
-            'ORDER'   => [
-                'last_playing' => 'ASC'
-            ],
             'LIMIT' => [0, $count]
         ]);
     }

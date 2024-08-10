@@ -25,7 +25,7 @@ class GenrePattern implements IRotation
     public function execute(int $timestamp = 0): void
     {
         if ($this->mpd->getQueueCount() > 1) {
-            $this->log->debug('GenrePatternStrategy: очередь ещё не подошла к концу');
+            $this->log->debug(self::NAME . ': очередь ещё не подошла к концу');
 
             return;
         }
@@ -80,7 +80,7 @@ class GenrePattern implements IRotation
 
         shuffle($pls_list);
 
-        $this->log->info('GenrePatternStrategy: ставлю ' . implode(',', $pls_list));
+        $this->log->info(self::NAME . ': ставлю ' . implode(',', $pls_list));
 
         $track_paths = [];
 
@@ -119,7 +119,7 @@ class GenrePattern implements IRotation
         $this->mpd->cropQueue();
 
         array_walk($track_paths, function (string $path) {
-            $this->log->info("GenrePatternStrategy: ставлю в очередь файл {$path}");
+            $this->log->info(self::NAME . ": ставлю в очередь файл {$path}");
 
             $this->mpd->addToQueue($path);
         });
