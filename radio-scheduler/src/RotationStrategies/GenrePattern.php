@@ -114,7 +114,7 @@ class GenrePattern implements IRotation
 
         list($jingle) = $this->jingles->getJingles();
 
-        array_push($track_paths, $jingle);
+        array_unshift($track_paths, $jingle);
 
         $this->mpd->cropQueue();
 

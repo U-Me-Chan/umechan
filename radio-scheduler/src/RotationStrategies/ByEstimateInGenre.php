@@ -125,7 +125,7 @@ class ByEstimateInGenre implements IRotation
         array_unshift($track_paths, $comm_three);
         array_unshift($track_paths, $comm_two);
         array_unshift($track_paths, $comm_one);
-        array_push($track_paths, $jingle);
+        array_unshift($track_paths, $jingle);
 
         $this->mpd->cropQueue();
 
