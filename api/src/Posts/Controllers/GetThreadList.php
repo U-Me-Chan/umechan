@@ -2,6 +2,7 @@
 
 namespace PK\Posts\Controllers;
 
+use PK\Boards\IBoardRepository;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Posts\IPostRepository;
@@ -9,7 +10,8 @@ use PK\Posts\IPostRepository;
 final class GetThreadList
 {
     public function __construct(
-        private IPostRepository $post_repo
+        private IPostRepository $post_repo,
+        private IBoardRepository $board_repo
     ) {
     }
 
@@ -20,6 +22,8 @@ final class GetThreadList
 
         $tags = explode('+', $vars['tags']);
 
+        list($boards,) = $this->board_repo->findMany(['tags' => $tags]);
+
         list($posts, $count) = $this->post_repo->findMany(
             [
                 'board_tags' => $tags,
@@ -29,6 +33,6 @@ final class GetThreadList
             ]
         );
 
-        return new Response(['count' => $count, 'posts' => $posts]);
+        return new Response(['count' => $count, 'posts' => $posts, 'boards' => $boards]);
     }
 }

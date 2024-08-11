@@ -20,6 +20,7 @@ final class MedooBoardRepository implements IBoardRepository
      *
      * @param array $filters                Список фильтов
      * @param array $filters[$exclude_tags] Список исключаемых тегов
+     * @param array $filters[$tags]         Список тегов
      *
      * @return array
      */
@@ -38,6 +39,10 @@ final class MedooBoardRepository implements IBoardRepository
 
         if (isset($filters['exclude_tags'])) {
             $conditions['tag[!]'] = $filters['exclude_tags'];
+        }
+
+        if (isset($filters['tags'])) {
+            $conditions['tag'] = $filters['tag'];
         }
 
         $count = $this->db->count('boards', $conditions);

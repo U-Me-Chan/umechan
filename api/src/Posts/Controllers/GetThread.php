@@ -5,6 +5,7 @@ namespace PK\Posts\Controllers;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Posts\IPostRepository;
+use PK\Posts\Post\Post;
 
 final class GetThread
 {
@@ -18,6 +19,7 @@ final class GetThread
         $id = $vars['id'];
 
         try {
+            /** @var Post */
             $thread = $this->post_repo->findOne(['id' => $id]);
         } catch (\OutOfBoundsException) {
             return new Response([], 404);
