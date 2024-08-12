@@ -30,7 +30,7 @@ class TrackTest extends TestCase
     public function dataProviderForTestDecreaseEstimate(): array
     {
         return [
-            [240, 0],
+            [240, 120],
             [0, -120],
             [-120, -240],
             [360, 180],

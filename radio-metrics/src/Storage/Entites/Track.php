@@ -65,6 +65,8 @@ class Track extends AEntity
 
         if ($estimate < 0)  {
             $this->estimate = ceil($this->estimate * 2);
+        } else if ($estimate == 0) {
+            $this->estimate = $this->estimate - $this->duration;
         } else {
             $this->estimate = ceil($this->estimate / 2);
         }
