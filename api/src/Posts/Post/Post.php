@@ -2,8 +2,40 @@
 
 namespace PK\Posts\Post;
 
-use PK\Boards\Board\Board;
+use OpenApi\Attributes as OA;
 
+use PK\Boards\Board\Board;
+use PK\Posts\Post\Password;
+use PK\Posts\Post\Poster;
+use PK\Posts\Post\PasswordHash;
+
+#[OA\Schema(properties: [
+    new OA\Property(property: 'id', type: 'integer'),
+    new OA\Property(property: 'poster', type: 'string'),
+    new OA\Property(property: 'subject', type: 'string'),
+    new OA\Property(property: 'message', type: 'string'),
+    new OA\Property(property: 'timestamp', type: 'integer'),
+    new OA\Property(property: 'board', type: 'object', ref: '#/components/schemas/Board'),
+    new OA\Property(property: 'parent_id', type: 'integer', nullable: true),
+    new OA\Property(property: 'updated_at', type: 'integer'),
+    new OA\Property(property: 'estimate', type: 'integer'),
+    new OA\Property(property: 'replies', type: 'array', items: new OA\Items(ref: '#/components/schemas/Post')),
+    new OA\Property(property: 'replies_count', type: 'integer'),
+    new OA\Property(property: 'board_id', type: 'integer'),
+    new OA\Property(property: 'truncated_message', type: 'string'),
+    new OA\Property(property: 'media', type: 'array', items: new OA\Items(properties: [
+        new OA\Property(property: 'youtubes', type: 'array', items: new OA\Items(properties: [
+            new OA\Property(property: 'link', type: 'string'),
+            new OA\Property(property: 'preview', type: 'string')
+        ])),
+        new OA\Property(property: 'images', type: 'array', items: new OA\Items(properties: [
+            new OA\Property(property: 'link', type: 'string'),
+            new OA\Property(property: 'preview', type: 'string')
+        ]))
+    ])),
+    new OA\Property(property: 'datetime', type: 'string'),
+    new OA\Property(property: 'is_verify', type: 'string')
+])]
 class Post implements \JsonSerializable
 {
     public static function draft(
@@ -23,7 +55,7 @@ class Post implements \JsonSerializable
             $parent_id,
             time(),
             0,
-            hash('sha256', bin2hex(random_bytes(5)))
+            Password::draft()
         );
     }
 
@@ -39,7 +71,7 @@ class Post implements \JsonSerializable
             $state['parent_id'],
             $state['updated_at'],
             $state['estimate'],
-            $state['password'],
+            PasswordHash::fromString($state['password']),
             !empty($state['replies']) ? $state['replies'] : [],
             isset($state['replies_count']) ? $state['replies_count'] : 0
         );
@@ -104,7 +136,7 @@ EOT;
         public readonly int|null $parent_id,
         public int $updated_at,
         public int $estimate,
-        public readonly string $password,
+        public readonly Password|PasswordHash $password,
         public array $replies = [],
         public int $replies_count = 0
     ) {

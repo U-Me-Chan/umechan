@@ -3,7 +3,9 @@
 namespace PK;
 
 use Pimple\Container;
+use OpenApi\Attributes as OA;
 
+#[OA\Info(title: 'Pissykaka API', version: '2')]
 class Application extends Container
 {
     public static $app;

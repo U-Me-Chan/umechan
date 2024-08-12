@@ -3,6 +3,8 @@
 use Evenement\EventEmitter;
 use Medoo\Medoo;
 
+use OpenApi\Attributes as OA;
+
 use PK\Router;
 use PK\Application;
 use PK\Http\Request;

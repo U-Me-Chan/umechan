@@ -2,18 +2,18 @@
 
 namespace PK\Http;
 
+use PK\Base\AResponseSchema;
+use Throwable;
+
 class Response
 {
-    private $data;
-    private $code;
-    private $headers;
-    private $error;
+    private Throwable|null $error;
 
-    public function __construct(array $data = [], int $code = 200, array $headers = [])
-    {
-        $this->data = $data;
-        $this->code = $code;
-        $this->headers = $headers;
+    public function __construct(
+        private array|AResponseSchema $data = [],
+        private int $code = 200,
+        private array $headers = []
+    ) {
         $this->error = null;
     }
 
