@@ -5,7 +5,6 @@ namespace Ridouchire\RadioMetrics\Http\Controllers;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
 use Ridouchire\RadioMetrics\Exceptions\EntityNotFound;
-use Ridouchire\RadioMetrics\Services\Mpd;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
 use Ridouchire\RadioMetrics\Utils\Container;
 
@@ -30,7 +29,7 @@ final class EstimateTrack
             $last_time_estimate = 0;
         }
 
-        if ($last_time_estimate >= (time() - 30)) {
+        if ($last_time_estimate >= (time() - 5)) {
             $res = Response::json(['status' => 'failed', 'reason' => 'timeout']);
             $res = $res->withStatus(Response::STATUS_FORBIDDEN);
 
