@@ -104,16 +104,7 @@ class ByEstimateInGenre implements IRotation
             'LIMIT' => [0, $track_count]
         ]);
 
-        $top_track_paths = $this->db->select('tracks', 'path', [
-            'path[~]' => "{$genre}/%",
-            'last_playing[<]' => time() + (60 * 60 * 12),
-            'ORDER' => [
-                'estimate' => 'DESC'
-            ],
-            'LIMIT' => [0, $track_count]
-        ]);
-
-        $track_paths = array_merge($avg_track_paths, $new_track_path, $top_track_paths);
+        $track_paths = array_merge($avg_track_paths, $new_track_path);
 
         $this->logger->debug(implode(',', $track_paths));
 
