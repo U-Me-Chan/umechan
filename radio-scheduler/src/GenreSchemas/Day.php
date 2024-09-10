@@ -52,7 +52,12 @@ class Day implements IGenreSchema
             [
                 'Korean Pop',
                 'Japan Pop'
-            ]
+            ],
+            [
+                'Pop Dance',
+                'Pop Retro Dance',
+                'Pop Ru Dance'
+            ],
         ];
     }
 }

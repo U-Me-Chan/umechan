@@ -35,11 +35,13 @@ class Morning implements IGenreSchema
             [
                 'Alternative',
                 'Instrumental',
-                'Jazz'
+                'Jazz',
+                'Alternative Ru'
             ],
             [
                 'Pop Chill Electronica',
-                'Chill Hop'
+                'Chill Hop',
+                'Pop Ru Chill'
             ]
         ];
     }

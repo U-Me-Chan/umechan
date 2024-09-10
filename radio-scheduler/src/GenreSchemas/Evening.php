@@ -41,7 +41,7 @@ class Evening implements IGenreSchema
     {
         return [
             [
-                'Alternative',
+                'Retrowave',
                 'Video Game Music'
             ],
             [
@@ -52,7 +52,8 @@ class Evening implements IGenreSchema
             [
                 'Pop Chill Electronica',
                 'Chill Electronica',
-                'Slowave'
+                'Slowave',
+                'Pop Ru Chill'
             ],
                         [
                 'DnB Atmosphere',
@@ -62,8 +63,9 @@ class Evening implements IGenreSchema
             [
                 'Pop Dance Evening',
                 'Retrowave',
-                'Digital Resistance'
-            ]
+                'Digital Resistance',
+                'Pop Ru Dance Evening'
+            ],
         ];
     }
 }
