@@ -61,11 +61,11 @@ const routes = [
       component: () => import('./components/Board.vue')
     },
     {
-      path: '/files',
+      path: '/admin/files',
       component: () => import('./components/Files.vue')
     },
     {
-      path: '/files/:page',
+      path: '/admin/files/:page',
       component: () => import('./components/Files.vue')
     },
     {
