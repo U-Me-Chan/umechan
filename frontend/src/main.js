@@ -61,7 +61,11 @@ const routes = [
       component: () => import('./components/Board.vue')
     },
     {
-      path: '/file/all',
+      path: '/files',
+      component: () => import('./components/Files.vue')
+    },
+    {
+      path: '/files/:page',
       component: () => import('./components/Files.vue')
     },
     {

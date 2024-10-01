@@ -6,12 +6,12 @@
     :total="count"
     :current="current"
     :per-page="perPage"
+    :page-input="true"
     v-model="current"
-    v-on:change="getFiles"
-    rangeBefore="2"
-    rangeAfter="2"
+    v-on:change="changePage"
     order="is-centered"
-    size="is-small">
+    size="is-small"
+    >
   </b-pagination>
 
   <div class="files">
@@ -39,8 +39,8 @@ export default {
       perPage: 6
     }
   },
-  created: function  () {
-    this.getFiles(this.current)
+  created: function () {
+    this.init()
 
     var self = this
 
@@ -49,6 +49,12 @@ export default {
     })
   },
   methods: {
+    changePage: function (page) {
+      this.$router.push('/files/' + page)
+    },
+    init: function () {
+      this.getFiles(this.current)
+    },
     getFiles: function (page) {
       var self = this
       bus.$emit('app.loader', [true])
@@ -69,6 +75,13 @@ export default {
         console.log(error)
         bus.$emit('app.loader', [false])
       })
+    }
+  },
+  watch: {
+    '$route': function(to, from) {
+      if (to.path !== from.path) {
+        this.init()
+      }
     }
   }
 }
