@@ -50,7 +50,7 @@ export default {
   },
   methods: {
     changePage: function (page) {
-      this.$router.push('/files/' + page)
+      this.$router.push('/admin/files/' + page)
     },
     init: function () {
       this.getFiles(this.current)
