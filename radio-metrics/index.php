@@ -65,7 +65,7 @@ $senderProvider = new SenderProvider($logger);
 if ($env->is_dev == true) {
     $senderProvider->attach(new DummySender());
 } else {
-    $senderProvider->attach(new DiscordWebHookSender($env->radio_discord_hook_url));
+    //$senderProvider->attach(new DiscordWebHookSender($env->radio_discord_hook_url));
 }
 
 $icecastCollector = new IcecastCollector($env->radio_api_url);
