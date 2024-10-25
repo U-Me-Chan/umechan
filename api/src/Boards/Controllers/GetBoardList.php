@@ -2,14 +2,23 @@
 
 namespace PK\Boards\Controllers;
 
+use OpenApi\Attributes as OA;
+
 use PK\Http\Request;
 use PK\Http\Response;
-use PK\Boards\BoardStorage;
+use PK\Boards\IBoardRepository;
+use PK\Boards\ResponseSchemas\BoardListResponseSchema;
 
+#[OA\Get(path: '/api/v2/board')]
+#[OA\Response(
+    response: 200,
+    description: 'Return board list',
+    content: new OA\JsonContent(ref: '#/components/schemas/boardList')
+)]
 final class GetBoardList
 {
     public function __construct(
-        private BoardStorage $storage
+        private IBoardRepository $storage
     ) {
     }
 
@@ -23,8 +32,8 @@ final class GetBoardList
             }
         }
 
-        $boards = $this->storage->find($exclude_tags);
+        list($boards, $count) = $this->storage->findMany(['exclude_tags' => $exclude_tags]);
 
-        return new Response(['boards' => $boards], 200);
+        return new Response(new BoardListResponseSchema($boards, $count), 200);
     }
 }

@@ -2,20 +2,18 @@
 
 namespace PK\Http;
 
+use PK\Base\AResponseSchema;
+use Throwable;
+
 class Response
 {
-    private const API_VERSION = '1.0.0';
+    private Throwable|null $error;
 
-    private $data;
-    private $code;
-    private $headers;
-    private $error;
-
-    public function __construct(array $data = [], int $code = 200, array $headers = [])
-    {
-        $this->data = $data;
-        $this->code = $code;
-        $this->headers = $headers;
+    public function __construct(
+        private array|AResponseSchema $data = [],
+        private int $code = 200,
+        private array $headers = []
+    ) {
         $this->error = null;
     }
 
@@ -28,7 +26,6 @@ class Response
     {
         $body = [
             'payload' => $this->data,
-            'version' => self::API_VERSION,
             'error'   => null
         ];
 

@@ -3,7 +3,9 @@
 namespace PK;
 
 use Pimple\Container;
+use OpenApi\Attributes as OA;
 
+#[OA\Info(title: 'Pissykaka API', version: '2')]
 class Application extends Container
 {
     public static $app;
@@ -25,10 +27,10 @@ class Application extends Container
             }
         }
 
-        header('Content-type: application/json');
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: *');
-        header('Access-Control-Allow-Headers: *');
+        @header('Content-type: application/json');
+        @header('Access-Control-Allow-Origin: *');
+        @header('Access-Control-Allow-Methods: *');
+        @header('Access-Control-Allow-Headers: *');
 
         http_response_code($res->getCode());
         echo json_encode($res->getBody());
