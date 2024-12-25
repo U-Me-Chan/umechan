@@ -10,10 +10,12 @@ class Morning implements IGenreSchema
     {
         return [
             'Alternative',
+            'Alternative Ru',
             'Chill Hop',
             'Instrumental',
             'Jazz',
-            'Pop Chill Electronica'
+            'Pop Chill Electronica',
+            'Pop Ru Chill'
         ];
     }
 

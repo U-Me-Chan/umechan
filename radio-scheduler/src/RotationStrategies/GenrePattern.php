@@ -85,7 +85,7 @@ class GenrePattern implements IRotation
         $track_paths = [];
 
         foreach ($pls_list as $pls) {
-            $limit = random_int(3, 5);
+            $limit = random_int(5, 7);
 
             for ($i = 0; $i < $limit; $i++) {
                 $count = $this->mpd->getCountSongsInDirectory($pls);

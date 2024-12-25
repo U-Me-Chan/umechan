@@ -21,7 +21,9 @@ class Evening implements IGenreSchema
             'Video Game Music',
             'DnB Atmosphere',
             'DnB Liquid',
-            'Pop Dance Evening'
+            'Pop Dance Evening',
+            'Pop Ru Dance Evening',
+            'Pop Ru Chill'
         ];
     }
 

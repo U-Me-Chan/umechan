@@ -84,7 +84,7 @@ class ByEstimateInGenre implements IRotation
         }
 
         $track_paths = [];
-        $track_count = random_int(3, 5);
+        $track_count = random_int(5, 7);
 
         $avg_track_paths = $this->db->select('tracks', 'path', [
             'path[~]' => "{$genre}/%",

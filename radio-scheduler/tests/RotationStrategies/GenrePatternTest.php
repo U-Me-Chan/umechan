@@ -23,7 +23,7 @@ class GenrePatternTest extends TestCase
         /** @var Logger|MockObject */
         $logger = $this->createMock(Logger::class);
         $logger->method('debug')->willReturnCallback(function (...$args) {
-            $this->assertEquals('GenrePatternStrategy: очередь ещё не подошла к концу', $args[0]);
+            $this->assertEquals('GenrePattern: очередь ещё не подошла к концу', $args[0]);
         });
 
         /** @var Jingles|MockObject */

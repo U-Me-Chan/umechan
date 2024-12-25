@@ -9,12 +9,18 @@ class Night implements IGenreSchema
     public static function getAll(): array
     {
         return [
+            'Alternative',
+            'CityPop',
+            'Pop Chill Electronica',
+            'Retrowave',
+            'Video Game Music',
             'Chill Electronica',
             'Chill Hop',
             'DnB Atmosphere',
             'DnB Liquid',
             'House',
-            'Slowave'
+            'Slowave',
+            'Vaporwave'
         ];
     }
 
@@ -34,8 +40,21 @@ class Night implements IGenreSchema
     {
         return [
             [
+                'Retrowave',
+                'Video Game Music',
+                'Alternative'
+            ],
+            [
+                'CityPop',
+                'Retrowave',
+                'Slowave',
+                'Vaporwave'
+            ],
+            [
                 'Chill Electronica',
-                'Chill Hop'
+                'Chill Hop',
+                'Pop Chill Electronica',
+                'Slowave'
             ],
             [
                 'DnB Liquid',

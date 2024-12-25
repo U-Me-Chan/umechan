@@ -19,7 +19,9 @@ class Day implements IGenreSchema
             'Japan Pop',
             'Japan Rock',
             'Ru Angst',
-            'Pop Ru'
+            'Pop Ru',
+            'Pop Ru Dance',
+            'Pop Retro Dance'
         ];
     }
 
