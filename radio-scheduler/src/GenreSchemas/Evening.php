@@ -14,7 +14,6 @@ class Evening implements IGenreSchema
             'Digital Resistance',
             'Chill Electronica',
             'Pop Chill Electronica',
-            'Pop Retro',
             'Retrowave',
             'Slowave',
             'Vaporwave',

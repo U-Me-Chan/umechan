@@ -14,7 +14,6 @@ class Day implements IGenreSchema
             'Breakcore and Lolicore',
             'Pop',
             'Pop Dance',
-            'Pop Retro',
             'Korean Pop',
             'Japan Pop',
             'Japan Rock',
@@ -49,7 +48,6 @@ class Day implements IGenreSchema
             [
                 'Pop',
                 'Pop Ru',
-                'Pop Retro'
             ],
             [
                 'Korean Pop',
