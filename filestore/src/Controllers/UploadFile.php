@@ -47,7 +47,7 @@ class UploadFile implements IController
             );
         }
 
-        $filename = sprintf('%s.%s', uniqid(), $file->getClientOriginalExtension());
+        $filename = sprintf('%s.%s', uniqid(), strtolower($file->getClientOriginalExtension()));
         $filepath = sprintf('%s%s', self::UPLOAD_DIR, $filename);
 
         try {
