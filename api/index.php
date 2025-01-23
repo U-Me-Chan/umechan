@@ -28,8 +28,6 @@ use PK\Posts\Controllers\DeletePost;
 use PK\Passports\Controllers\CreatePassport;
 use PK\Passports\Controllers\GetPassportList;
 use PK\Passports\PassportStorage;
-use PK\Tracks\Controllers\GetTrackList;
-use PK\Tracks\TrackRepository;
 
 require_once "vendor/autoload.php";
 
@@ -42,6 +40,7 @@ $app = new Application($config);
 $app['request'] = new Request($_SERVER, $_POST, $_FILES);
 $app['router'] = new Router();
 
+/** @var Medoo */
 $app['db'] = function ($app) {
     return new Medoo([
         'database_type' => 'mysql',
@@ -62,7 +61,6 @@ $post_storage = new PostStorage($app['db'], $board_storage);
 
 $passport_storage = new PassportStorage($app['db']);
 
-$tracks_repo = new TrackRepository($app['db']);
 $events_repo = new EventRepository($app['db']);
 
 $event_storage = new EventStorage($app['db']);
@@ -90,7 +88,5 @@ $r->addRoute('GET', '/v2/passport', new GetPassportList($passport_storage));
 $r->addRoute('POST', '/v2/passport', new CreatePassport($passport_storage, $app['config']['default_name']));
 
 $r->addRoute('GET', '/v2/events', new GetEventList($event_storage));
-
-$r->addRoute('GET', '/radio/tracks', new GetTrackList($tracks_repo));
 
 $app->run();

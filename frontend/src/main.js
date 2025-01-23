@@ -69,7 +69,7 @@ const routes = [
       component: () => import('./components/Files.vue')
     },
     {
-      path: '/radio/tracks',
+      path: '/tracks',
       component: () => import('./components/Tracks.vue')
     },
     {

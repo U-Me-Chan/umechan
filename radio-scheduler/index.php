@@ -6,16 +6,16 @@ use Monolog\Level;
 use Monolog\Logger;
 use React\EventLoop\Loop;
 use Ridouchire\RadioScheduler\Commercials;
+use Ridouchire\RadioScheduler\Http\Controllers\GetQueue;
+use Ridouchire\RadioScheduler\Http\Controllers\GetTrackList;
+use Ridouchire\RadioScheduler\Http\Controllers\OrderTrack;
+use Ridouchire\RadioScheduler\Http\Router;
 use Ridouchire\RadioScheduler\Jingles;
 use Ridouchire\RadioScheduler\Mpd;
 use Ridouchire\RadioScheduler\QueueCropper;
 use Ridouchire\RadioScheduler\RotationMaster;
-use Ridouchire\RadioScheduler\RotationStrategies\AverageInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\ByEstimateInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
-use Ridouchire\RadioScheduler\RotationStrategies\JingleAndCommercialPattern;
-use Ridouchire\RadioScheduler\RotationStrategies\NewInGenre;
-use Ridouchire\RadioScheduler\RotationStrategies\TopInGenre;
 use Ridouchire\RadioScheduler\TickHandler;
 use Ridouchire\RadioScheduler\Utils\TickCounter;
 
@@ -74,3 +74,14 @@ Loop::addPeriodicTimer(1, function () use ($tickHanlder, $log, $mpd, $queue_crop
         $log->debug('Время очищения очереди воспроизведения ещё не пришло');
     }
 });
+
+$r = new Router();
+
+$r->addRoute('GET', '/radio/queue', new GetQueue($mpd));
+$r->addRoute('PUT', '/radio/queue', new OrderTrack($mpd, $db, $log));
+
+$r->addRoute('GET', '/radio/tracks', new GetTrackList($db));
+
+$http = new React\Http\HttpServer($r);
+$socket = new React\Socket\SocketServer('0.0.0.0:8080');
+$http->listen($socket);

@@ -23,6 +23,11 @@ class Mpd
         ]);
     }
 
+    public function getQueue(): array
+    {
+        return $this->getConnection()->queue()->search(new Filter('file', 'contains', '.'));
+    }
+
     /**
      * Возвращает список треков
      *
@@ -87,6 +92,11 @@ class Mpd
     public function addToQueue(string $uri): bool
     {
         return $this->getConnection()->queue()->add($uri);
+    }
+
+    public function addToQueueAfterCurrentTrack(string $uri): bool
+    {
+        return $this->getConnection()->queue()->add($uri, 1);
     }
 
     /**
