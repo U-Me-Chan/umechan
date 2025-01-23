@@ -9,14 +9,11 @@ class Day implements IGenreSchema
     public static function getAll(): array
     {
         return [
-            'Alternative High',
-            'Alternative Rock',
+            'Alternative High/20',
+            'Alternative Rock/20',
             'Breakcore and Lolicore',
-            'Pop',
-            'Pop Dance',
-            'Korean Pop',
-            'Japan Pop',
-            'Japan Rock',
+            'Pop/20',
+            'Pop Dance/20',
             'Ru Angst',
             'Pop Ru',
             'Pop Ru Dance',
@@ -40,21 +37,16 @@ class Day implements IGenreSchema
     {
         return [
             [
-                'Alternative High',
-                'Alternative Rock',
+                'Alternative High/20',
+                'Alternative Rock/20',
                 'Ru Angst',
-                'Japan Rock'
             ],
             [
-                'Pop',
+                'Pop/20',
                 'Pop Ru',
             ],
             [
-                'Korean Pop',
-                'Japan Pop'
-            ],
-            [
-                'Pop Dance',
+                'Pop Dance/20',
                 'Pop Retro Dance',
                 'Pop Ru Dance'
             ],
