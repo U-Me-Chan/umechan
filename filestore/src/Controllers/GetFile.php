@@ -34,6 +34,10 @@ class GetFile implements IController
         $original = $this->static_url . '/' . $vars['id'];
         $thumbnail = $this->static_url . '/thumb.' . $vars['id'];
 
+        if (substr($thumbnail, -3) == 'mp4' || substr($thumbnail, -4) == 'webm') {
+            $thumbnail = $thumbnail . '.' . 'jpeg';
+        }
+
         return new Response(new DTOFileInfo($original, $thumbnail, $post_ids));
     }
 }

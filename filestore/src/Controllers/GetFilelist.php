@@ -30,7 +30,12 @@ class GetFilelist implements IController
         );
 
         $files = array_map(function (string $path) {
-            $data['thumbnail'] = $this->static_url . '/thumb.' . substr($path, 42);
+            if (substr($path, -3) == 'mp4' || substr($path, -4) == 'webm') {
+                $data['thumbnail'] = $this->static_url . '/thumb.' . substr($path, 42) . '.' . 'jpeg';
+            } else {
+                $data['thumbnail'] = $this->static_url . '/thumb.' . substr($path, 42);
+            }
+
             $data['original']  = $this->static_url . '/' . substr($path, 42);
             $data['name']      = substr($path, 42);
 
