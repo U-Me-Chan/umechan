@@ -1,6 +1,6 @@
 <?php
 
-namespace IH\DTO\;
+namespace IH\DTO;
 
 use IH\DTO\DTO;
 
