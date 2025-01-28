@@ -4,7 +4,9 @@ namespace IH\Controllers;
 
 use Rweb\IController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use IH\Http\Response;
+use IH\DTO\Error as DTOError;
+use IH\DTO\FileDeleted as DTOFileDeleted;
 
 class DeleteFile implements IController
 {
@@ -16,11 +18,11 @@ class DeleteFile implements IController
     public function __invoke(Request $req, array $vars = []): Response
     {
         if (!$req->headers->get('key')) {
-            return new Response('', Response::HTTP_UNAUTHORIZED, $this->getHeaders());
+            return new Response(new DTOError('unauthorized'), Response::HTTP_UNAUTHORIZED);
         }
 
         if ($req->headers->get('key') !== $this->maintenance_key) {
-            return new Response('', Response::HTTP_UNAUTHORIZED, $this->getHeaders());
+            return new Response(new DTOError('unauthorized'), Response::HTTP_UNAUTHORIZED);
         }
 
         $filepath      = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . "{$vars['id']}";
@@ -34,16 +36,6 @@ class DeleteFile implements IController
             unlink($thumbnailpath);
         }
 
-        return new Response('', Response::HTTP_OK, $this->getHeaders());
-    }
-
-    private function getHeaders(): array
-    {
-        return [
-            'Content-type'                 => 'application/json',
-            'Access-Control-Allow-Origin'  => '*',
-            'Access-Control-Allow-Methods' => '*',
-            'Access-Control-Allow-Headers' => '*'
-        ];
+        return new Response(new DTOFileDeleted());
     }
 }

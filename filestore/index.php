@@ -1,14 +1,16 @@
 <?php
 
-use IH\Controllers\DeleteFile;
 use Medoo\Medoo;
 use Rweb\App;
 use Rweb\Middlewares\Router;
 use Symfony\Component\HttpFoundation\Request;
-use IH\Controllers\Index;
 use IH\Controllers\UploadFile;
 use IH\Controllers\GetFilelist;
 use IH\Controllers\GetFile;
+use IH\Controllers\DeleteFile;
+use IH\Services\ThumbnailCreator;
+use IH\Services\Thumbnailers\ImageThumbnailer;
+use IH\Services\Thumbnailers\VideoThumbnailer;
 
 require "vendor/autoload.php";
 
@@ -24,13 +26,16 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
+$thumbnail_creator = new ThumbnailCreator();
+$thumbnail_creator->register(new ImageThumbnailer(__DIR__ . '/files/'));
+$thumbnail_creator->register(new VideoThumbnailer(__DIR__ . '/files/'));
+
 /** @var Router */
 $r = new Router();
 
-$r->addRoute('GET', '/filestore', new Index());
 $r->addRoute('GET', '/filestore/files', new GetFilelist($_ENV['STATIC_URL'], $_ENV['ADMINISTRATOR_KEY']));
 $r->addRoute('GET', '/filestore/files/{id:[0-9a-z\.]+}', new GetFile($_ENV['STATIC_URL'], $db));
-$r->addRoute('POST', '/filestore', new UploadFile($_ENV['STATIC_URL']));
+$r->addRoute('POST', '/filestore', new UploadFile($_ENV['STATIC_URL'], $thumbnail_creator));
 $r->addRoute('DELETE', '/filestore/files/{id:[0-9a-z\.]+}', new DeleteFile($_ENV['ADMINISTRATOR_KEY']));
 
 $app->addMiddleware($r);

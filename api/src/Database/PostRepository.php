@@ -158,7 +158,9 @@ class PostRepository
 
     public function getNewId(): int
     {
-        return $this->db->max(self::TABLE, self::ID);
+        $id = $this->db->max(self::TABLE, self::ID);
+
+        return $id ? $id : 1;
     }
 
     private function getFields(): array

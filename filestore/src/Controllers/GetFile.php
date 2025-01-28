@@ -5,7 +5,9 @@ namespace IH\Controllers;
 use Medoo\Medoo;
 use Rweb\IController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use IH\Http\Response;
+use IH\DTO\FileInfo as DTOFileInfo;
+use IH\DTO\Error as DTOError;
 
 class GetFile implements IController
 {
@@ -18,29 +20,20 @@ class GetFile implements IController
     public function __invoke(Request $req, array $vars = []): Response
     {
         if (!is_file(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . "{$vars['id']}")) {
-            return new Response('', Response::HTTP_NOT_FOUND);
+            return new Response(new DTOError('not found'), Response::HTTP_NOT_FOUND);
         }
 
-        $data = [];
-
-        $post_datas = $this->db->select('posts', 'id', [
+        $post_ids = $this->db->select('posts', 'id', [
             'message[~]' => '%' . $vars['id'] . '%'
         ]);
 
-        if (!$post_datas) {
-            $data['post_ids'] = [];
-        } else {
-            $data['post_ids'] = $post_datas;
+        if (!$post_ids) {
+            $post_ids = [];
         }
 
-        $data['original'] = $this->static_url . '/' . $vars['id'];
-        $data['thumbnail'] = $this->static_url . '/thumb.' . $vars['id'];
+        $original = $this->static_url . '/' . $vars['id'];
+        $thumbnail = $this->static_url . '/thumb.' . $vars['id'];
 
-        return new Response(json_encode($data), Response::HTTP_OK, [
-                'Content-type'                 => 'application/json',
-                'Access-Control-Allow-Origin'  => '*',
-                'Access-Control-Allow-Methods' => '*',
-                'Access-Control-Allow-Headers' => '*'
-        ]);
+        return new Response(new DTOFileInfo($original, $thumbnail, $post_ids));
     }
 }

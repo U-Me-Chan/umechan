@@ -59,7 +59,7 @@ export default {
             var uploadData = new formData();
             var self = this;
 
-            uploadData.append('image', this.file, 'name.jpg');
+            uploadData.append('image', this.file);
 
             axios.post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data' }}).then((response) => {
                 var orig = response.data.original_file;

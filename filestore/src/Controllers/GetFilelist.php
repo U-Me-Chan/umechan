@@ -4,7 +4,8 @@ namespace IH\Controllers;
 
 use Rweb\IController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use IH\Http\Response;
+use IH\DTO\FileList as DTOFileList;
 
 class GetFilelist implements IController
 {
@@ -40,11 +41,6 @@ class GetFilelist implements IController
 
         $files = array_slice($files, $offset, $limit);
 
-        return new Response(json_encode(['files' => $files, 'count' => $count]), Response::HTTP_OK, [
-                'Content-type'                 => 'application/json',
-                'Access-Control-Allow-Origin'  => '*',
-                'Access-Control-Allow-Methods' => '*',
-                'Access-Control-Allow-Headers' => '*'
-        ]);
+        return new Response(new DTOFileList($files, $count));
     }
 }
