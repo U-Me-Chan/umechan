@@ -25,6 +25,8 @@ class ImageThumbnailer implements Thumbnailer
         $fh = fopen($filepath, 'r');
 
         $this->image->readImageFile($fh);
+
+        fclose($fh);
     }
 
     public function create(int $width, int $height): void

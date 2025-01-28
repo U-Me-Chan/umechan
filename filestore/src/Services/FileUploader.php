@@ -62,9 +62,9 @@ class FileUploader
 
         return match ($mimetype) {
             'image/jpeg' => Mimetype::image,
-            'image/gif'  => Mimetype::image,
             'image/png'  => Mimetype::image,
             'image/webp' => Mimetype::image,
+            'image/gif'  => Mimetype::image,
             'video/webm' => Mimetype::video,
             'video/mp4'  => Mimetype::video,
             default      => Mimetype::unsupported

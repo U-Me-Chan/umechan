@@ -48,6 +48,21 @@ class VideoThumbnailer implements Thumbnailer
 
             throw new \Exception;
         }
+
+        $imagick = new \Imagick();
+        $draw    = new \ImagickDraw();
+        $pixel   = new \ImagickPixel();
+
+        $fh = fopen($this->temp_thumb_filepath, 'r');
+
+        $imagick->readImageFile($fh);
+
+        fclose($fh);
+
+        $draw->setFillColor('white');
+        $draw->setFontSize(50);
+        $imagick->annotateImage($draw, 50, 50, 0, 'Video File');
+        $imagick->writeImage($this->temp_thumb_filepath);
     }
 
     public function save(string $filename): string
