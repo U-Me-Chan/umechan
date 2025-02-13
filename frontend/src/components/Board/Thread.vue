@@ -2,7 +2,7 @@
 <div class="post card" :id="id" :ref="id">
   <Meta :id="id" :poster="poster" :subject="subject" :datetime="datetime" :isVerify="isVerify" :parentId="parentId" :board="board"/>
   <div class="post-body">
-    <Media :images="images" :youtubes="youtubes"/>
+    <Media :images="images" :youtubes="youtubes" :videos="videos"/>
     <Message :message="message"/>
   </div>
 
@@ -15,7 +15,7 @@
       <Meta :id="post.id" :poster="post.poster" :subject="post.subject" :datetime="post.datetime" :isVerify="post.is_verify" :parentId="post.parent_id"/>
 
       <div class="post-body">
-	<Media :images="post.media.images" :youtubes="post.media.youtubes"/>
+	<Media :images="post.media.images" :youtubes="post.media.youtubes" :videos="post.media.videos"/>
 	<Message :message="post.truncated_message"/>
       </div>
     </div>
@@ -52,6 +52,7 @@ export default {
     message: String,
     images: Array,
     youtubes: Array,
+    videos: Array,
     replies: Array,
     board: Object,
     repliesCount: Number

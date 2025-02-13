@@ -10,6 +10,7 @@
 	:repliesCount="opPost.repliesCount"
 	:youtubes="opPost.youtubes"
 	:images="opPost.images"
+        :videos="opPost.videos"
 	:isVerify="opPost.isVerify"
         :isThread="true"
 	:datetime="opPost.datetime"/>
@@ -22,6 +23,7 @@
         :message="post.truncated_message"
         :images="post.media.images"
         :youtubes="post.media.youtubes"
+        :videos="post.media.videos"
 	:isVerify="post.is_verify"
         :parentId="post.parent_id"
 	:datetime="post.datetime"/>
@@ -60,6 +62,7 @@ export default {
           repliesCount: response.data.payload.thread_data.replies_count,
           images: response.data.payload.thread_data.media.images,
           youtubes: response.data.payload.thread_data.media.youtubes,
+          videos: response.data.payload.thread_data.media.videos,
           isVerify: response.data.payload.thread_data.is_verify,
           datetime: response.data.payload.thread_data.datetime,
           boardName: response.data.payload.thread_data.board.name

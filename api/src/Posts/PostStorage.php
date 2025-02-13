@@ -3,7 +3,7 @@
 namespace PK\Posts;
 
 use Medoo\Medoo;
-use PK\Posts\Post\Post;
+use PK\Posts\Post;
 use PK\Boards\Board\Board;
 use PK\Boards\BoardStorage;
 
