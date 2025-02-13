@@ -2,6 +2,9 @@ data/db/*
 data/files/*
 data/grafana/*
 data/dumps/*
+data/music
+data/tagme
+data/convert
 !data/dumps/.gitkeep
 api/vendor/*
 api/.phpunit.result.cache

@@ -1,24 +1,26 @@
 <?php
 
-use FloFaber\MphpD\Filter;
-use FloFaber\MphpD\MphpD;
 use Medoo\Medoo;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use React\EventLoop\Loop;
+use Ridouchire\RadioDbImporter\DirectoryIterator;
+use Ridouchire\RadioDbImporter\FileManager;
+use Ridouchire\RadioDbImporter\Handler;
+use Ridouchire\RadioDbImporter\Id3v2Parser;
+use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
 
-require_once "vendor/autoload.php";
+require_once __DIR__ . DIRECTORY_SEPARATOR . "vendor/autoload.php";
+require_once __DIR__ . DIRECTORY_SEPARATOR . "vendor/james-heinrich/getid3/getid3/getid3.php";
 
 $logger = new Logger('log');
-$logger->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-db-importer.log', Level::Info));
+$logger->pushHandler(new StreamHandler(__DIR__ . DIRECTORY_SEPARATOR . 'logs/radio-db-importer.log', Level::Info));
 $logger->info('Запуск');
 
-$mphpd = new MphpD([
-    'host' => $_ENV['MPD_HOSTNAME'],
-    'port' => $_ENV['MPD_PORT'],
-    'timeout' => 5
-]);
+$music_dir_path                  = '/var/lib/music';
+$music_dir_of_convertible_files  = '/var/lib/convert';
+$music_dir_of_files_without_tags = '/var/lib/tagme';
 
 $db = new Medoo([
     'database_type' => 'mysql',
@@ -30,89 +32,10 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-$mpd_database_path = $_ENV['MPD_DATABASE_PATH'];
+$dir_iterator = new DirectoryIterator($music_dir_path);
+$tags_parser  = new Id3v2Parser(new getID3());
+$track_repo   = new TrackRepository($db);
+$file_manager = new FileManager($music_dir_of_convertible_files, $music_dir_of_files_without_tags);
+$handler      = new Handler($dir_iterator, $tags_parser, $logger, $track_repo, $file_manager);
 
-$num = 0;
-
-Loop::addPeriodicTimer(1, function () use ($mphpd, $db, $logger, $mpd_database_path, &$num) {
-    $logger->debug('Запуск цикла');
-
-    if (!$mphpd->connected) {
-        try {
-            $logger->debug('Подключаюсь к MPD');
-
-            $mphpd->connect();
-        } catch (\FloFaber\MPDException) {
-            $logger->error('Произошла ошибка подключения к MPD');
-
-            return;
-        }
-    }
-
-    /** @var array|false */
-    $files = $mphpd->db()->search(new Filter('file', 'contains', '/'), '-Last-Modified', [$num, $num + 1]);
-
-    if (!$files) {
-        $num = 0;
-
-        $logger->debug('Список пуст, начинаю сначала');
-    }
-
-    foreach ($files as $file) {
-        if (!file_exists($mpd_database_path . '/' . $file['file'])) {
-            $logger->error('Файл не существует: ' . $file['file']);
-
-            continue;
-        }
-
-        $hash = md5_file($mpd_database_path . '/' . $file['file']);
-
-        $track_data = $db->get('tracks', '*', ['hash' => $hash]);
-
-        $logger->debug('Файл уже добавлен: ' . $file['file']);
-
-        if (!$track_data) {
-            $logger->info('Добавляю файл: ' . $file['file']);
-
-            $db->insert('tracks', [
-                'artist'        => $file['artist'],
-                'title'         => $file['title'],
-                'duration'      => $file['time'],
-                'hash'          => $hash,
-                'estimate'      => 0,
-                'first_playing' => time(),
-                'last_playing'  => time(),
-                'play_count'    => 0,
-                'path'          => $file['file']
-            ]);
-
-            continue;
-        }
-
-        if (empty($track_data['path'])) {
-            $logger->info('Файл без пути, обновляю для ' . $file['file']);
-
-            $db->update('tracks', [
-                'path' => $file['file']
-            ], [
-                'hash' => $hash
-            ]);
-
-            continue;
-        }
-
-        if (strcmp($track_data['path'], $file['file']) !== 0) {
-            $logger->info('Файл был перемещён, обновляю путь для ' . $file['file']);
-
-            $db->update('tracks', [
-                'path' => $file['file']
-            ], [
-                'hash' => $hash
-            ]);
-        }
-    }
-
-    $num++;
-
-    $logger->debug('Конец цикла');
-});
+Loop::addPeriodicTimer(0.01, $handler);

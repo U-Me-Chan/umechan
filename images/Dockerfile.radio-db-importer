@@ -4,7 +4,6 @@ WORKDIR /db-importer
 RUN apt update -yyq && apt install -yyq zip libzip-dev
 RUN docker-php-ext-install zip
 RUN docker-php-ext-install pdo_mysql
-RUN docker-php-ext-install sockets
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 RUN php composer-setup.php --install-dir=/usr/local/bin/ --filename composer; rm composer-setup.php
@@ -16,14 +15,9 @@ ARG MYSQL_DATABASE
 ARG MYSQL_HOSTNAME
 ARG MYSQL_USERNAME
 ARG MYSQL_PASSWORD
-ARG MPD_HOSTNAME
-ARG MPD_PORT
 ENV MYSQL_DATABASE $MYSQL_DATABASE
 ENV MYSQL_HOSTNAME $MYSQL_HOSTNAME
 ENV MYSQL_USERNAME $MYSQL_USERNAME
 ENV MYSQL_PASSWORD $MYSQL_PASSWORD
-ENV MPD_HOSTNAME $MPD_HOSTNAME
-ENV MPD_PORT $MPD_PORT
-ENV MPD_DATABASE_PATH /var/lib/music
 
 CMD php ./index.php
