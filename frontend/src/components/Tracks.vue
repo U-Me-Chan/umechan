@@ -71,29 +71,7 @@ export default {
   },
   data: function () {
     return {
-      tracks: [
-        {
-          id: 1,
-          artist: 'foo',
-          title: 'bar',
-          estimate: 0,
-          path: '/path/to/file'
-        },
-        {
-          id: 2,
-          artist: 'fooooooooooooooooooooo',
-          title: 'baaaaaaaaaaaaaaaaaaaaar',
-          estimate: 0,
-          path: '/path/to/file'
-        },
-        {
-          id: 3,
-          artist: 'fooooooooooooooooooooooooooooo',
-          title: 'baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaraaaaaaaaaaaa',
-          estimate: 0,
-          path: '/path/to/fileeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-        }
-      ],
+      tracks: [],
       count: 0,
       current: 1,
       perPage: 10,
