@@ -2,7 +2,7 @@
 <div class="post card" :id="id" :ref="id">
   <Meta :id="id" :poster="poster" :subject="subject" :datetime="datetime" :isVerify="isVerify" :parentId="parentId"/>
   <div class="post-body">
-    <Media :images="images" :youtubes="youtubes"/>
+    <Media :images="images" :youtubes="youtubes" :videos="videos"/>
     <Message :message="message"/>
   </div>
 </div>
@@ -30,7 +30,8 @@ export default {
     datetime: String,
     message: String,
     images: Array,
-    youtubes: Array
+    youtubes: Array,
+    videos: Array
   }
 }
 </script>

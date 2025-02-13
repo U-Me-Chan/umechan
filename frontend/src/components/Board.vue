@@ -37,6 +37,7 @@
         :message="post.truncated_message"
         :images="post.media.images"
         :youtubes="post.media.youtubes"
+        :videos="post.media.videos"
         :replies="post.replies"
         :repliesCount="post.replies_count"
         />
