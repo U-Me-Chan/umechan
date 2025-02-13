@@ -9,6 +9,7 @@ use Monolog\Logger;
 use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
 use Ridouchire\RadioDbImporter\Tracks\Track;
 use Ridouchire\RadioDbImporter\Tracks\Track\Hash;
+use Ridouchire\RadioDbImporter\Utils\PathCutter;
 
 final class Handler
 {
@@ -17,7 +18,8 @@ final class Handler
         private Id3v2Parser $tags_parser,
         private Logger $logger,
         private TrackRepository $track_repo,
-        private FileManager $file_manager
+        private FileManager $file_manager,
+        private PathCutter $path_cutter
     ) {
     }
 
@@ -85,8 +87,8 @@ final class Handler
                 $this->logger->info('У трека обновлено наименование');
             }
 
-            if ($track->getPath() !== $file->getPathname()) {
-                $track->path = $file->getPathname();
+            if ($track->getPath() !== $this->path_cutter->cut($file->getPathname())) {
+                $track->path = $this->path_cutter->cut($file->getPathname());
 
                 $this->logger->info('У трека обновлён путь');
             }
@@ -105,7 +107,7 @@ final class Handler
                 $this->tags_parser->getArtist(),
                 $this->tags_parser->getTitle(),
                 $this->tags_parser->getDuration(),
-                $file->getPathname(),
+                $this->path_cutter->cut($file->getPathname()),
                 Hash::fromPath($file->getPathname())
             );
 

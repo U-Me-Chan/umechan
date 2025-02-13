@@ -10,6 +10,7 @@ use Ridouchire\RadioDbImporter\FileManager;
 use Ridouchire\RadioDbImporter\Handler;
 use Ridouchire\RadioDbImporter\Id3v2Parser;
 use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
+use Ridouchire\RadioDbImporter\Utils\PathCutter;
 
 require_once __DIR__ . DIRECTORY_SEPARATOR . "vendor/autoload.php";
 require_once __DIR__ . DIRECTORY_SEPARATOR . "vendor/james-heinrich/getid3/getid3/getid3.php";
@@ -32,10 +33,11 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
+$path_cutter  = new PathCutter($music_dir_path);
 $dir_iterator = new DirectoryIterator($music_dir_path);
 $tags_parser  = new Id3v2Parser(new getID3());
 $track_repo   = new TrackRepository($db);
 $file_manager = new FileManager($music_dir_of_convertible_files, $music_dir_of_files_without_tags);
-$handler      = new Handler($dir_iterator, $tags_parser, $logger, $track_repo, $file_manager);
+$handler      = new Handler($dir_iterator, $tags_parser, $logger, $track_repo, $file_manager, $path_cutter);
 
 Loop::addPeriodicTimer(0.01, $handler);

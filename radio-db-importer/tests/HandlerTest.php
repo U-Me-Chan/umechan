@@ -10,6 +10,7 @@ use Ridouchire\RadioDbImporter\Id3v2Parser;
 use Ridouchire\RadioDbImporter\Tracks\Track;
 use Ridouchire\RadioDbImporter\Tracks\Track\Hash;
 use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
+use Ridouchire\RadioDbImporter\Utils\PathCutter;
 
 class HandlerTest extends TestCase
 {
@@ -64,7 +65,8 @@ class HandlerTest extends TestCase
             $this->parser,
             $this->logger,
             $this->track_repo,
-            $this->file_manager
+            $this->file_manager,
+            new PathCutter($tmp_dir)
         );
     }
 
@@ -182,9 +184,10 @@ class HandlerTest extends TestCase
             ->willReturnCallback(function (Track $track) {
                 $this->assertEquals('Foo', $track->getArtist());
                 $this->assertEquals('Bar', $track->getTitle());
+                $this->assertEquals('1.mp3', $track->getPath());
             });
 
-        $this->logger->expects($this->exactly(3))
+        $this->logger->expects($this->exactly(4))
             ->method('info');
 
         $this->dir_iterator->expects($this->once())->method('next');
