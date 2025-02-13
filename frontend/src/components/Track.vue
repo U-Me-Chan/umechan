@@ -1,6 +1,6 @@
 <template>
 <div class="track card">
-  <b-button @click="putTrackToQueue" size="is-small">В очередь</b-button>
+  <b-button @click="putTrackToQueue(id, $event)" size="is-small">В очередь</b-button>
   <span class="track-info">{{artist}} - {{title}}</span>
 </div>
 </template>
@@ -19,13 +19,17 @@ export default {
     title: String
   },
   methods: {
-    putTrackToQueue: function (track_id) {
+    putTrackToQueue: function (track_id, event) {
+      event.preventDefault()
+      
       var self = this
       bus.$emit('app.loader', [true])
 
-      axios.put(config.base_url + '/radio/queue', {
-	track_id: track_id
-      }).then(() => {
+      axios.put(
+	config.base_url + '/radio/queue', {
+	  track_id: track_id
+	}
+      ).then(() => {
 	self.$buefy.toast.open('Отправлено!')
 	bus.$emit('app.loader', [false])
       }).catch((error) => {
