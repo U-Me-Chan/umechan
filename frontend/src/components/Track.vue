@@ -26,16 +26,17 @@ export default {
       bus.$emit('app.loader', [true])
 
       axios.put(
-	config.base_url + '/radio/queue', {
-	  track_id: track_id
-	}
+
+        config.base_url + '/radio/queue', {
+          track_id: track_id
+        }
       ).then(() => {
-	self.$buefy.toast.open('Отправлено!')
-	bus.$emit('app.loader', [false])
+        self.$buefy.toast.open('Отправлено!')
+        bus.$emit('app.loader', [false])
       }).catch((error) => {
-	self.$buefy.toast.open('Произошла ошибка при заказе трека')
-	console.error(error)
-	bus.$emit('app.loader', [false])
+        self.$buefy.toast.open('Произошла ошибка при заказе трека')
+        console.error(error)
+        bus.$emit('app.loader', [false])
       }) 
     }
   }
