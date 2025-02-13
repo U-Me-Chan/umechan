@@ -1,30 +1,38 @@
 <template>
 <div class="track card">
-  <b-tag size="is-small" type="is-light is-info" class="id">{{id}}</b-tag>
-  <b-tag size="is-small" type="is-light">{{artist}} - {{title}}</b-tag>
+  <b-button @click="putTrackToQueue" size="is-small">В очередь</b-button>
+  <span class="track-info">{{artist}} - {{title}}</span>
 </div>
 </template>
 
 <script>
+import axios from 'axios'
+import { bus} from '../bus'
+
+const config = require('../../config')
+
 export default {
   name: 'Track',
   props: {
     id: Number,
     artist: String,
-    title: String,
-    path: String,
-    estimate: Number,
-    duration: Number
+    title: String
   },
-  computed: {
-    durationString: function () {
-      var minutes = Math.floor(this.duration / 60)
-      var seconds = this.duration % 60
+  methods: {
+    putTrackToQueue: function (track_id) {
+      var self = this
+      bus.$emit('app.loader', [true])
 
-      return minutes + ':' + seconds
-    },
-    estimateValue: function () {
-      return this.estimate / 100 / 5
+      axios.put(config.base_url + '/radio/queue', {
+	track_id: track_id
+      }).then(() => {
+	self.$buefy.toast.open('Отправлено!')
+	bus.$emit('app.loader', [false])
+      }).catch((error) => {
+	self.$buefy.toast.open('Произошла ошибка при заказе трека')
+	console.error(error)
+	bus.$emit('app.loader', [false])
+      }) 
     }
   }
 }
@@ -34,9 +42,10 @@ export default {
 .track {
     padding: 5px;
     margin: 2px;
+    font-size: 14px;
 }
 
-.path, .duration {
-    font-size: 0.5em;
+.track-info {
+    padding: 10px;
 }
 </style>

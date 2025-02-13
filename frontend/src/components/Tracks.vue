@@ -32,7 +32,16 @@
     size="is-small">
   </b-pagination>
 
-  <b-table :data="tracks" :columns="tableColumns"></b-table>
+  <section class="tracks" v-for="track in tracks" :key="track.id">
+    <Track
+      :id="track.id"
+      :artist="track.artist"
+      :title="track.title"
+      :path="track.path"
+      :estimate="track.estimate"
+      :duration="track.duration"
+      />
+  </section>
 
   <b-pagination
     :total="count"
@@ -51,19 +60,46 @@
 <script>
 import axios from 'axios'
 import { bus } from '../bus'
+import Track from './Track.vue'
 
 const config = require('../../config')
 
 export default {
+  name: 'Tracks',
+  components: {
+    Track
+  },
   data: function () {
     return {
-      tracks: [],
+      tracks: [
+        {
+          id: 1,
+          artist: 'foo',
+          title: 'bar',
+          estimate: 0,
+          path: '/path/to/file'
+        },
+        {
+          id: 2,
+          artist: 'fooooooooooooooooooooo',
+          title: 'baaaaaaaaaaaaaaaaaaaaar',
+          estimate: 0,
+          path: '/path/to/file'
+        },
+        {
+          id: 3,
+          artist: 'fooooooooooooooooooooooooooooo',
+          title: 'baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaraaaaaaaaaaaa',
+          estimate: 0,
+          path: '/path/to/fileeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+        }
+      ],
       count: 0,
       current: 1,
       perPage: 10,
       artist: '',
       title: '',
-      sortField: 'estimate',
+      sortField: 'artist',
       tableColumns: [
         {
           field: 'id',
@@ -101,12 +137,12 @@ export default {
       var offset = page - 1
       offset = offset * this.perPage
 
-      axios.get(config.chan_url + '/radio/tracks', {
+      axios.get(config.base_url + '/radio/tracks', {
         params: {
           offset: offset,
           limit: this.perPage,
-           artist: this.artist,
-           title: this.title
+           artist_substr: this.artist,
+           title_substr: this.title
         }
       }).then((response) => {
         self.tracks = response.data.payload.tracks
