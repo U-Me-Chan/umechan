@@ -16,7 +16,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . "vendor/autoload.php";
 require_once __DIR__ . DIRECTORY_SEPARATOR . "vendor/james-heinrich/getid3/getid3/getid3.php";
 
 $logger = new Logger('log');
-$logger->pushHandler(new StreamHandler(__DIR__ . DIRECTORY_SEPARATOR . 'logs/radio-db-importer.log', Level::Info));
+$logger->pushHandler(new StreamHandler(__DIR__ . DIRECTORY_SEPARATOR . 'logs/radio-db-importer.log', Level::Debug));
 $logger->info('Запуск');
 
 $music_dir_path                  = '/var/lib/music';
