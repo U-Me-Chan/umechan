@@ -98,8 +98,8 @@ export default {
            title_substr: this.title
         }
       }).then((response) => {
-        self.tracks = response.data.payload.tracks
-        self.count = response.data.payload.count
+        self.tracks = response.data.tracks
+        self.count = response.data.count
         bus.$emit('app.loader', [false])
       }).catch((error) => {
         console.log(error)
