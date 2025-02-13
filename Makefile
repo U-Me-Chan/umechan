@@ -11,3 +11,6 @@ up-dev:
 	docker exec umechan-filestore composer install
 down-dev:
 	docker compose -f docker-compose.dev.yml down
+run-db-importer-test:
+	docker compose -f docker-compose.prod.yml up db radio-db-importer --build -d
+	tail -f ./logs/radio-db-importer.log

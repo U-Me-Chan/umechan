@@ -4,7 +4,7 @@
         "react/event-loop": "^1.5",
         "catfan/medoo": "^2.1",
         "monolog/monolog": "^3.5",
-        "flofaber/mphpd": "^1.2"
+        "james-heinrich/getid3": "^1.9"
     },
     "license": "MIT",
     "autoload": {
@@ -17,5 +17,8 @@
             "name": "ridouchire",
             "email": "ridouchire@gmail.com"
         }
-    ]
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    }
 }
