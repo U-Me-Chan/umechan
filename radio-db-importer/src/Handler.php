@@ -10,6 +10,7 @@ use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
 use Ridouchire\RadioDbImporter\Tracks\Track;
 use Ridouchire\RadioDbImporter\Tracks\Track\Hash;
 use Ridouchire\RadioDbImporter\Utils\PathCutter;
+use Throwable;
 
 final class Handler
 {
@@ -44,6 +45,12 @@ final class Handler
 
                 $this->track_repo->delete($track);
             } catch (OutOfBoundsException) {
+            } catch (Throwable) {
+                $track = new Track('', '', 0, $file->getPathname(), Hash::fromPath($file->getPathname()));
+
+                $this->track_repo->delete($track);
+
+                //FIXME: треки без тегов в БД вызывают падение
             }
 
             $this->file_manager->moveToDirOfConvertibleFiles($file->getPathname(), $file->getFilename());

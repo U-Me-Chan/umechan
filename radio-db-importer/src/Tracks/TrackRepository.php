@@ -64,6 +64,6 @@ class TrackRepository
 
     public function delete(Track $track)
     {
-        $this->db->delete('tracks', ['id' => $track->getId()]);
+        $this->db->delete('tracks', ['hash' => $track->getHash()]);
     }
 }
