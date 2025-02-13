@@ -77,31 +77,6 @@ export default {
       perPage: 10,
       artist: '',
       title: '',
-      sortField: 'artist',
-      tableColumns: [
-        {
-          field: 'id',
-          label: 'ID',
-          width: 40,
-          numeric: true
-        },
-        {
-          field: 'artist',
-          label: 'Исполнитель'
-        },
-        {
-          field: 'title',
-          label: 'Композиция'
-        },
-        {
-          field: 'estimate',
-          label: 'Оценка'
-        },
-        {
-          field: 'path',
-          label: 'Путь'
-        }
-      ]
     }
   },
   created: function  () {
