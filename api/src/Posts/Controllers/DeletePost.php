@@ -8,7 +8,7 @@ use PK\Events\Event\EventType;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Posts\PostStorage;
-use PK\Posts\Post\Post;
+use PK\Posts\Post;
 
 final class DeletePost
 {

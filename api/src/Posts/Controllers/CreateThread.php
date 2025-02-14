@@ -5,7 +5,7 @@ namespace PK\Posts\Controllers;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Posts\PostStorage;
-use PK\Posts\Post\Post;
+use PK\Posts\Post;
 use PK\Boards\Board\Board;
 use PK\Boards\BoardStorage;
 use PK\Events\Event\Event;
