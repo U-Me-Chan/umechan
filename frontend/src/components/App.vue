@@ -1,7 +1,9 @@
 <template>
 <div id="app">
   <div class="board-list">
-    <a :href="'/board/' + board.tag" class="board-link" v-for="board in boards" @click="selectBoard(board.tag, $event)" :key="board.id" v-bind:class="{ active: tag === board.tag }">{{ board.name }} (+{{ board.new_posts_count }}) </a>
+    <a :href="'/board/' + board.tag" class="board-link" v-for="board in boards" @click="selectBoard(board.tag, $event)" :key="board.id" v-bind:class="{ active: tag === board.tag }">
+      {{ board.name }} {{ board.new_posts_count ? `(+${board.new_posts_count})` : '' }}
+    </a>
   </div>
 
   <div class="columns-wrap">
@@ -31,7 +33,7 @@
 
 <script>
 import axios from 'axios'
-import { bus} from '../bus'
+import { bus } from '../bus'
 import Radio from './Radio.vue'
 import AuthPanel from './AuthPanel.vue'
 
