@@ -140,10 +140,8 @@ audio {
 
 .track-title {
     background-color: #e8ffff;
-    padding-top: 15px;
-    padding-bottom: 15px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-block: 15px;
+    padding-inline: 10px;
     font-size: 15px;
     margin-left: 10px;
     border: 1px solid black;

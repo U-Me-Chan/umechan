@@ -4,23 +4,25 @@
     <a :href="'/board/' + board.tag" class="board-link" v-for="board in boards" @click="selectBoard(board.tag, $event)" :key="board.id" v-bind:class="{ active: tag === board.tag }">{{ board.name }} (+{{ board.new_posts_count }}) </a>
   </div>
 
-  <div class="columns">
-    <div class="main-content column">
+  <div class="columns-wrap">
+    <div class="main-content">
       <b-loading :can-cancel="true" v-model="isLoading" :isFullPage="true"></b-loading>
       <router-view/>
     </div>
-
-    <Radio class="column radio-content"/>
-
-    <div class="auth-panel">
-      <AuthPanel/>
+    <div class="side-content-fixed">
+      <div class="radios-panel-wrap">
+        <Radio class="radio-content"/>
+      </div>
+      <div class="auth-panel-wrap">
+        <AuthPanel/>
+      </div>
     </div>
   </div>
 
   <footer class="footer">
     <div class="content has-text-centered">
       <p>
-	<strong>U III E</strong> 2011-2077
+        <strong>U III E</strong> 2011-2077
       </p>
     </div>
   </footer>
@@ -70,9 +72,9 @@ export default {
   computed: {
     allTags: function () {
       return this.boards.map(function (board) {
-	return board.tag;
-      }).join('+');
-    }
+        return board.tag;
+          }).join('+');
+        }
   },
   methods: {
     selectBoard: function (tag, event) {
@@ -124,7 +126,7 @@ p {
 }
 
 .active {
-    color: white;
+    color: #fafafa;
     background-color: #7957d5;
     border: 1px solid;
 }
@@ -132,7 +134,7 @@ p {
 .board-list {
     display:flex;
     justify-content: space-around;
-    background-color: #fff;
+    background-color: #fafafa;
     flex-wrap: wrap;
 }
 
@@ -140,31 +142,42 @@ p {
     margin: 0px;
 }
 
-.main-content {
-    margin: 10px 500px 10px 150px;
-    box-sizing: border-box;
+.columns-wrap {
+    margin-block: 10px;
 }
 
-.radio-content {
+.main-content {
+    margin-block: 10px;
+    margin-inline: 150px 328px;
+    box-sizing: border-box;
+    max-width: 1280px;
+}
+
+.side-content-fixed {
     position: fixed;
-    background-color: white;
-    border: 2px dotted grey;
-    bottom: 0;
-    right: 0;
+    display: flex;
+    flex-direction: column-reverse;
+    bottom: 245px;
+    right: 0px;
+    gap: 30px;
+}
+
+.auth-panel-wrap,
+.radios-panel-wrap {
+  background-color: #fafafa;
+  border: 2px dotted grey;
+  padding: 10px;
 }
 
 @media (max-width: 1300px) {
-    .main-content {
-	margin: 10px 5px 10px 5px;
-    }
-    .radio-content {
-	display: none;
-	visibility: hidden;
-    }
+  .main-content {
+      margin-inline: 5px;
+      max-width: max-content;
+  }
 
-    .auth-panel {
-	display: none;
-	visibility: hidden;
-    }
+  .side-content-fixed {
+      display: none;
+      visibility: hidden;
+  }
 }
 </style>

@@ -162,6 +162,8 @@ h3 {
 .thread {
     background-color: #eee;
     margin-top: 0;
+    overflow-wrap: break-word;
+    max-width: 1280px;
 }
 
 .post-reply {
