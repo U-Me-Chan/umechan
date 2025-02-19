@@ -44,7 +44,10 @@
     </section>
   </div>
 
+  <hr v-if="isContentExist">
+
   <b-pagination
+    class="board-paginator"
     v-if="isContentExist"
     :total="count"
     :current="current"
@@ -184,5 +187,9 @@ hr {
 .card {
     margin: 5px;
     padding: 10px;
+}
+
+.board-paginator {
+  margin-bottom: unset;
 }
 </style>
