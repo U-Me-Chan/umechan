@@ -27,7 +27,7 @@ export default {
     },
     formattedMessage: function () {
       marked.use({
-        gfm: true,
+        gfm: false,
         breaks: true,
         extensions: [
           {
@@ -54,6 +54,13 @@ export default {
             },
             renderer(token) {
               return `${this.parser.parse(token.tokens)}`
+            }
+          },
+          {
+            name: 'link',
+            level: 'inline',
+            renderer (token) {
+              return `<a href='${token.href}' target='_blank'>${token.href}</a>`;
             }
           }
         ]
