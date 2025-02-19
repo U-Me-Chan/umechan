@@ -6,15 +6,15 @@
       <a :href="m3uUrl">Плейлист для внешнего плеера</a>
     </audio>
     <div>
+      <span v-bind:class="{ 'track-title-actived': isPlaying }" class="track-title">
+	<marquee behavior="alternate" direction="rigth" scrollamount="3">{{title}}</marquee>
+      </span>
       <span v-bind:class="{ 'button-play-actived': isPlaying }" class="button-play" @click="togglePlay()">⏯</span>
-      <span v-bind:class="{ 'track-title-actived': isPlaying }" class="track-title">{{title}}</span>
+      <span><a href="#" @click="estimateTrack(track_id, 'plus')">💜</a></span>
+      <span><a href="#" @click="estimateTrack(track_id, 'minus')">❌</a></span>
+      <span><a href="#" @click="goToThread()"> 📝</a></span>
     </div>
     <span><input class="volume-slider" type="range" min="0" max="100" v-model="volume" @change="setVolume"></span>
-  </div>
-  <div class="radio-meta">
-    <span><a href="#" @click="estimateTrack(track_id, 'plus')">💜: Нраица</a></span>
-    <span><a href="#" @click="estimateTrack(track_id, 'minus')">❌: Гавно</a></span>
-    <span><a href="#" @click="goToThread()"> 📝: Обсудить</a></span>
   </div>
   <br/>
 </div>
@@ -112,12 +112,6 @@ audio {
     display: none;
 }
 
-.radio-meta {
-    display: flex;
-    flex-direction: column;
-    font-size: 12px;
-}
-
 .button-play {
     cursor: pointer;
     font-size: 20px;
@@ -140,10 +134,7 @@ audio {
 
 .track-title {
     background-color: #e8ffff;
-    padding-block: 15px;
-    padding-inline: 10px;
     font-size: 15px;
-    margin-left: 10px;
     border: 1px solid black;
     border-radius: 5% 5% 10% 5%;
 }

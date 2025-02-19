@@ -169,6 +169,7 @@ p {
   background-color: #fafafa;
   border: 2px dotted grey;
   padding: 10px;
+  max-width: 300px;
 }
 
 @media (max-width: 1300px) {
