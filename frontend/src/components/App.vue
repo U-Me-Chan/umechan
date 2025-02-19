@@ -21,8 +21,8 @@
     </div>
   </div>
 
-  <footer class="footer">
-    <div class="content has-text-centered">
+  <footer class="footer-wrap">
+    <div class="footer-content has-text-centered">
       <p>
         <strong>U III E</strong> 2011-2077
       </p>
@@ -136,7 +136,6 @@ p {
 .board-list {
     display:flex;
     justify-content: space-around;
-    background-color: #fafafa;
     flex-wrap: wrap;
 }
 
@@ -148,39 +147,57 @@ p {
     margin-block: 10px;
 }
 
+.auth-panel-wrap,
+.radios-panel-wrap,
+.footer-wrap,
+.board-list {
+    background-color: #fafafa;
+}
+
+.main-content,
+.footer-content {
+    max-width: 1280px;
+    margin-inline: 150px 350px;
+    box-sizing: border-box;
+}
+
 .main-content {
     margin-block: 10px;
-    margin-inline: 150px 328px;
     box-sizing: border-box;
-    max-width: 1280px;
 }
 
 .side-content-fixed {
     position: fixed;
     display: flex;
     flex-direction: column-reverse;
-    bottom: 245px;
+    bottom: 200px;
     right: 0px;
     gap: 30px;
+    width: 300px;
 }
 
 .auth-panel-wrap,
 .radios-panel-wrap {
-  background-color: #fafafa;
-  border: 2px dotted grey;
-  padding: 10px;
-  max-width: 300px;
+    border: 2px dotted grey;
+    padding: 10px;
+}
+
+.footer-wrap {
+    padding-block: 45px 90px;
 }
 
 @media (max-width: 1300px) {
   .main-content {
       margin-inline: 5px;
-      max-width: max-content;
   }
 
   .side-content-fixed {
       display: none;
       visibility: hidden;
+  }
+
+  .footer-content {
+      margin-inline: unset;
   }
 }
 </style>
