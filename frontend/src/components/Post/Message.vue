@@ -30,21 +30,17 @@ export default {
       marked.use({
         gfm: true,
         breaks: true,
-        mangle: true,
-        xhtml: true,
-        smartList: true,
-        smartypants: true,
         extensions: [
           {
             name: 'replier',
             level: 'block',
             tokenizer(src) {
-              const rule = />{2}([0-9]+)/gmi;
+              const rule = /(&gt;){2}([0-9]+)/gmi;
               const match = rule.exec(src);
 
               if (match) {
                 const text = src.replace(match[0], match => {
-                  return `<a href='#${match.slice('>>'.length)}'>&gt;&gt;${match.slice('>>'.length)}</a>`;
+                  return `<a href='#${match.slice('&gt;&gt;'.length)}'>>>${match.slice('&gt;&gt;'.length)}</a>`;
                 });
 
                 const token = {
