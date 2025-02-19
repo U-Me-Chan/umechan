@@ -247,6 +247,8 @@ class Post
             'youtubes' => array_values($youtubes)
         ];
 
+        $message = htmlspecialchars($message, ENT_HTML5);
+
         return [$data, $message];
     }
 }

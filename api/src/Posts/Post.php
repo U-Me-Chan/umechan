@@ -107,6 +107,8 @@ class Post implements \JsonSerializable
             'youtubes' => $youtubes,
         ];
 
+        $message = htmlspecialchars($message, ENT_HTML5);
+
         return [$media, $message];
     }
 }
