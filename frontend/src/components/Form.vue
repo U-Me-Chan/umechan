@@ -15,11 +15,11 @@
   <b-field label="Изображение">
     <b-upload v-model="file" class="file-label">
       <span class="file-cta">
-	<b-icon class="file-icon" icon="upload"></b-icon>
-	<span class="file-label">PNG, JPEG или GIF файл</span>
+        <b-icon class="file-icon" icon="upload"></b-icon>
+        <span class="file-label">PNG, JPEG или GIF файл</span>
       </span>
       <span class="file-name" v-if="file">
-	{{ file.name }}
+        {{ file.name }}
       </span>
     </b-upload>
   </b-field>

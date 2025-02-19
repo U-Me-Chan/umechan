@@ -43,15 +43,6 @@ export default {
 </script>
 
 <style scoped>
-.auth-panel {
-    position: fixed;
-    background-color: white;
-    border: 2px dotted grey;
-    right: 0;
-    bottom: 205px;
-    padding: 10px;
-}
-
 .key-saved {
     display: flex;
     flex-direction: column;
