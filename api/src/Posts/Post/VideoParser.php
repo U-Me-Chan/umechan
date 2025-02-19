@@ -9,7 +9,7 @@ final class VideoParser extends PostMessageParser
     private const REGEXP = '/' .
         self::SKIP_CODE_BLOCK_REGEXP .
         '|' .
-        '\[\!\[\]\((?<preview>https\:\/\/scheoble\.xyz\/files\/thumb\.\w+\.(webm|mp4|gif)\.jpeg)\)\]\((?<link>https\:\/\/scheoble\.xyz\/files\/\w+\.(webm|mp4|gif))\)' .
+        '\[\!\[\]\((?<preview>https?\:\/\/scheoble\.xyz\/files\/thumb\.\w+\.(webm|mp4|gif)\.jpeg)\)\]\((?<link>https?\:\/\/scheoble\.xyz\/files\/\w+\.(webm|mp4|gif))\)' .
         '/mi';
 
     public static function parse(string $message): array

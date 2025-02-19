@@ -9,7 +9,7 @@ final class ImageParser extends PostMessageParser
     private const REGEXP = '/'.
         self::SKIP_CODE_BLOCK_REGEXP .
         '|' .
-        '\[\!\[\]\((?<preview>https\:\/\/scheoble\.xyz\/files\/thumb\.\w+\.(jpe?g?|png|webp))\)\]\((?<link>https\:\/\/scheoble\.xyz\/files\/\w+\.(jpe?g?|png|webp))\)' .
+        '\[\!\[\]\((?<preview>https?\:\/\/scheoble\.xyz\/files\/thumb\.\w+\.(jpe?g?|png|webp))\)\]\((?<link>https?\:\/\/scheoble\.xyz\/files\/\w+\.(jpe?g?|png|webp))\)' .
         '/mi';
 
     public static function parse(string $message): array
