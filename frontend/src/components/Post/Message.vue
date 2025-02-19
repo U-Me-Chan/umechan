@@ -1,6 +1,5 @@
 <template>
-<div class="post-message" v-html="formattedMessage">
-</div>
+<div class="post-message" v-html="formattedMessage"></div>
 </template>
 
 <script>

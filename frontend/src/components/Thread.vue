@@ -83,7 +83,7 @@ export default {
     scrollTo: function (section, type) {
       var el = window.document.getElementById(section);
       
-      //this.$nextTick(() => el.scrollIntoView())
+      this.$nextTick(() => el.scrollIntoView())
       
       if (type == 'post') {
         el.classList.add('post-active');
@@ -173,5 +173,9 @@ h3 {
 .card {
     margin: 5px;
     padding: 10px;
+}
+
+.post-active {
+    border: 3px dotted blue;
 }
 </style>
