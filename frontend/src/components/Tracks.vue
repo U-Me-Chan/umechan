@@ -87,6 +87,7 @@ export default {
 
       this.artist = ''
       this.title  = ''
+      this.getTracks()
     },
     putTrackToQueue: function (track_id, event) {
       event.preventDefault()
