@@ -41,7 +41,7 @@
         :videos="post.media.videos"
         :replies="post.replies"
         :repliesCount="post.replies_count"
-        />
+      />
     </section>
   </div>
 
@@ -190,7 +190,11 @@ hr {
     padding: 10px;
 }
 
+.board-threads {
+    overflow-wrap: anywhere;
+}
+
 .board-paginator {
-  margin-bottom: unset;
+    margin-bottom: unset;
 }
 </style>

@@ -162,12 +162,12 @@ h3 {
 .thread {
     background-color: #eee;
     margin-top: 0;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
     max-width: 1280px;
 }
 
 .post-reply {
-    background-color: #fff;    
+    background-color: #fff;
 }
 
 .card {
