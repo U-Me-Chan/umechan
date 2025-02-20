@@ -47,6 +47,6 @@ class Id3v2Parser
 
     public function getDuration(): int
     {
-        return $this->data['playtime_seconds'];
+        return $this->data['playtime_seconds'] ?? 0;
     }
 }
