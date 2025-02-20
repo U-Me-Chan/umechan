@@ -150,9 +150,12 @@ p {
 
 .auth-panel-wrap,
 .radios-panel-wrap,
-.footer-wrap,
 .board-list {
     background-color: #fafafa;
+}
+
+.footer-wrap {
+    background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%)
 }
 
 .main-content,
