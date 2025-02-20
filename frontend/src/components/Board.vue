@@ -11,6 +11,7 @@
   <hr v-if="isContentExist">
 
   <b-pagination
+    class="board-paginator"
     v-if="isContentExist"
     :total="count"
     :current="current"
