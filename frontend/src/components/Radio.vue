@@ -7,12 +7,28 @@
     </audio>
     <div>
       <span v-bind:class="{ 'track-title-actived': isPlaying }" class="track-title">
-	<marquee behavior="alternate" direction="rigth" scrollamount="3">{{title}}</marquee>
+        <marquee hspace="15px" direction="rigth" scrollamount="4">{{title}} {{formatDuration(duration)}}</marquee>
       </span>
-      <span v-bind:class="{ 'button-play-actived': isPlaying }" class="button-play" @click="togglePlay()">⏯</span>
-      <span><a href="#" @click="estimateTrack(track_id, 'plus')">💜</a></span>
-      <span><a href="#" @click="estimateTrack(track_id, 'minus')">❌</a></span>
-      <span><a href="#" @click="goToThread()"> 📝</a></span>
+      <span v-bind:class="{ 'button-play-actived': isPlaying }" class="button-play button-custom" @click="togglePlay()">
+        <b-tooltip label="Пауза/Воспроизведение">
+          ⏯
+        </b-tooltip>
+      </span>
+      <span class="button-custom">
+        <b-tooltip label="Плюс треку">
+          <a href="#" @click="estimateTrack(track_id, 'plus')">💜</a>
+        </b-tooltip>
+      </span>
+      <span class="button-custom">
+        <b-tooltip label="Минус треку">
+          <a href="#" @click="estimateTrack(track_id, 'minus')">❌</a>
+        </b-tooltip>
+      </span>
+      <span class="button-custom">
+        <b-tooltip label="Заказать трек">
+          <a href="#" @click="goToOrderTrack()">📝</a>
+        </b-tooltip>
+      </span>
     </div>
     <span><input class="volume-slider" type="range" min="0" max="100" v-model="volume" @change="setVolume"></span>
   </div>
@@ -41,6 +57,16 @@ export default {
     }
   },
   methods: {
+    formatDuration: function (value) {
+      var sec_num = parseInt(value, 10);
+      var hours   = Math.floor(sec_num / 3600);
+      var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+      var seconds = sec_num - (hours * 3600) - (minutes * 60);
+      if (hours   < 10) {hours   = "0"+hours;}
+      if (minutes < 10) {minutes = "0"+minutes;}
+      if (seconds < 10) {seconds = "0"+seconds;}
+      return hours+':'+minutes+':'+seconds;
+    },
     estimateTrack: function (track_id, operator) {
       if (this.isPlaying == false) {
         this.$buefy.toast.open('Нельзя оценивать треки, если не слушаешь радио!');
@@ -72,9 +98,9 @@ export default {
         .catch(() => {
         })
     },
-    goToThread: function () {
+    goToOrderTrack: function () {
       event.preventDefault();
-      this.$router.push('/thread/34298')
+      this.$router.push('/tracks')
     },
     togglePlay: function () {
       if (this.isPlaying) {
@@ -115,7 +141,7 @@ audio {
 .button-play {
     cursor: pointer;
     font-size: 20px;
-    padding: 10px;
+    padding: 1px;
     border-radius: 15%;
 }
 
@@ -124,7 +150,7 @@ audio {
 }
 
 .track-title-actived {
-    box-shadow: inset 1px 1px 1px 1px #8e8ed2;
+    box-shadow: inset 2px 1px 2px 1px #8e8ed2;
 }
 
 .volume-slider {
@@ -136,6 +162,12 @@ audio {
     background-color: #e8ffff;
     font-size: 15px;
     border: 1px solid black;
+    padding: 3px;
     border-radius: 5% 5% 10% 5%;
+}
+
+.button-custom {
+    margin-left: 20px;
+    margin-right: 20px;
 }
 </style>

@@ -1,0 +1,135 @@
+{
+    "tracks": [
+        {
+            "id": 37427,
+            "first_playing": 1735192432,
+            "last_playing": 1735192432,
+            "play_count": 0,
+            "estimate": 0,
+            "duration": 374,
+            "path": "Core/Dancecore/01.EveryHole!!!!(CHAN IS DEAD).mp3",
+            "mpd_track_id": null,
+            "artist": "Öq",
+            "title": "EveryHole!!!!(CHAN IS DEAD)",
+            "hash": "b214deaf30847ffd9b487dba5999e070"
+        },
+        {
+            "id": 31794,
+            "first_playing": 1725577748,
+            "last_playing": 1730792914,
+            "play_count": 1,
+            "estimate": 0,
+            "duration": 158,
+            "path": "Breakcore and Lolicore/_belladonna - This Is The Primer Your Ears Need To Accept This Drug As It Should Be Taken.mp3",
+            "mpd_track_id": null,
+            "artist": "_belladonna",
+            "title": "This Is The Primer Your Ears Need To Accept This Drug As It Should Be Taken",
+            "hash": "51fbc90bddd8bc38d084eb6cbfc7c1a7"
+        },
+        {
+            "id": 21350,
+            "first_playing": 1704982082,
+            "last_playing": 1737023822,
+            "play_count": 18,
+            "estimate": 0,
+            "duration": 185,
+            "path": "Pop/20/-Cqbvn4j5ry - ねぇ.mp3",
+            "mpd_track_id": null,
+            "artist": "-Cqbvn4j5ry",
+            "title": "ねぇ",
+            "hash": "7769378646a3e688a4af5beb97fd3938"
+        },
+        {
+            "id": 21329,
+            "first_playing": 1704982059,
+            "last_playing": 1739509578,
+            "play_count": 7,
+            "estimate": 1338,
+            "duration": 271,
+            "path": "Pop Ru/-Ojj78mbolq - Цветет Герань.mp3",
+            "mpd_track_id": null,
+            "artist": "-Ojj78mbolq",
+            "title": "Цветет Герань",
+            "hash": "f512a764a1f2219c7f67a2f18ce12a68"
+        },
+        {
+            "id": 37426,
+            "first_playing": 1735192431,
+            "last_playing": 1735192431,
+            "play_count": 0,
+            "estimate": 0,
+            "duration": 210,
+            "path": "Core/Glitchcore/03.hujikopro_-_sailor_lipstick.mp3",
+            "mpd_track_id": null,
+            "artist": "¡q¼l",
+            "title": "Sailor Lipstick",
+            "hash": "ef5a6969ecf1834a5a80f4205231b4b0"
+        },
+        {
+            "id": 29437,
+            "first_playing": 1723017021,
+            "last_playing": 1739391504,
+            "play_count": 3,
+            "estimate": 265,
+            "duration": 90,
+            "path": "Slowave/??_ - Circles.mp3",
+            "mpd_track_id": null,
+            "artist": "??_",
+            "title": "Circles",
+            "hash": "2b8c86abb614891f562835ada0427bcc"
+        },
+        {
+            "id": 8723,
+            "first_playing": 1703604907,
+            "last_playing": 1703604907,
+            "play_count": 0,
+            "estimate": 0,
+            "duration": 836,
+            "path": "Ambient Space/? - Hallway Ambience_Spiritus Inanis.mp3",
+            "mpd_track_id": null,
+            "artist": "???",
+            "title": "Hallway Ambience_Spiritus Inanis",
+            "hash": "a7743657a1a9f70ce43aca40ab8f9750"
+        },
+        {
+            "id": 8722,
+            "first_playing": 1703604906,
+            "last_playing": 1737496369,
+            "play_count": 5,
+            "estimate": 196,
+            "duration": 205,
+            "path": "Slowave/? - Saveroommusic.mp3",
+            "mpd_track_id": null,
+            "artist": "???",
+            "title": "Saveroommusic",
+            "hash": "05706f83e52392a464ba55fdacae6781"
+        },
+        {
+            "id": 8721,
+            "first_playing": 1703604905,
+            "last_playing": 1703604905,
+            "play_count": 0,
+            "estimate": 0,
+            "duration": 189,
+            "path": "Ambient Space/? - Title_prodigium.mp3",
+            "mpd_track_id": null,
+            "artist": "???",
+            "title": "Title_prodigium",
+            "hash": "13c548e0759cdcec658fffffdfb35890"
+        },
+        {
+            "id": 34877,
+            "first_playing": 1728601831,
+            "last_playing": 1738094394,
+            "play_count": 4,
+            "estimate": 1420,
+            "duration": 1523,
+            "path": "Retrowave/???? ??? ???? ?? ?? ??? ?????? - �?????? ????????? ????? ????????.mp3",
+            "mpd_track_id": null,
+            "artist": "???? ??? ???? ?? ?? ??? ??????",
+            "title": "??????? ????????? ????? ????????",
+            "hash": "1f492ade3e2b757073b345ebc307e196"
+        }
+    ],
+    "count": 34841
+}

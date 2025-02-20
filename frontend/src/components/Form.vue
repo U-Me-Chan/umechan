@@ -24,7 +24,7 @@
     </b-upload>
   </b-field>
   <b-button v-if="parent_id" v-bind:loading="isLoading" @click="createReply" type="is-primary" expanded>Ответить</b-button>
-  <b-button v-if="!parent_id" v-bind:loading="isLoading" @click="createThread()" type="is-primary" expanded>Создать</b-button>
+  <b-button v-if="!parent_id" v-bind:loading="isLoading" @click="createThread" type="is-primary" expanded>Создать</b-button>
 </div>
 </template>
 

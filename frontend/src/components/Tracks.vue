@@ -1,74 +1,59 @@
 <template>
 <div class="file-list">
-  <h1>Tracks</h1>
+  <div class="flex-wrapper">
+    <h2>Очередь:</h2>
+    <div class="queue-wrapper">
+      <section class="queue card" v-for="track in queue" :key="track.path">
+        <span>{{track.artist}} - {{track.title}} ({{formatDuration(track.time)}})</span>
+      </section>
+    </div>
 
-  <b-field label="Артист">
-    <b-input v-model="artist" value=""></b-input>
-  </b-field>
+    <h2>Найти и заказать:</h2>
+    <div class="tracks-list card">
+      <b-table
+        :data="tracks"
+        :paginated="true"
+        :per-page="perPage"
+        :current-page.sync="current"
+        backend-pagination
+        :total="count"
+        @page-change="getTracks">
 
-  <b-field label="Имя">
-    <b-input v-model="title" value=""></b-input>
-  </b-field>
+        <b-table-column field="artist" label="Исполнитель" searchable sortable>
+          <template slot="searchable">
+            <b-input v-model="artist" placeholder="Найти исполнителя"/>
+          </template>
+          <template v-slot="props">{{props.row.artist}}</template>
+        </b-table-column>
 
-  <!-- <b-field label="Сортировка"> -->
-  <!--   <b-select placeholder="Выберите поле" v-model="sortField"> -->
-  <!--     <option value="estimate">Оценка</option> -->
-  <!--     <option value="artist">Исполнитель</option> -->
-  <!--     <option value="title">Композиция</option> -->
-  <!--   </b-select> -->
-  <!-- </b-field> -->
+        <b-table-column field="title" label="Композиция" searchable sortable>
+          <template slot="searchable">
+            <b-input v-model="title" placeholder="Найти композицию"/>
+          </template>
+          <template v-slot="props">{{props.row.title}}</template>
+        </b-table-column>
 
-  <b-button @click="getTracks(current)" type="is-primary">Найти</b-button>
-
-  <b-pagination
-    :total="count"
-    :current="current"
-    :per-page="perPage"
-    v-model="current"
-    v-on:change="getTracks"
-    rangeBefore="2"
-    rangeAfter="2"
-    order="is-centered"
-    size="is-small">
-  </b-pagination>
-
-  <section class="tracks" v-for="track in tracks" :key="track.id">
-    <Track
-      :id="track.id"
-      :artist="track.artist"
-      :title="track.title"
-      :path="track.path"
-      :estimate="track.estimate"
-      :duration="track.duration"
-      />
-  </section>
-
-  <b-pagination
-    :total="count"
-    :current="current"
-    :per-page="perPage"
-    v-model="current"
-    v-on:change="getTracks"
-    rangeBefore="2"
-    rangeAfter="2"
-    order="is-centered"
-    size="is-small">
-  </b-pagination>
+        <b-table-column field="time" label="Длительность" v-slot="props">{{formatDuration(props.row.duration)}}</b-table-column>
+        <b-table-column label="Действие" v-slot="props">
+          <b-button @click="putTrackToQueue(props.row.id, $event)">Заказать</b-button>
+        </b-table-column>
+        <span class="button" @click="resetFilters($event)">Очистить фильтры</span>
+      </b-table>
+    </div>
+  </div>
 </div>
 </template>
 
 <script>
 import axios from 'axios'
 import { bus } from '../bus'
-import Track from './Track.vue'
 
 const config = require('../../config')
+const _      = require('lodash')
 
 export default {
   name: 'Tracks',
-  components: {
-    Track
-  },
+  components: {},
   data: function () {
     return {
       tracks: [],
@@ -77,46 +62,126 @@ export default {
       perPage: 10,
       artist: '',
       title: '',
+      queue: []
     }
   },
   created: function  () {
     this.getTracks(this.current)
+    this.getQueue()
+    this.debouncedGetTracks = _.debounce(this.getTracks, 1000)
   },
   methods: {
-    getTracks: function (page) {
+    formatDuration: function (value) {
+      var sec_num = parseInt(value, 10);
+      var hours   = Math.floor(sec_num / 3600);
+      var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+      var seconds = sec_num - (hours * 3600) - (minutes * 60);
+      if (hours   < 10) {hours   = "0"+hours;}
+      if (minutes < 10) {minutes = "0"+minutes;}
+      if (seconds < 10) {seconds = "0"+seconds;}
+      return hours+':'+minutes+':'+seconds;
+    },
+    resetFilters: function (event) {
+      event.preventDefault()
+
+      this.artist = ''
+      this.title  = ''
+    },
+    putTrackToQueue: function (track_id, event) {
+      event.preventDefault()
+
       var self = this
       bus.$emit('app.loader', [true])
 
+      axios.put(config.base_url + '/radio/queue', {
+        track_id: track_id
+      }).then(() => {
+        self.$buefy.toast.open('Отправлено')
+        bus.$emit('app.loader', [false])
+      }).catch((error) => {
+        console.error(error)
+        self.$buefy.toast.open('Произошла ошибка при заказе трека')
+        bus.$emit('app.loader', [false])
+      })
+    },
+    getQueue: function () {
+      bus.$emit('app.loader', [true])
+
+      var self = this
+
+      axios.get(config.base_url + '/radio/queue').then((response) => {
+        self.queue = response.data.queue
+        bus.$emit('app.loader', [false])
+      }).catch((error) => {
+        console.error(error)
+        bus.$emit('app.loader', [false])
+      })
+    },
+    getTracks: function (page) {
+      var self = this
       var offset = page - 1
       offset = offset * this.perPage
+
+      if (this.artist.length > 0 || this.title.length > 0) {
+        offset = 0
+      }
 
       axios.get(config.base_url + '/radio/tracks', {
         params: {
           offset: offset,
           limit: this.perPage,
-           artist_substr: this.artist,
-           title_substr: this.title
+          artist_substr: this.artist,
+          title_substr: this.title
         }
       }).then((response) => {
         self.tracks = response.data.tracks
-        self.count = response.data.count
-        bus.$emit('app.loader', [false])
+        self.count  = response.data.count
       }).catch((error) => {
         console.log(error)
-        bus.$emit('app.loader', [false])
       })
+    }
+  },
+  computed: {
+    isTracksExist: function () {
+      return this.tracks.length == 0 ? false : true
+    }
+  },
+  watch: {
+    'artist': function(to) {
+      if (to.length < 3) {
+        return
+      }
+
+      this.debouncedGetTracks()
+    },
+    'title': function (to) {
+      if (to.length < 3) {
+        return
+      }
+
+      this.debouncedGetTracks()
     }
   }
 }
 </script>
 
 <style scoped>
-h1 {
-    font-size: 40px;
+h2 {
+    font-size: 20px;
     text-align: center;
     margin: 20px;
 }
 
-.files {
+.tracks-list {
+    padding: 10px;
+}
+
+.queue-wrapper {
+    margin-bottom: 10px;
+}
+
+.queue {
+    padding: 10px;
+    margin: 2px;
 }
 </style>
