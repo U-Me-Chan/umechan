@@ -44,7 +44,7 @@ export default {
   name: 'Radio',
   data: function () {
     return {
-      title: 'Unknown',
+      title: 'Включите воспроизведение для обновление информации',
       listeners: 0,
       streamUrl: config.icecast_url + '/stream',
       m3uUrl: config.icecast_url + '/stream.m3u',
@@ -106,12 +106,14 @@ export default {
       if (this.isPlaying) {
         this.$refs.audioPlayer.pause();
         this.isPlaying = false;
+        clearInterval(this.metadataInterval)
 
         return;
       }
 
       this.$refs.audioPlayer.play();
       this.isPlaying = true;
+      this.metadataInterval = setInterval(() => this.updateMetadata(), 5000);
 
       return;
     },
@@ -119,11 +121,7 @@ export default {
       console.log(this.volume, this.volume /100);
       this.$refs.audioPlayer.volume = this.volume / 100;
     }
-  },
-  created: function () {
-    this.updateMetadata();
-    this.metadataInterval = setInterval(() => this.updateMetadata(), 5000);
-  },
+  }
 }
 </script>
 

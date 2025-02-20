@@ -69,6 +69,7 @@ export default {
     this.getTracks(this.current)
     this.getQueue()
     this.debouncedGetTracks = _.debounce(this.getTracks, 1000)
+    this.queueUpdateHandler = setInterval(() => this.getQueue(), 50000)
   },
   methods: {
     formatDuration: function (value) {
@@ -97,6 +98,7 @@ export default {
         track_id: track_id
       }).then(() => {
         self.$buefy.toast.open('Отправлено')
+        self.getQueue()
         bus.$emit('app.loader', [false])
       }).catch((error) => {
         console.error(error)
