@@ -61,7 +61,6 @@ services:
         - MYSQL_USERNAME=${MYSQL_USERNAME}
         - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     container_name: umechan-radio-db-importer
-    restart: always
     depends_on:
       - db
     env_file:
