@@ -137,6 +137,7 @@ p {
     display:flex;
     justify-content: space-around;
     flex-wrap: wrap;
+    min-height: 36px;
 }
 
 .board-link {
