@@ -69,7 +69,7 @@ export default {
     this.getTracks(this.current)
     this.getQueue()
     this.debouncedGetTracks = _.debounce(this.getTracks, 1000)
-    this.queueUpdateHandler = setInterval(() => this.getQueue(), 50000)
+    this.queueUpdateHandler = setInterval(() => this.getQueue(), 5000)
   },
   methods: {
     formatDuration: function (value) {
