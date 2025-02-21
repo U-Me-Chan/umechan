@@ -137,6 +137,7 @@ p {
     display:flex;
     justify-content: space-around;
     flex-wrap: wrap;
+    min-height: 36px;
 }
 
 .board-link {
@@ -149,9 +150,12 @@ p {
 
 .auth-panel-wrap,
 .radios-panel-wrap,
-.footer-wrap,
 .board-list {
     background-color: #fafafa;
+}
+
+.footer-wrap {
+    background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%)
 }
 
 .main-content,
