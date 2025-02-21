@@ -125,10 +125,6 @@ export default {
       var offset = page - 1
       offset = offset * this.perPage
 
-      if (this.artist.length > 0 || this.title.length > 0) {
-        offset = 0
-      }
-
       axios.get(config.base_url + '/radio/tracks', {
         params: {
           offset: offset,
