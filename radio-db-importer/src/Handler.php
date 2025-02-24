@@ -10,6 +10,7 @@ use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
 use Ridouchire\RadioDbImporter\Tracks\Track;
 use Ridouchire\RadioDbImporter\Tracks\Track\Hash;
 use Ridouchire\RadioDbImporter\Utils\PathCutter;
+use RuntimeException;
 use Throwable;
 
 final class Handler
@@ -26,8 +27,14 @@ final class Handler
 
     public function __invoke(): void
     {
-        /** @var SplFileInfo */
-        $file = $this->dir_iterator->getFile();
+        try {
+            /** @var SplFileInfo */
+            $file = $this->dir_iterator->getFile();
+        } catch (RuntimeException) {
+            $this->logger->info('Все директории были перебраны');
+
+            exit(0);
+        }
 
         if (!$file->isFile()) {
             $this->dir_iterator->next();

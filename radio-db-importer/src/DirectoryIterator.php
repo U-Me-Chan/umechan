@@ -23,17 +23,12 @@ class DirectoryIterator
         );
     }
 
+    /**
+     * @throws RuntimeException
+     */
     public function getFile(): SplFileInfo
     {
-        try {
-            /** @var SplFileInfo */
-            $file = $this->iterator->current();
-        } catch (RuntimeException) {
-            $this->iterator->rewind();
-            $file = $this->iterator->current();
-        }
-
-        return $file;
+        return $this->iterator->current();
     }
 
     public function next(): void
