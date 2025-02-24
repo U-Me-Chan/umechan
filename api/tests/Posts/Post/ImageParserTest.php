@@ -64,12 +64,12 @@ class ImageParserTest extends TestCase
                 ]
             ],
             [
-                '[![](https://scheoble.xyz/files/thumb.test.gif)](https://scheoble.xyz/files/test.gif)',
+                '[![](https://scheoble.xyz/files/thumb.test.jfif)](https://scheoble.xyz/files/test.jfif)',
                 '',
                 [
                     [
-                        'preview' => 'https://scheoble.xyz/files/thumb.test.gif',
-                        'link'    => 'https://scheoble.xyz/files/test.gif'
+                        'preview' => 'https://scheoble.xyz/files/thumb.test.jfif',
+                        'link'    => 'https://scheoble.xyz/files/test.jfif'
                     ]
                 ]
             ]
