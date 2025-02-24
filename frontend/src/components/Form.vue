@@ -12,8 +12,8 @@
   <b-field label="Сообщение">
     <b-input max-length="200" type="textarea" v-model="message" ref="message"></b-input>
   </b-field>
-  <b-field label="Изображение">
-    <b-upload v-model="file" class="file-label">
+  <b-field label="Файл">
+    <b-upload v-model="file" class="file-label" drag-drop>
       <span class="file-cta">
         <b-icon class="file-icon" icon="upload"></b-icon>
         <span class="file-label">PNG, JPEG, WEBM, MP4 или GIF файл</span>
