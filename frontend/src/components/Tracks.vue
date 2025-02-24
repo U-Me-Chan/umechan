@@ -108,16 +108,12 @@ export default {
       })
     },
     getQueue: function () {
-      bus.$emit('app.loader', [true])
-
       var self = this
 
       axios.get(config.base_url + '/radio/queue').then((response) => {
         self.queue = response.data.queue
-        bus.$emit('app.loader', [false])
       }).catch((error) => {
         console.error(error)
-        bus.$emit('app.loader', [false])
       })
     },
     getTracks: function (page) {
