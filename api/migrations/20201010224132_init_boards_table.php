@@ -9,8 +9,9 @@ final class InitBoardsTable extends AbstractMigration
     {
         if (!$this->hasTable('boards')) {
             $this->table('boards')
-                 ->addColumn('name', 'string', [])
-                 ->create();
+                ->addColumn('tag', 'string')
+                ->addColumn('name', 'string', ['limit' => 100])
+                ->create();
         }
     }
 
