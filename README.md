@@ -29,5 +29,5 @@ make up-dev
 
 Запускаем дев-сервер клиентской части приложения:
 ```bash
-cd frontend && npm i && npm run serve -- --mode dev
+cd frontend && npm i && npm run serve
 ```

@@ -7,7 +7,9 @@
     </audio>
     <div>
       <span v-bind:class="{ 'track-title-actived': isPlaying }" class="track-title">
-        <marquee hspace="15px" direction="rigth" scrollamount="4">{{title}} {{formatDuration(duration)}}</marquee>
+        <marquee hspace="15px" direction="rigth" scrollamount="4">{{title}}
+          <span v-if="isPlaying">{{formatDuration(duration)}}</span>
+        </marquee>
       </span>
       <span v-bind:class="{ 'button-play-actived': isPlaying }" class="button-play button-custom" @click="togglePlay()">
         <b-tooltip label="Пауза/Воспроизведение">
@@ -39,6 +41,7 @@
 <script>
 const axios = require('axios');
 const config = require('../../config');
+import { formatDuration } from '../utils/duration_formatter'
 
 export default {
   name: 'Radio',
@@ -58,14 +61,7 @@ export default {
   },
   methods: {
     formatDuration: function (value) {
-      var sec_num = parseInt(value, 10);
-      var hours   = Math.floor(sec_num / 3600);
-      var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-      var seconds = sec_num - (hours * 3600) - (minutes * 60);
-      if (hours   < 10) {hours   = "0"+hours;}
-      if (minutes < 10) {minutes = "0"+minutes;}
-      if (seconds < 10) {seconds = "0"+seconds;}
-      return hours+':'+minutes+':'+seconds;
+      return formatDuration(value)
     },
     estimateTrack: function (track_id, operator) {
       if (this.isPlaying == false) {

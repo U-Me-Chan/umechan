@@ -1,12 +1,12 @@
 {
-  "name": "pissychan-client",
-  "version": "0.1.0",
+  "name": "schizochan-client",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "dev-serve": "npm run serve -- --port 8080 --mode dev",
+    "serve": "vue-cli-service serve --port 8080 --mode dev",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "test": "node --test"
   },
   "dependencies": {
     "axios": "^0.25.0",

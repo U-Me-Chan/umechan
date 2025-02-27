@@ -2,7 +2,6 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use FloFaber\MphpD\MphpD;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use React\EventLoop\Loop;
@@ -10,7 +9,6 @@ use Ridouchire\RadioMetrics\Collectors\IcecastCollector;
 use Ridouchire\RadioMetrics\Collectors\MpdCollector;
 use Ridouchire\RadioMetrics\Http\Controllers\EstimateTrack;
 use Ridouchire\RadioMetrics\SenderProvider;
-use Ridouchire\RadioMetrics\Senders\DiscordWebHookSender;
 use Ridouchire\RadioMetrics\Senders\DummySender;
 use Ridouchire\RadioMetrics\Storage\DbConnector;
 use Ridouchire\RadioMetrics\Storage\RecordRepository;
