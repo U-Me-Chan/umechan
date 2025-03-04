@@ -4,15 +4,15 @@ namespace Ridouchire\RadioMetrics\Http\Controllers;
 
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
+use Ridouchire\RadioMetrics\ICache;
 use Ridouchire\RadioMetrics\Exceptions\EntityNotFound;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
-use Ridouchire\RadioMetrics\Utils\Container;
 
 final class EstimateTrack
 {
     public function __construct(
         private TrackRepository $track_repo,
-        private Container $cache
+        private ICache $cache
     ) {
     }
 
@@ -23,9 +23,9 @@ final class EstimateTrack
 
         $client_addr = $req->getServerParams()['REMOTE_ADDR'];
 
-        try {
-            $last_time_estimate = $this->cache->$client_addr;
-        } catch (\Exception) {
+        $last_time_estimate = $this->cache->get($client_addr);
+
+        if ($last_time_estimate == false) {
             $last_time_estimate = 0;
         }
 
@@ -53,7 +53,7 @@ final class EstimateTrack
             return $res;
         }
 
-        if ($this->cache->current_track['id'] !== $track->getId()) {
+        if ($this->cache->get('current_track')['id'] !== $track->getId()) {
             $res =  Response::json(['status' => 'failed', 'reason' => 'track not playing']);
             $res = $res->withStatus(Response::STATUS_BAD_REQUEST);
 
@@ -79,7 +79,7 @@ final class EstimateTrack
 
         $this->track_repo->save($track);
 
-        $this->cache->$client_addr = time();
+        $this->cache->set($client_addr, time());
 
         return Response::json(['status' => 'accepted', 'track' => $track->toArray()]);
     }

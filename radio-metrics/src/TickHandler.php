@@ -2,8 +2,9 @@
 
 namespace Ridouchire\RadioMetrics;
 
+use RuntimeException;
 use Monolog\Logger;
-use Ridouchire\RadioMetrics\SenderProvider;
+use Ridouchire\RadioMetrics\ICache;
 use Ridouchire\RadioMetrics\Collectors\MpdCollector;
 use Ridouchire\RadioMetrics\Collectors\IcecastCollector;
 use Ridouchire\RadioMetrics\Exceptions\EntityNotFound;
@@ -11,59 +12,76 @@ use Ridouchire\RadioMetrics\Storage\Entites\Record;
 use Ridouchire\RadioMetrics\Storage\Entites\Track;
 use Ridouchire\RadioMetrics\Storage\RecordRepository;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
-use Ridouchire\RadioMetrics\Utils\Container;
 use Ridouchire\RadioMetrics\Utils\Md5Hash;
 
 class TickHandler
 {
-    private ?Track $last_track;
-
     public function __construct(
         private Logger $logger,
         private MpdCollector $mpdCollector,
         private IcecastCollector $icecastCollector,
-        private SenderProvider $senderProvider,
         private TrackRepository $trackRepository,
         private RecordRepository $recordRepository,
         private Md5Hash $md5Hash,
-        private Container $cache
+        private ICache $cache
     ) {
-        $this->last_track = null;
     }
 
-    public function __invoke(): void
+    public function handle(): void
     {
         $this->logger->debug('Начало цикла коллекционирования');
+        $this->logger->debug('Запрашиваю данные о текущем треке у MPD');
 
         try {
-            $this->logger->debug('Запрашиваю данные о текущем треке у MPD');
-
-            $track_data = $this->mpdCollector->getData();
-        } catch (\RuntimeException $e) {
-            $this->logger->error("Не могу получить данные о треке из MPD", [$e->getMessage()]);
+            $filepath = $this->getFilePathFromMPD();
+        } catch (RuntimeException $e) {
+            $this->logger->error('Ошибка при запросе данных у MPD', [$e]);
 
             return;
         }
 
-        /** @var Track */
-        $track = $this->getTrack($track_data);
+        if ($this->cache->get('current_track') == false ||
+            $this->cache->get('current_track')['path'] !== $filepath
+        ) {
+            $this->logger->debug('Пытаемся найти композицию в БД');
 
-        $this->cache->current_track = $track->toArray();
+            try {
 
-        if ($this->last_track == null) {
-            $this->logger->debug('Кеширую данные');
+                /** @var Track */
+                $track = $this->trackRepository->findOne([
+                    'hash' => $this->md5Hash->get($filepath)
+                ]);
 
-            $this->last_track = $track;
+                $this->logger->debug('Нашли композицию в БД по её md5-хешу');
+            } catch (EntityNotFound) {
+                $this->logger->error('Трек не найден: ' . $filepath);
 
+                return;
+            }
+
+            $this->logger->debug('Трек изменился', ['track' => $track->toArray(), 'old_track' => $this->cache->get('current_track')]);
+
+            $this->logger->debug('Увеличиваю счётчик проигрываний');
             $track->bumpPlayCount();
+
+            $this->logger->debug('Изменяю дату последнего воспроизведения');
             $track->togglePlaying();
+
+            $this->trackRepository->save($track);
+
+            $this->logger->debug('Обновляю данные трека', ['track' => $track->toArray()]);
+
+            $this->cache->set('current_track', $track->toArray());
+            $this->cache->set('estimate', $track->getEstimate());
+        } else {
+            $track = Track::fromArray($this->cache->get('current_track'));
         }
 
         try {
             $this->logger->debug('Запрашиваю данные о слушателях из Icecast');
 
             $listeners_data = $this->icecastCollector->getData();
-            $listeners = $listeners_data['listeners'];
+            $listeners      = $listeners_data['listeners'];
         } catch (\RuntimeException $e) {
             $this->logger->error("Произошла ошибка при запросе данных из Icecast", [$e->getMessage()]);
 
@@ -72,58 +90,24 @@ class TickHandler
 
         if ($listeners !== 0) {
             $this->logger->debug("Увеличиваю оценку трека", ['track' => $track->getName(), 'listeners' => $listeners]);
-            $track->increaseEstimate($listeners);
+            $this->cache->increment('estimate', $listeners);
         }
-
-        if ($track->getName() !== $this->last_track->getName()) {
-            $this->logger->debug('Трек изменился', ['track' => $track->getName(), 'old_track' => $this->last_track]);
-            $track->bumpPlayCount();
-            $track->togglePlaying();
-
-            $this->logger->debug('Передаю данные о треке и слушателях отправителям оповещений');
-            $this->senderProvider->send($track, $listeners);
-        }
-
-        $this->last_track = $track;
-
-        $track_id = $this->trackRepository->save($track);
-
-        $this->logger->debug('Обновляю данные трека', ['track_id' => $track_id]);
-
-        $record = Record::draft($track_id, $listeners);
-
-        $this->recordRepository->save($record);
 
         $this->logger->debug('Сохраняю данные о слушателях трека');
 
-        $this->logger->debug('Текущие данные', ['track' => $this->last_track, 'listeners' => $listeners]);
+        $record = Record::draft($track->getId(), $listeners);
+        $this->recordRepository->save($record);
+
+        $this->logger->debug('Текущие данные', ['track' => $track->toArray(), 'listeners' => $listeners]);
 
         $this->logger->debug('Конец цикла коллекционирования');
     }
 
-    private function getTrack(array $mpd_track_data): Track
+    /**
+     * @throws RuntimeException
+     */
+    public function getFilePathFromMPD(): string
     {
-        $this->logger->debug('Пытаемся найти композицию в БД');
-
-        try {
-             $track = $this->trackRepository->findOne([
-                 'hash' => $this->md5Hash->get($mpd_track_data['file'])
-             ]);
-
-             $this->logger->debug('Нашли композицию в БД по её md5-хешу');
-
-             return $track;
-        } catch (EntityNotFound) {
-            $this->logger->debug('Композиция не найдена в БД, будет создан новый');
-
-            return Track::draft(
-                $mpd_track_data['artist'],
-                $mpd_track_data['title'],
-                $this->md5Hash->get($mpd_track_data['file']),
-                $mpd_track_data['file'],
-                $mpd_track_data['time'],
-                $mpd_track_data['id'],
-            );
-        }
+        return $this->mpdCollector->getData()['file'];
     }
 }

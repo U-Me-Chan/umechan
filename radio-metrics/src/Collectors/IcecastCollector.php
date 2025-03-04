@@ -10,72 +10,47 @@ use Ridouchire\RadioMetrics\ICollector;
 class IcecastCollector implements ICollector
 {
     public function __construct(
-        private string $url
+        private Client $client
     ) {
-        $this->client = new Client([
-            'timeout' => 3.0
-        ]);
     }
 
     public function getData(): array
     {
         /** @var Response */
-        $response = $this->client->request('GET', $this->url);
+        $response = $this->client->request('GET');
 
-        if ($response->getStatusCode() == 200) {
-            $content_type = $response->getHeaderLine('Content-type');
-
-            if (preg_match('/application\/json/', $content_type) !== 1) {
-                throw new \RuntimeException("Полученный ответ от источника данных в неизвестном формате");
-            }
-
-            $payload = json_decode((string) $response->getBody(), true, JSON_UNESCAPED_UNICODE);
-
-            if (!isset($payload['icestats'])) {
-                throw new RuntimeException("Нет данных о сервере стриминга");
-            }
-
-            if (!isset($payload['icestats']['source'])) {
-                throw new RuntimeException("Нет данных о стриме");
-            }
-
-            if (is_array($payload['icestats']['source'])) {
-                if (isset($payload['icestats']['source'][1]['stream_start'])) {
-                    return [
-                        'title'     => $payload['icestats']['source'][1]['server_name'],
-                        'listeners' => $payload['icestats']['source'][1]['listeners']
-                    ];
-                }
-
-                if (!isset($payload['icestats']['source'][0]['title'])) {
-                    throw new RuntimeException("Нет данных о воспроизводимом треке");
-                }
-
-                if (!isset($payload['icestats']['source'][0]['listeners'])) {
-                    throw new RuntimeException("Нет данных о слушателях");
-                }
-
-                return [
-                    'title'     => $payload['icestats']['source'][0]['title'],
-                    'listeners' =>  $payload['icestats']['source'][0]['listeners']
-                ];
-            }
-
-
-            if (!isset($payload['icestats']['source']['title'])) {
-                throw new RuntimeException("Нет данных о воспроизводимом треке");
-            }
-
-            if (!isset($payload['icestats']['source']['listeners'])) {
-                throw new RuntimeException("Нет данных о слушателях");
-            }
-
-            return [
-                'title'     => $payload['icestats']['source']['title'],
-                'listeners' => $payload['icestats']['source']['listeners']
-            ];
+        if ($response->getStatusCode() !== 200) {
+            throw new RuntimeException("Источник данных не отвечает");
         }
 
-        throw new RuntimeException("Источник данных не отвечает");
+        $content_type = $response->getHeaderLine('Content-type');
+
+        if (preg_match('/application\/json/', $content_type) !== 1) {
+            throw new \RuntimeException("Полученный ответ от источника данных в неизвестном формате");
+        }
+
+        $payload = json_decode((string) $response->getBody(), true, JSON_UNESCAPED_UNICODE);
+
+        if (!isset($payload['icestats'])) {
+            throw new RuntimeException("Нет данных о сервере стриминга");
+        }
+
+        if (!isset($payload['icestats']['source'])) {
+            throw new RuntimeException("Нет данных о стриме");
+        }
+
+        $source = $payload['icestats']['source'];
+
+        if (isset($source['listeners'])) {
+            return ['listeners' => $source['listeners']];
+        }
+
+        foreach ($source as $_source) {
+            if (isset($_source['user_agent']) && $_source['user_agent'] == 'MPD') {
+                return ['listeners' => $_source['listeners']];
+            }
+        }
+
+        throw new \RuntimeException('Ошибка извлечения данных о слушателях');
     }
 }
