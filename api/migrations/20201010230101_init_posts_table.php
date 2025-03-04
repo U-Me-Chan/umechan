@@ -16,6 +16,10 @@ final class InitPostsTable extends AbstractMigration
                  ->addColumn('board_id', 'integer')
                  ->addColumn('parent_id', 'integer', ['null' => true])
                  ->addForeignKey('board_id', 'boards', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+                ->addColumn('updated_at', 'integer', ['limit' => 10])
+                ->addColumn('estimate', 'integer', ['limit' => 10, 'default' => 1])
+                ->addColumn('password', 'string', ['limit' => 255, 'null' => false])
+                ->addColumn('is_verify', 'enum', ['values' => ['no', 'yes']])
                  ->save();
         }
     }
