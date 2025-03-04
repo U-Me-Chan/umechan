@@ -2,19 +2,18 @@
 
 namespace Ridouchire\RadioMetrics\Http\Controllers;
 
-use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
-use Ridouchire\RadioMetrics\Utils\Container;
+use Ridouchire\RadioMetrics\ICache;
 
 final class GetInfo
 {
     public function __construct(
-        private Container $cache
+        private ICache $cache
     ) {
     }
 
-    public function __invoke(ServerRequestInterface $req, array $vars = []): Response
+    public function __invoke(): Response
     {
-        return Response::json($this->cache->current_track);
+        return Response::json($this->cache->get('current_track'));
     }
 }

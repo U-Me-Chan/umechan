@@ -24,16 +24,4 @@ class DbConnector
 
         return self::$conn;
     }
-
-    public static function getTestConnection(): Medoo
-    {
-        if (null === self::$conn) {
-            self::$conn = new Medoo([
-                'type' => 'sqlite',
-                'database' => __DIR__ . '/../../test.db'
-            ]);
-        }
-
-        return self::$conn;
-    }
 }

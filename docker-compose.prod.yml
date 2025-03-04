@@ -123,7 +123,7 @@ services:
       - PHINX_USER=${MYSQL_USERNAME}
       - PHINX_PASSWORD=${MYSQL_PASSWORD}
     volumes:
-      - './logs:/metrics/logs'
+      - './logs:/usr/local/share/metrics/logs'
       - '/home/ridouchire/Music:/var/lib/music'
   nginx:
     build:
@@ -166,3 +166,10 @@ services:
     volumes:
       - "./data/grafana:/var/lib/grafana"
     restart: always
+  memcached:
+    container_name: umechan-memcached
+    image: memcached
+    command:
+      - --conn-limit=1024
+      - --memory-limit=64
+      - --threads=4

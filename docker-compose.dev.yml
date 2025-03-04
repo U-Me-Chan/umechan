@@ -69,3 +69,10 @@ services:
       - './data/dev-stubs:/var/www/html/dev-stubs'
     ports:
       - '80:80'
+  memcached:
+    container_name: umechan-memcached
+    image: memcached
+    command:
+      - --conn-limit=1024
+      - --memory-limit=64
+      - --threads=4
