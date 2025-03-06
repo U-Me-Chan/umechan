@@ -8,14 +8,18 @@ use Ridouchire\RadioScheduler\QueueCropper;
 
 class QueueCropperTest extends TestCase
 {
+    private Mpd|MockObject $mpd;
+
+    public function setUp(): void
+    {
+        $this->mpd = $this->createMock(Mpd::class);
+    }
 
     #[DataProvider('getTimestamps')]
     public function testPositive(int $timestamp): void
     {
-        /** @var Mpd|MockObject */
-        $mpd = $this->createMock(Mpd::class);
-        $mpd->method('cropQueue')->willReturn(true);
-        $queue_cropper = new QueueCropper($mpd);
+        $this->mpd->method('cropQueue')->willReturn(true);
+        $queue_cropper = new QueueCropper($this->mpd);
 
         $this->assertTrue($queue_cropper($timestamp));
     }
@@ -32,10 +36,8 @@ class QueueCropperTest extends TestCase
 
     public function testNegative(): void
     {
-        /** @var Mpd|MockObject */
-        $mpd = $this->createMock(Mpd::class);
-        $mpd->method('cropQueue')->willReturn(true);
-        $queue_cropper = new QueueCropper($mpd);
+        $this->mpd->method('cropQueue')->willReturn(true);
+        $queue_cropper = new QueueCropper($this->mpd);
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Ещё не время');

@@ -2,6 +2,7 @@
 
 namespace Ridouchire\RadioScheduler\RotationStrategies;
 
+use Medoo\Medoo;
 use Monolog\Logger;
 use Ridouchire\RadioScheduler\GenreSchemas\Day;
 use Ridouchire\RadioScheduler\GenreSchemas\Evening;
@@ -16,6 +17,7 @@ class GenrePattern implements IRotation
     public const NAME = 'GenrePattern';
 
     public function __construct(
+        private Medoo $db,
         private Mpd $mpd,
         private Jingles $jingles,
         private Logger $log
@@ -74,8 +76,6 @@ class GenrePattern implements IRotation
                 break;
             default:
                 throw new \RuntimeException("Неизвестный час: {$hour}");
-
-                break;
         }
 
         shuffle($pls_list);
@@ -85,34 +85,24 @@ class GenrePattern implements IRotation
         $track_paths = [];
 
         foreach ($pls_list as $pls) {
-            $limit = random_int(5, 7);
-
-            for ($i = 0; $i < $limit; $i++) {
-                $count = $this->mpd->getCountSongsInDirectory($pls);
-
-                $start = random_int(0, $count);
-                $end   = $start + 1;
-
-                if ($start == $count) {
-                    $end   = $count;
-                    $start = $count - 1;
-                }
-
-                /** @var array */
-                $_tracks = $this->mpd->getTracks($pls, $start, $end);
-
-                if (empty($_tracks)) {
-                    throw new \RuntimeException("GenrePatternStrategy: ошибка при получении данных трека для плейлиста {$pls}");
-                }
-
-                /** @var array */
-                $track = reset($_tracks);
-
-                $track_paths[] = $track['file'];
-            }
+            $track_paths = $this->db->rand('tracks', 'path', [
+                'path[~]' => "{$pls}/%",
+                'estimate[>=]' => 0,
+                'LIMIT'        => [0, random_int(5, 7)]
+            ]);
         }
 
-        list($jingle) = $this->jingles->getJingles();
+        if (sizeof($track_paths) == 0) {
+            $this->log->error(self::NAME . ': полученный список файлов пуст');
+
+            return;
+        }
+
+        $track_paths = array_map(function (array $track_data) {
+            return $track_data['path'];
+        }, $track_paths);
+
+        list($jingle) = $this->jingles->getJingles(1);
 
         array_unshift($track_paths, $jingle);
 

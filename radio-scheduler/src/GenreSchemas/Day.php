@@ -11,11 +11,10 @@ class Day implements IGenreSchema
         return [
             'Alternative High/20',
             'Alternative Rock/20',
-            'Breakcore and Lolicore',
-            'Pop/20',
-            'Pop Dance/20',
             'Ru Angst',
+            'Pop/20',
             'Pop Ru',
+            'Pop Dance/20',
             'Pop Ru Dance',
             'Pop Retro Dance'
         ];

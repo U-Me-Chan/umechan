@@ -3,7 +3,6 @@
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Ridouchire\RadioScheduler\Mpd;
 use Ridouchire\RadioScheduler\RotationMaster;
 use Ridouchire\RadioScheduler\RotationStrategies\ByEstimateInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
@@ -17,20 +16,29 @@ class TickHandlerTest extends TestCase
 
     public function setUp(): void
     {
-        /** @var Mpd|MockObject */
-        $mpd = $this->createMock(Mpd::class);
-
-        /** @var GenrePattern|MockObject */
+        /**
+         * @var GenrePattern|MockObject
+         * @phpstan-ignore varTag.nativeType
+         */
         $genre_pattern_strategy = $this->createMock(GenrePattern::class);
 
-        /** @var ByEstimateInGenre|MockObject */
+        /**
+         * @var ByEstimateInGenre|MockObject
+         * @phpstan-ignore varTag.nativeType
+         */
         $by_estimate_in_genre_strategy = $this->createMock(ByEstimateInGenre::class);
 
-        $this->rotation_master = new RotationMaster($this->createMock(Logger::class));
+        /**
+         * @var Logger|MockObject
+         * @phpstan-ignore varTag.nativeType
+         */
+        $logger = $this->createMock(Logger::class);
+
+        $this->rotation_master = new RotationMaster($logger);
         $this->rotation_master->addStrategy($genre_pattern_strategy);
         $this->rotation_master->addStrategy($by_estimate_in_genre_strategy);
 
-        $this->tick_handler = new TickHandler($this->rotation_master, $mpd);
+        $this->tick_handler = new TickHandler($this->rotation_master);
     }
 
     public function test(): void

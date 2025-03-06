@@ -9,12 +9,20 @@ use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
 
 class RotationMasterTest extends TestCase
 {
+    private Logger|MockObject $logger;
+    private GenrePattern|MockObject $genre_pattern_strategy;
+    private ByEstimateInGenre|MockObject $by_estimate_in_genre_strategy;
+
+    public function setUp(): void
+    {
+        $this->logger                        = $this->createMock(Logger::class);
+        $this->genre_pattern_strategy        = $this->createMock(GenrePattern::class);
+        $this->by_estimate_in_genre_strategy = $this->createMock(ByEstimateInGenre::class);
+    }
+
     public function testWihtoutStrategies(): void
     {
-        /** @var Logger|MockObject */
-        $logger = $this->createMock(Logger::class);
-
-        $rotation_master = new RotationMaster($logger);
+        $rotation_master = new RotationMaster($this->logger);
 
         $this->expectException(\Exception::class);
 
@@ -23,11 +31,8 @@ class RotationMasterTest extends TestCase
 
     public function testStrategyNotFound(): void
     {
-        /** @var Logger|MockObject */
-        $logger = $this->createMock(Logger::class);
-
-        $rotation_master = new RotationMaster($logger);
-        $rotation_master->addStrategy($this->createMock(GenrePattern::class));
+        $rotation_master = new RotationMaster($this->logger);
+        $rotation_master->addStrategy($this->by_estimate_in_genre_strategy);
 
         $this->expectException(\Exception::class);
 
@@ -36,15 +41,12 @@ class RotationMasterTest extends TestCase
 
     public function testStrategyExecute(): void
     {
-        /** @var Logger|MockObject */
-        $logger = $this->createMock(Logger::class);
-        $logger->method('info')->willReturnCallback(function (string $message) {
+        $this->logger->method('info')->willReturnCallback(function (string $message) {
             $this->assertEquals('Текущая стратегия: ' . GenrePattern::NAME, $message);
         });
 
-        $rotation_master = new RotationMaster($logger);
-        $rotation_master->addStrategy($this->createMock(GenrePattern::class));
-
+        $rotation_master = new RotationMaster($this->logger);
+        $rotation_master->addStrategy($this->genre_pattern_strategy);
         $rotation_master->execute(GenrePattern::NAME);
 
         $this->assertEquals(GenrePattern::NAME, $rotation_master->getCurrentStrategy());
@@ -52,12 +54,9 @@ class RotationMasterTest extends TestCase
 
     public function testGetRandomStrategy(): void
     {
-        /** @var Logger|MockObject */
-        $logger = $this->createMock(Logger::class);
-
-        $rotation_master = new RotationMaster($logger);
-        $rotation_master->addStrategy($this->createMock(GenrePattern::class));
-        $rotation_master->addStrategy($this->createMock(ByEstimateInGenre::class));
+        $rotation_master = new RotationMaster($this->logger);
+        $rotation_master->addStrategy($this->genre_pattern_strategy);
+        $rotation_master->addStrategy($this->by_estimate_in_genre_strategy);
 
         $rotation_master->execute(GenrePattern::NAME);
 

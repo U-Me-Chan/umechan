@@ -16,8 +16,9 @@ class Jingles
     public function getJingles(int $count = 2): array
     {
         return $this->db->rand('tracks', 'path', [
-            'path[~]' => self::JINGLE_DIR . '/%',
-            'LIMIT' => [0, $count]
+            'path[~]'      => self::JINGLE_DIR . '/%',
+            'estimate[>=]' => 0,
+            'LIMIT'        => [0, $count]
         ]);
     }
 }

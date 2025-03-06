@@ -16,8 +16,9 @@ class Commercials
     public function getCommercials(int $count = 3): array
     {
         return $this->db->rand('tracks', 'path', [
-            'path[~]' => self::COMMERICIALS_DIR . '/%',
-            'LIMIT' => [0, $count]
+            'path[~]'      => self::COMMERICIALS_DIR . '/%',
+            'estimate[>=]' => 0,
+            'LIMIT'        => [0, $count]
         ]);
     }
 }

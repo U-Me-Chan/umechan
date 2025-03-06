@@ -2,6 +2,7 @@
 
 namespace Ridouchire\RadioScheduler;
 
+use RuntimeException;
 use FloFaber\MphpD\MphpD;
 use FloFaber\MPDException;
 use FloFaber\MphpD\Filter;
@@ -54,7 +55,7 @@ class Mpd
     /**
      * Возвращает количество композиций в директории
      *
-     * @param string $dir Относительный путь
+     * @param string $pls Относительный путь
      *
      * @throws RuntimeException
      *
@@ -89,11 +90,14 @@ class Mpd
      *
      * @return bool
      */
-    public function addToQueue(string $uri): bool
+    public function addToQueue(string $uri, int $pos = -1): bool
     {
-        return $this->getConnection()->queue()->add($uri);
+        return $this->getConnection()->queue()->add($uri, $pos);
     }
 
+    /**
+     * @deprecated
+     */
     public function addToQueueAfterCurrentTrack(string $uri): bool
     {
         return $this->getConnection()->queue()->add($uri, 1);
@@ -125,7 +129,7 @@ class Mpd
         $current_song_position = $current_song_data['pos'];
 
         /** @var bool */
-        $res = $this->getConnection()->queue()->move($current_song_position, 0);
+        $res = $this->getConnection()->queue()->move($current_song_position, '0');
 
         $this->log->debug('MPD: Перемещаю текущий трек в начало очереди');
 
@@ -168,8 +172,8 @@ class Mpd
 
             try {
                 $this->mphpd->connect();
-            } catch (MPDException $e) {
-                $this->log->error('MPD: произошла ошибка при подключении к серверу: ' . $e->getMessage(), ['error' => $this->mphpd->get_last_error()]);
+            } catch (MPDException $e) { // @phpstan-ignore class.notFound
+                $this->log->error('MPD: произошла ошибка при подключении к серверу: ' . $e->getMessage(), ['error' => $this->mphpd->get_last_error()]); // @phpstan-ignore class.notFound
             }
         }
 

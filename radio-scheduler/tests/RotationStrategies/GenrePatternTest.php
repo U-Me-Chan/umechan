@@ -1,5 +1,6 @@
 <?php
 
+use Medoo\Medoo;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -14,264 +15,121 @@ use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
 
 class GenrePatternTest extends TestCase
 {
+    private Medoo|MockObject $db;
+    private Mpd|MockObject $mpd;
+    private Logger|MockObject $logger;
+    private Jingles|MockObject $jingles;
+
+    public function setUp(): void
+    {
+        $this->db      = $this->createMock(Medoo::class);
+        $this->mpd     = $this->createMock(Mpd::class);
+        $this->logger  = $this->createMock(Logger::class);
+        $this->jingles = $this->createMock(Jingles::class);
+    }
+
     public function testWithQuequeContainMoreThanOneTrack(): void
     {
-        /** @var Mpd|MockObject */
-        $mpd = $this->createMock(Mpd::class);
-        $mpd->method('getQueueCount')->willReturn(2);
+        $this->mpd->expects($this->once())->method('getQueueCount')->willReturn(2);
 
-        /** @var Logger|MockObject */
-        $logger = $this->createMock(Logger::class);
-        $logger->method('debug')->willReturnCallback(function (...$args) {
-            $this->assertEquals('GenrePattern: очередь ещё не подошла к концу', $args[0]);
+        $this->logger->expects($this->once())->method('debug')->willReturnCallback(function (string $message) {
+            $this->assertEquals('GenrePattern: очередь ещё не подошла к концу', $message);
         });
 
-        /** @var Jingles|MockObject */
-        $jingles = $this->createMock(Jingles::class);
-        $jingles->method('getJingles')->willReturn([
-            'Jingles/1.mp3',
-            'Jingles/2.mp3'
-        ]);
-
-        $strategy = new GenrePattern($mpd, $jingles, $logger);
+        $strategy = new GenrePattern($this->db, $this->mpd, $this->jingles, $this->logger);
 
         $strategy->execute();
     }
 
-    #[DataProvider('getNightDatetimes')]
-    public function testNight(string $datetime): void
+    #[DataProvider('dataProvider')]
+    public function test(string $datetime, array $pls): void
     {
-        /** @var Mpd|MockObject */
-        $mpd = $this->createMock(Mpd::class);
-        $mpd->method('getQueueCount')->willReturn(1);
-        $mpd->method('getCountSongsInDirectory')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], Night::getAll());
+        $this->mpd->method('getQueueCount')->willReturn(1);
 
-            return 10;
-        });
-        $mpd->method('getTracks')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], Night::getAll());
+        $this->db->expects($this->atLeast(2))->method('rand')->willReturnCallback(function (string $table, string $field, array $conditions) use ($pls) {
+            $this->assertEquals('tracks', $table);
+            $this->assertEquals('path', $field);
 
-            $this->assertLessThanOrEqual(10, $args[1]);
-            $this->assertEquals($args[1] + 1, $args[2]);
+            $this->assertArrayHasKey('path[~]', $conditions);
+            $_path = explode('/', $conditions['path[~]']);
+
+            if (sizeof($_path) == 3) {
+                $path = "{$_path[0]}/{$_path[1]}";
+            } else {
+                $path = $_path[0];
+            }
+
+            $this->assertContains($path, $pls);
+
+            $this->assertArrayHasKey('estimate[>=]', $conditions);
+            $this->assertEquals(0, $conditions['estimate[>=]']);
+
+            $this->assertArrayHasKey('LIMIT', $conditions);
+            $this->assertEquals(0, $conditions['LIMIT'][0]);
+            $this->assertContains($conditions['LIMIT'][1], range(5, 7));
 
             return [
                 [
-                    'file' => '1.mp3'
+                    'path' => 'Dir/1.mp3',
                 ],
                 [
-                    'file' => '2.mp3'
+                    'path' => 'Dir/2.mp3'
+                ],
+                [
+                    'path' => 'Dir/3.mp3'
+                ],
+                [
+                    'path' => 'Dir/4.mp3'
+                ],
+                [
+                    'path' => 'Dir/5.mp3'
                 ]
             ];
         });
-        $mpd->method('addToQueue')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], ['1.mp3', '2.mp3', 'Jingles/1.mp3', 'Jingles/2.mp3']);
+
+        $this->jingles->expects($this->once())->method('getJingles')->willReturn(['Jingles/1.mp3'
+]);
+
+        $this->mpd->expects($this->atLeast(5))->method('addToQueue')->willReturnCallback(function (string $path) {
+            $this->assertContains($path, ['Dir/1.mp3', 'Dir/2.mp3', 'Dir/3.mp3', 'Dir/4.mp3', 'Dir/5.mp3', 'Jingles/1.mp3']);
 
             return true;
         });
 
-        /** @var Logger|MockObject */
-        $logger = $this->createMock(Logger::class);
+        $this->logger->expects($this->atLeast(6))->method('info');
 
-        /** @var Jingles|MockObject */
-        $jingles = $this->createMock(Jingles::class);
-        $jingles->method('getJingles')->willReturn([
-            'Jingles/1.mp3',
-            'Jingles/2.mp3'
-        ]);
-
-        $strategy = new GenrePattern($mpd, $jingles, $logger);
+        $strategy = new GenrePattern($this->db, $this->mpd, $this->jingles, $this->logger);
 
         $strategy->execute(strtotime($datetime));
     }
 
-    public static function getNightDatetimes(): array
+    public static function dataProvider(): array
     {
         return [
-            ['2024-04-14 00:00:00'],
-            ['2024-04-14 01:00:00'],
-            ['2024-04-14 02:00:00'],
-            ['2024-04-14 03:00:00'],
-            ['2024-04-14 04:00:00'],
-            ['2024-04-14 05:00:00']
-        ];
-    }
-
-
-    #[DataProvider('getMorningDatetimes')]
-    public function testMorning(string $datetime): void
-    {
-        /** @var Mpd|MockObject */
-        $mpd = $this->createMock(Mpd::class);
-        $mpd->method('getQueueCount')->willReturn(1);
-        $mpd->method('getCountSongsInDirectory')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], Morning::getAll());
-
-            return 10;
-        });
-        $mpd->method('getTracks')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], Morning::getAll());
-
-            $this->assertLessThanOrEqual(10, $args[1]);
-            $this->assertEquals($args[1] + 1, $args[2]);
-
-            return [
-                [
-                    'file' => '1.mp3'
-                ],
-                [
-                    'file' => '2.mp3'
-                ]
-            ];
-        });
-        $mpd->method('addToQueue')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], ['1.mp3', '2.mp3', 'Jingles/1.mp3', 'Jingles/2.mp3']);
-
-            return true;
-        });
-
-        /** @var Logger|MockObject */
-        $logger = $this->createMock(Logger::class);
-
-        /** @var Jingles|MockObject */
-        $jingles = $this->createMock(Jingles::class);
-        $jingles->method('getJingles')->willReturn([
-            'Jingles/1.mp3',
-            'Jingles/2.mp3'
-        ]);
-
-        $strategy = new GenrePattern($mpd, $jingles, $logger);
-
-        $strategy->execute(strtotime($datetime));
-    }
-
-    public static function getMorningDatetimes(): array
-    {
-        return [
-            ['2024-04-14 06:00:00'],
-            ['2024-04-14 07:00:00'],
-            ['2024-04-14 08:00:00']
-        ];
-    }
-
-    #[DataProvider('getDayDatetimes')]
-    public function testDay(string $datetime): void
-    {
-        /** @var Mpd|MockObject */
-        $mpd = $this->createMock(Mpd::class);
-        $mpd->method('getQueueCount')->willReturn(1);
-        $mpd->method('getCountSongsInDirectory')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], Day::getAll());
-
-            return 10;
-        });
-        $mpd->method('getTracks')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], Day::getAll());
-
-            $this->assertLessThanOrEqual(10, $args[1]);
-            $this->assertEquals($args[1] + 1, $args[2]);
-
-            return [
-                [
-                    'file' => '1.mp3'
-                ],
-                [
-                    'file' => '2.mp3'
-                ]
-            ];
-        });
-        $mpd->method('addToQueue')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], ['1.mp3', '2.mp3', 'Jingles/1.mp3', 'Jingles/2.mp3']);
-
-            return true;
-        });
-
-        /** @var Logger|MockObject */
-        $logger = $this->createMock(Logger::class);
-
-        /** @var Jingles|MockObject */
-        $jingles = $this->createMock(Jingles::class);
-        $jingles->method('getJingles')->willReturn([
-            'Jingles/1.mp3',
-            'Jingles/2.mp3'
-        ]);
-
-        $strategy = new GenrePattern($mpd, $jingles, $logger);
-
-        $strategy->execute(strtotime($datetime));
-    }
-
-    public static function getDayDatetimes(): array
-    {
-        return [
-            ['2024-04-14 09:00:00 '],
-            ['2024-04-14 10:00:00'],
-            ['2024-04-14 11:00:00'],
-            ['2024-04-14 12:00:00'],
-            ['2024-04-14 13:00:00'],
-            ['2024-04-14 14:00:00'],
-            ['2024-04-14 15:00:00'],
-            ['2024-04-14 16:00:00'],
-            ['2024-04-14 17:00:00'],
-            ['2024-04-14 18:00:00'],
-        ];
-    }
-
-    #[DataProvider('getEveningDatetimes')]
-    public function testEvening(string $datetime): void
-    {
-        /** @var Mpd|MockObject */
-        $mpd = $this->createMock(Mpd::class);
-        $mpd->method('getQueueCount')->willReturn(1);
-        $mpd->method('getCountSongsInDirectory')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], Evening::getAll());
-
-            return 10;
-        });
-        $mpd->method('getTracks')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], Evening::getAll());
-
-            $this->assertLessThanOrEqual(10, $args[1]);
-            $this->assertEquals($args[1] + 1, $args[2]);
-
-            return [
-                [
-                    'file' => '1.mp3'
-                ],
-                [
-                    'file' => '2.mp3'
-                ]
-            ];
-        });
-        $mpd->method('addToQueue')->willReturnCallback(function (...$args) {
-            $this->assertContains($args[0], ['1.mp3', '2.mp3', 'Jingles/1.mp3', 'Jingles/2.mp3']);
-
-            return true;
-        });
-
-        /** @var Logger|MockObject */
-        $logger = $this->createMock(Logger::class);
-
-        /** @var Jingles|MockObject */
-        $jingles = $this->createMock(Jingles::class);
-        $jingles->method('getJingles')->willReturn([
-            'Jingles/1.mp3',
-            'Jingles/2.mp3'
-        ]);
-
-        $strategy = new GenrePattern($mpd, $jingles, $logger);
-
-        $strategy->execute(strtotime($datetime));
-    }
-
-    public static function getEveningDatetimes(): array
-    {
-        return [
-            ['2024-04-14 19:00:00 '],
-            ['2024-04-14 20:00:00'],
-            ['2024-04-14 21:00:00'],
-            ['2024-04-14 22:00:00'],
-            ['2024-04-14 23:00:00'],
+            ['2024-04-14 00:00:00', Night::getAll()],
+            ['2024-04-14 01:00:00', Night::getAll()],
+            ['2024-04-14 02:00:00', Night::getAll()],
+            ['2024-04-14 03:00:00', Night::getAll()],
+            ['2024-04-14 04:00:00', Night::getAll()],
+            ['2024-04-14 05:00:00', Night::getAll()],
+            ['2024-04-14 06:00:00', Morning::getAll()],
+            ['2024-04-14 07:00:00', Morning::getAll()],
+            ['2024-04-14 08:00:00', Morning::getAll()],
+            ['2024-04-14 09:00:00', Day::getAll()],
+            ['2024-04-14 10:00:00', Day::getAll()],
+            ['2024-04-14 11:00:00', Day::getAll()],
+            ['2024-04-14 12:00:00', Day::getAll()],
+            ['2024-04-14 13:00:00', Day::getAll()],
+            ['2024-04-14 14:00:00', Day::getAll()],
+            ['2024-04-14 15:00:00', Day::getAll()],
+            ['2024-04-14 16:00:00', Day::getAll()],
+            ['2024-04-14 17:00:00', Day::getAll()],
+            ['2024-04-14 18:00:00', Day::getAll()],
+            ['2024-04-14 19:00:00', Evening::getAll()],
+            ['2024-04-14 20:00:00', Evening::getAll()],
+            ['2024-04-14 21:00:00', Evening::getAll()],
+            ['2024-04-14 22:00:00', Evening::getAll()],
+            ['2024-04-14 23:00:00', Evening::getAll()],
         ];
     }
 }

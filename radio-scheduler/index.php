@@ -44,7 +44,7 @@ $db = new Medoo([
 $jingles     = new Jingles($db);
 $commercials = new Commercials($db);
 
-$genre_pattern_strategy        = new GenrePattern($mpd, $jingles, $log);
+$genre_pattern_strategy        = new GenrePattern($db, $mpd, $jingles, $log);
 $by_estimate_in_genre_strategy = new ByEstimateInGenre($db, $jingles, $commercials, $mpd, $log);
 
 $strategy_master = new RotationMaster($log);
