@@ -18,7 +18,7 @@ class RotationMaster
     /**
      * Запускает стратегию ротации очереди радио-потока
      *
-     * @param string $strategy
+     * @param string $strategy_name
      *
      * @return void
      */

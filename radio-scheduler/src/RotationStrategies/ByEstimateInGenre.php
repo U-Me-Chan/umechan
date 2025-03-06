@@ -79,13 +79,12 @@ class ByEstimateInGenre implements IRotation
                 break;
             default:
                 throw new \RuntimeException("Неизвестный час: {$hour}");
-
-                break;
         }
 
         $track_paths = [];
         $track_count = random_int(5, 7);
 
+        /** @phpstan-ignore argument.type, arguments.count */
         $avg_track_paths = $this->db->select('tracks', 'path', [
             'path[~]' => "{$genre}/%",
             'estimate[>=]' => Medoo::raw("(SELECT AVG(estimate) FROM tracks WHERE path LIKE '{$genre}/%')"),
@@ -96,6 +95,7 @@ class ByEstimateInGenre implements IRotation
             'LIMIT' => [0, $track_count]
         ]);
 
+        /** @phpstan-ignore argument.type, arguments.count */
         $new_track_path = $this->db->select('tracks', 'path', [
             'path[~]' => "{$genre}/%",
             'ORDER'   => [
@@ -104,10 +104,12 @@ class ByEstimateInGenre implements IRotation
             'LIMIT' => [0, $track_count]
         ]);
 
+        /** @phpstan-ignore argument.type, argument.type */
         $track_paths = array_merge($avg_track_paths, $new_track_path);
 
         $this->logger->debug(implode(',', $track_paths));
 
+        /** @phpstan-ignore argument.unresolvableType */
         shuffle($track_paths);
 
         list($jingle)                           = $this->jingles->getJingles(1);
