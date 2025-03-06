@@ -69,26 +69,15 @@ class GenrePatternTest extends TestCase
             $this->assertContains($conditions['LIMIT'][1], range(5, 7));
 
             return [
-                [
-                    'path' => 'Dir/1.mp3',
-                ],
-                [
-                    'path' => 'Dir/2.mp3'
-                ],
-                [
-                    'path' => 'Dir/3.mp3'
-                ],
-                [
-                    'path' => 'Dir/4.mp3'
-                ],
-                [
-                    'path' => 'Dir/5.mp3'
-                ]
+                'Dir/1.mp3',
+                'Dir/2.mp3',
+                'Dir/3.mp3',
+                'Dir/4.mp3',
+                'Dir/5.mp3'
             ];
         });
 
-        $this->jingles->expects($this->once())->method('getJingles')->willReturn(['Jingles/1.mp3'
-]);
+        $this->jingles->expects($this->once())->method('getJingles')->willReturn(['Jingles/1.mp3']);
 
         $this->mpd->expects($this->atLeast(5))->method('addToQueue')->willReturnCallback(function (string $path) {
             $this->assertContains($path, ['Dir/1.mp3', 'Dir/2.mp3', 'Dir/3.mp3', 'Dir/4.mp3', 'Dir/5.mp3', 'Jingles/1.mp3']);

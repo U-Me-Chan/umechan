@@ -85,22 +85,12 @@ class GenrePattern implements IRotation
         $track_paths = [];
 
         foreach ($pls_list as $pls) {
-            $track_paths = $this->db->rand('tracks', 'path', [
+            $track_paths = array_merge($track_paths, $this->db->rand('tracks', 'path', [
                 'path[~]' => "{$pls}/%",
                 'estimate[>=]' => 0,
                 'LIMIT'        => [0, random_int(5, 7)]
-            ]);
+            ]));
         }
-
-        if (sizeof($track_paths) == 0) {
-            $this->log->error(self::NAME . ': полученный список файлов пуст');
-
-            return;
-        }
-
-        $track_paths = array_map(function (array $track_data) {
-            return $track_data['path'];
-        }, $track_paths);
 
         list($jingle) = $this->jingles->getJingles(1);
 
