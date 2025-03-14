@@ -64,15 +64,9 @@ export default {
       return formatDuration(value)
     },
     estimateTrack: function (track_id, operator) {
-      if (this.isPlaying == false) {
-        this.$buefy.toast.open('Нельзя оценивать треки, если не слушаешь радио!');
+      let self = this;
+      let data = {};
 
-        return;
-      }
-
-      var self = this;
-
-      var data = {};
       data['operator'] = operator;
 
       axios.post(config.base_url + '/metrics/tracks/' + track_id, data, { 'headers': { 'Content-type': 'application/json' }}).then(() => {
@@ -86,7 +80,7 @@ export default {
 
       axios.get(config.base_url + '/metrics/info')
         .then((response) => {
-          self.title = response.data.artist + ' - ' + response.data.title;
+          self.title    = response.data.artist + ' - ' + response.data.title;
           self.track_id = response.data.id;
           self.estimate = response.data.estimate;
           self.duration = response.data.duration;
@@ -109,6 +103,7 @@ export default {
 
       this.$refs.audioPlayer.play();
       this.isPlaying = true;
+      this.updateMetadata();
       this.metadataInterval = setInterval(() => this.updateMetadata(), 5000);
 
       return;
