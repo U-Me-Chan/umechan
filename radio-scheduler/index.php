@@ -6,7 +6,9 @@ use Monolog\Level;
 use Monolog\Logger;
 use React\EventLoop\Loop;
 use Ridouchire\RadioScheduler\Commercials;
+use Ridouchire\RadioScheduler\Http\Controllers\GetOpenApiSpecifitation;
 use Ridouchire\RadioScheduler\Http\Controllers\GetQueue;
+use Ridouchire\RadioScheduler\Http\Controllers\GetRedocPage;
 use Ridouchire\RadioScheduler\Http\Controllers\GetTrackList;
 use Ridouchire\RadioScheduler\Http\Controllers\OrderTrack;
 use Ridouchire\RadioScheduler\Http\Router;
@@ -77,9 +79,10 @@ Loop::addPeriodicTimer(1, function () use ($tickHanlder, $log, $mpd, $queue_crop
 
 $r = new Router();
 
+$r->addRoute('GET', '/radio/docs/openapi.json', new GetOpenApiSpecifitation());
+$r->addRoute('GET', '/radio/docs/redoc.html', new GetRedocPage());
 $r->addRoute('GET', '/radio/queue', new GetQueue($mpd));
 $r->addRoute('PUT', '/radio/queue', new OrderTrack($mpd, $db, $log));
-
 $r->addRoute('GET', '/radio/tracks', new GetTrackList($db));
 
 $http = new React\Http\HttpServer($r);

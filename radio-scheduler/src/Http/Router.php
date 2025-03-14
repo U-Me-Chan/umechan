@@ -2,6 +2,7 @@
 
 namespace Ridouchire\RadioScheduler\Http;
 
+use OpenApi\Attributes as OA;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std as RouteParser;
 use FastRoute\DataGenerator\GroupCountBased as DataGenerator;
@@ -9,6 +10,13 @@ use FastRoute\Dispatcher\GroupCountBased as RouteDispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
 
+#[OA\Info(
+    version: '1.0.0',
+    title: 'Radio Scheduler Public API',
+
+)]
+#[OA\License(name: 'MIT', identifier: 'MIT')]
+#[OA\Server(url: 'https://scheoble.xyz/', description: 'production server')]
 class Router
 {
     private RouteCollector $route_collector;
