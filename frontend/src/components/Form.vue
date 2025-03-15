@@ -1,5 +1,5 @@
 <template>
-<div class="box">
+<div class="box" @paste="handlePasteEvent">
   <h3 v-if="!parent_id">Создать тред</h3>
   <h3 v-if="parent_id">Ответить на:</h3>
   <b-switch v-if="parent_id" v-model="isSage">Не поднимать</b-switch>
@@ -30,6 +30,7 @@
 
 <script>
 import { bus } from '../bus';
+import { CLPBRD_ERR } from '../constants/common-error-texts.js';
 
 const config = require('../../config');
 const axios  = require('axios');
@@ -56,15 +57,71 @@ export default {
       this.message = '';
       this.isSage = false;
     },
-    uploadImage: function() {
-      var uploadData = new formData();
-      var self = this;
+    onNavigatorPaste: async function () {
+      try {
+        const clipboardItems = await navigator.clipboard.read();
+        const foundImageMimeType = clipboardItems[0].types.find((value) =>
+          value.startsWith('image/')
+        );
+        if (!foundImageMimeType) {
+          this.$buefy.toast.open(CLPBRD_ERR.mime);
+        } else {
+          const blob = await clipboardItems[0].getType(foundImageMimeType);
+          const file = new File([blob], 'screenshot.png', {
+            type: foundImageMimeType
+          });
+          file.uid = String(Math.random());
+
+          this.file = file;
+        }
+      } catch (error) {
+        const errTips =
+          error.name === 'NotAllowedError'
+            ? CLPBRD_ERR.allow
+            : error.name === 'DataError'
+            ? CLPBRD_ERR.data
+            : CLPBRD_ERR.unknown;
+        this.$buefy.toast.open(`${errTips} (${error.message})`, 5);
+      }
+    },
+    onEventPaste: function (e) {
+      const clipboardItems = e.clipboardData?.files;
+
+      if (clipboardItems?.length) {
+        const foundImageMimeType = clipboardItems[0].type.startsWith('image/');
+
+        if (!foundImageMimeType) {
+          this.$buefy.toast.open(CLPBRD_ERR.mime);
+        } else {
+          const blob = clipboardItems[0];
+          const file = new File([blob], 'screenshot.png', {
+            type: clipboardItems?.[0].type
+          });
+          file.uid = String(Math.random());
+          this.file = file;
+        }
+      } else {
+        this.$buefy.toast.open(CLPBRD_ERR.empty);
+      }
+    },
+    handlePasteEvent: async function (e) {
+      e.preventDefault();
+
+      if (typeof navigator.clipboard === 'undefined') {
+        this.onEventPaste(e);
+      } else {
+        this.onNavigatorPaste();
+      }
+    },
+    uploadImage: function () {
+      const uploadData = new formData();
+      const self = this;
 
       uploadData.append('image', this.file);
 
       axios.post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data' }}).then((response) => {
-        var orig = response.data.original_file;
-        var thumb = response.data.thumbnail_file;
+        const orig = response.data.original_file;
+        const thumb = response.data.thumbnail_file;
 
         self.message = self.message + '\n' + `[![](${thumb})](${orig})`;
         self.image = null;
@@ -81,8 +138,8 @@ export default {
 
       this.isLoading = true;
 
-      var self = this;
-      var data = {};
+      const self = this;
+      const data = {};
 
       data['poster']  = this.poster;
       data['subject'] = this.subject;
@@ -113,8 +170,8 @@ export default {
 
       this.isLoading = true;
 
-      var self = this;
-      var data = {};
+      const self = this;
+      const data = {};
 
       data['poster']  = this.poster;
       data['subject'] = this.subject;
