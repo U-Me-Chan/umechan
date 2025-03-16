@@ -13,15 +13,17 @@
     <b-input max-length="200" type="textarea" v-model="message" ref="message"></b-input>
   </b-field>
   <b-field label="Медиафайлы">
-    <b-upload v-model="files" class="file-label" drag-drop multiple>
-      <span class="file-cta">
-        <b-icon class="file-icon" icon="upload"></b-icon>
-        <span class="file-label">PNG, JPEG, WEBM, MP4 или GIF файл</span>
+    <div class="file-uploader__wrap">
+      <b-upload v-model="files" class="file-label" drag-drop multiple>
+        <span class="file-cta">
+          <b-icon class="file-icon" icon="upload"></b-icon>
+          <span class="file-label">PNG JPEG WEBM MP4 GIF</span>
+        </span>
+      </b-upload>
+      <span v-if="filesNames.length > 0">
+        {{ filesNames.join(', ') }}
       </span>
-      <span class="file-name" v-if="files.length > 1">
-        {{ files.map(({ name }) => name).join(', ') }}
-      </span>
-    </b-upload>
+    </div>
   </b-field>
   <b-button v-if="parent_id" v-bind:loading="isLoading" @click="createReply" type="is-primary" expanded>Ответить</b-button>
   <b-button v-if="!parent_id" v-bind:loading="isLoading" @click="createThread" type="is-primary" expanded>Создать</b-button>
@@ -153,6 +155,8 @@ export default {
 
           self.message = `${self.message}\n[![](${thumb})](${orig})`;
           self.image = null;
+
+          return file.name;
         })
         .catch((error) => {
           const fileExtension = error.response.data.original_file.match(/(.\w*$)/)[0];
@@ -169,7 +173,7 @@ export default {
     handleUploadFile: async function () {
       if (this.files.length > 0) {
         return Promise
-          .all(this.files.map((file) => this.sendFile(file)))
+          .all(this.files.map((file) => this.sendFile(file).then((filename) => { this.filesNames.push(filename); })))
           .then(() => {
             this.files = [];
           });
@@ -245,6 +249,7 @@ export default {
       subject: '',
       isSage: false,
       files: [],
+      filesNames: [],
       isLoading: false
     }
   },
@@ -259,5 +264,12 @@ export default {
 <style scoped>
 .reply-message {
     margin-left: 20px;
+}
+
+.file-uploader__wrap {
+    display: grid;
+    align-items: center;
+    grid-template-columns: max-content auto;
+    gap: 1em;
 }
 </style>
