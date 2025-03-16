@@ -57,22 +57,34 @@ export default {
       this.message = '';
       this.isSage = false;
     },
-    onNavigatorPaste: async function () {
+    onNavigatorPaste: async function (event) {
       try {
         const clipboardItems = await navigator.clipboard.read();
-        const foundImageMimeType = clipboardItems[0].types.find((value) =>
-          value.startsWith('image/')
+        const textMimeType = clipboardItems[0].types.find((value) =>
+          value.startsWith('text/')
         );
-        if (!foundImageMimeType) {
-          this.$buefy.toast.open(CLPBRD_ERR.mime);
-        } else {
-          const blob = await clipboardItems[0].getType(foundImageMimeType);
-          const file = new File([blob], 'screenshot.png', {
-            type: foundImageMimeType
-          });
-          file.uid = String(Math.random());
+        const mediaMimeType = clipboardItems[0].types.find((value) =>
+          value.startsWith('image/') || value.startsWith('video/')
+        );
 
-          this.file = file;
+        if (clipboardItems.length < 1) {
+          this.$buefy.toast.open(CLPBRD_ERR.empty);
+        }
+        if (clipboardItems.length > 0) {
+          if (mediaMimeType) {
+            event.preventDefault();
+
+            const blob = await clipboardItems[0].getType(mediaMimeType);
+            const file = new File([blob], 'screenshot.png', {
+              type: mediaMimeType
+            });
+            file.uid = String(Math.random());
+
+            this.file = file;
+          }
+          if (!mediaMimeType && !textMimeType) {
+            this.$buefy.toast.open(CLPBRD_ERR.mime);
+          }
         }
       } catch (error) {
         const errTips =
@@ -84,15 +96,21 @@ export default {
         this.$buefy.toast.open(`${errTips} (${error.message})`, 5);
       }
     },
-    onEventPaste: function (e) {
-      const clipboardItems = e.clipboardData?.files;
+    onEventPaste: function (event) {
+      const clipboardItems = event.clipboardData?.files;
 
-      if (clipboardItems?.length) {
-        const foundImageMimeType = clipboardItems[0].type.startsWith('image/');
+      if (clipboardItems?.length < 1) {
+        this.$buefy.toast.open(CLPBRD_ERR.empty);
+      }
+      if (clipboardItems?.length > 0) {
+        const imageType = clipboardItems[0].type;
 
-        if (!foundImageMimeType) {
-          this.$buefy.toast.open(CLPBRD_ERR.mime);
-        } else {
+        const hasTextMimeType = imageType.startsWith('text/');
+        const hasMediaMimeType = imageType.startsWith('image/') || imageType.startsWith('video/');
+
+        if (hasMediaMimeType) {
+          event.preventDefault();
+
           const blob = clipboardItems[0];
           const file = new File([blob], 'screenshot.png', {
             type: clipboardItems?.[0].type
@@ -100,17 +118,16 @@ export default {
           file.uid = String(Math.random());
           this.file = file;
         }
-      } else {
-        this.$buefy.toast.open(CLPBRD_ERR.empty);
+        if (!hasMediaMimeType && !hasTextMimeType) {
+          this.$buefy.toast.open(CLPBRD_ERR.mime);
+        }
       }
     },
-    handlePasteEvent: async function (e) {
-      e.preventDefault();
-
-      if (typeof navigator.clipboard === 'undefined') {
-        this.onEventPaste(e);
+    handlePasteEvent: async function (event) {
+      if (navigator.clipboard === 'undefined') {
+        this.onEventPaste(event);
       } else {
-        this.onNavigatorPaste();
+        this.onNavigatorPaste(event);
       }
     },
     uploadImage: function () {
