@@ -130,7 +130,16 @@ export default {
         this.onNavigatorPaste(event);
       }
     },
-    uploadImage: function () {
+    checkIfSupportedMediaFileExtension: function (code, string) {
+      if (code === 'image') {
+        return (/\.(jpe?g?|png|webp|jfif|gif)/).test(string);
+      }
+      if (code === 'video') {
+        return (/\.(webm|mp4)/).test(string);
+      }
+      return false;
+    },
+    uploadFile: function () {
       const uploadData = new formData();
       const self = this;
 
@@ -140,10 +149,17 @@ export default {
         const orig = response.data.original_file;
         const thumb = response.data.thumbnail_file;
 
-        self.message = self.message + '\n' + `[![](${thumb})](${orig})`;
+        self.message = `${self.message}\n[![](${thumb})](${orig})`;
         self.image = null;
       }).catch((error) => {
-        self.$buefy.toast.open(`Произошла ошибка при отправке изображения: ${error}`);
+        const fileExtension = error.response.data.original_file.match(/(.\w*$)/)[0];
+        const fileTypeName = this.checkIfSupportedMediaFileExtension('image', fileExtension)
+          ? 'изображения'
+          : this.checkIfSupportedMediaFileExtension('video', fileExtension)
+          ? 'видео'
+          : 'файла';
+
+        self.$buefy.toast.open(`Произошла ошибка при отправке ${fileTypeName}: ${error}`);
         self.image = null;
       });
     },
@@ -218,7 +234,7 @@ export default {
   },
   watch: {
     'file': function () {
-      this.uploadImage();
+      this.uploadFile();
     }
   }
 }
