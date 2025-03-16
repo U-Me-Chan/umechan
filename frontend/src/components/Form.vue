@@ -12,14 +12,14 @@
   <b-field label="Сообщение">
     <b-input max-length="200" type="textarea" v-model="message" ref="message"></b-input>
   </b-field>
-  <b-field label="Файл">
-    <b-upload v-model="file" class="file-label" drag-drop>
+  <b-field label="Медиафайлы">
+    <b-upload v-model="files" class="file-label" drag-drop multiple>
       <span class="file-cta">
         <b-icon class="file-icon" icon="upload"></b-icon>
         <span class="file-label">PNG, JPEG, WEBM, MP4 или GIF файл</span>
       </span>
-      <span class="file-name" v-if="file">
-        {{ file.name }}
+      <span class="file-name" v-if="files.length > 1">
+        {{ files.map(({ name }) => name).join(', ') }}
       </span>
     </b-upload>
   </b-field>
@@ -80,7 +80,7 @@ export default {
             });
             file.uid = String(Math.random());
 
-            this.file = file;
+            this.files.push(file);
           }
           if (!mediaMimeType && !textMimeType) {
             this.$buefy.toast.open(CLPBRD_ERR.mime);
@@ -139,29 +139,42 @@ export default {
       }
       return false;
     },
-    uploadFile: function () {
-      const uploadData = new formData();
+    sendFile: async function (file) {
       const self = this;
+      const uploadData = new formData();
+      
+      uploadData.append('image', file);
 
-      uploadData.append('image', this.file);
+      return axios
+        .post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data' }})
+        .then((response) => {
+          const orig = response.data.original_file;
+          const thumb = response.data.thumbnail_file;
 
-      axios.post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data' }}).then((response) => {
-        const orig = response.data.original_file;
-        const thumb = response.data.thumbnail_file;
+          self.message = `${self.message}\n[![](${thumb})](${orig})`;
+          self.image = null;
+        })
+        .catch((error) => {
+          const fileExtension = error.response.data.original_file.match(/(.\w*$)/)[0];
+          const fileTypeName = this.checkIfSupportedMediaFileExtension('image', fileExtension)
+            ? 'изображения'
+            : this.checkIfSupportedMediaFileExtension('video', fileExtension)
+            ? 'видео'
+            : 'файла';
 
-        self.message = `${self.message}\n[![](${thumb})](${orig})`;
-        self.image = null;
-      }).catch((error) => {
-        const fileExtension = error.response.data.original_file.match(/(.\w*$)/)[0];
-        const fileTypeName = this.checkIfSupportedMediaFileExtension('image', fileExtension)
-          ? 'изображения'
-          : this.checkIfSupportedMediaFileExtension('video', fileExtension)
-          ? 'видео'
-          : 'файла';
-
-        self.$buefy.toast.open(`Произошла ошибка при отправке ${fileTypeName}: ${error}`);
-        self.image = null;
-      });
+          self.$buefy.toast.open(`Произошла ошибка при отправке ${fileTypeName}: ${error}`);
+          self.image = null;
+        });
+    },
+    handleUploadFile: async function () {
+      if (this.files.length > 0) {
+        return Promise
+          .all(this.files.map((file) => this.sendFile(file)))
+          .then(() => {
+            this.files = [];
+          });
+      }
+      return Promise.reject(CLPBRD_ERR.empty);
     },
     createReply: function () {
       if (this.message.length == 0) {
@@ -172,27 +185,30 @@ export default {
       this.isLoading = true;
 
       const self = this;
-      const data = {};
+      const outputData = {};
 
-      data['poster']  = this.poster;
-      data['subject'] = this.subject;
-      data['message'] = this.message;
-      data['tag']     = this.tag;
+      outputData['poster']  = this.poster;
+      outputData['subject'] = this.subject;
+      outputData['message'] = this.message;
+      outputData['tag']     = this.tag;
 
       if (this.isSage) {
-        data['sage'] = true;
+        outputData['sage'] = true;
       }
 
-      axios.put(config.chan_url + '/v2/post/' + this.parent_id, data).then((response) => {
-        self.$buefy.toast.open('Отправлено!');
-        self.init();
+      axios
+        .put(config.chan_url + '/v2/post/' + this.parent_id, outputData)
+        .then(({ data }) => {
+          self.$buefy.toast.open('Отправлено!');
+          self.init();
 
-        self.isLoading = false;
+          self.isLoading = false;
 
-        bus.$emit('form:success', [response.data]);
-      }).catch((error) => {
-        self.$buefy.toast.open(`Ошибка: ${error}`);
-      });
+          bus.$emit('form:success', [data]);
+        })
+        .catch((error) => {
+          self.$buefy.toast.open(`Ошибка: ${error}`);
+        });
     },
     createThread: function () {
       if (this.message.length == 0) {
@@ -228,13 +244,13 @@ export default {
       poster: 'Anonymous',
       subject: '',
       isSage: false,
-      file: null,
+      files: [],
       isLoading: false
     }
   },
   watch: {
-    'file': function () {
-      this.uploadFile();
+    'files': function () {
+      this.handleUploadFile();
     }
   }
 }
