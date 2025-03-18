@@ -1,5 +1,5 @@
 <template>
-<div class="box">
+<div class="box" @paste="handlePasteEvent">
   <h3 v-if="!parent_id">Создать тред</h3>
   <h3 v-if="parent_id">Ответить на:</h3>
   <b-switch v-if="parent_id" v-model="isSage">Не поднимать</b-switch>
@@ -30,6 +30,7 @@
 
 <script>
 import { bus } from '../bus';
+import { CLPBRD_ERR } from '../constants/common-error-texts.js';
 
 const config = require('../../config');
 const axios  = require('axios');
@@ -56,20 +57,109 @@ export default {
       this.message = '';
       this.isSage = false;
     },
-    uploadImage: function() {
-      var uploadData = new formData();
-      var self = this;
+    onNavigatorPaste: async function (event) {
+      try {
+        const clipboardItems = await navigator.clipboard.read();
+        const textMimeType = clipboardItems[0].types.find((value) =>
+          value.startsWith('text/')
+        );
+        const mediaMimeType = clipboardItems[0].types.find((value) =>
+          value.startsWith('image/') || value.startsWith('video/')
+        );
+
+        if (clipboardItems.length < 1) {
+          this.$buefy.toast.open(CLPBRD_ERR.empty);
+        }
+        if (clipboardItems.length > 0) {
+          if (mediaMimeType) {
+            event.preventDefault();
+
+            const blob = await clipboardItems[0].getType(mediaMimeType);
+            const file = new File([blob], 'screenshot.png', {
+              type: mediaMimeType
+            });
+            file.uid = String(Math.random());
+
+            this.file = file;
+          }
+          if (!mediaMimeType && !textMimeType) {
+            this.$buefy.toast.open(CLPBRD_ERR.mime);
+          }
+        }
+      } catch (error) {
+        const errTips =
+          error.name === 'NotAllowedError'
+            ? CLPBRD_ERR.allow
+            : error.name === 'DataError'
+            ? CLPBRD_ERR.data
+            : CLPBRD_ERR.unknown;
+        this.$buefy.toast.open(`${errTips} (${error.message})`, 5);
+      }
+    },
+    onEventPaste: function (event) {
+      const clipboardItems = event.clipboardData?.files;
+
+      if (clipboardItems?.length < 1) {
+        this.$buefy.toast.open(CLPBRD_ERR.empty);
+      }
+      if (clipboardItems?.length > 0) {
+        const imageType = clipboardItems[0].type;
+
+        const hasTextMimeType = imageType.startsWith('text/');
+        const hasMediaMimeType = imageType.startsWith('image/') || imageType.startsWith('video/');
+
+        if (hasMediaMimeType) {
+          event.preventDefault();
+
+          const blob = clipboardItems[0];
+          const file = new File([blob], 'screenshot.png', {
+            type: clipboardItems?.[0].type
+          });
+          file.uid = String(Math.random());
+          this.file = file;
+        }
+        if (!hasMediaMimeType && !hasTextMimeType) {
+          this.$buefy.toast.open(CLPBRD_ERR.mime);
+        }
+      }
+    },
+    handlePasteEvent: async function (event) {
+      if (navigator.clipboard === 'undefined') {
+        this.onEventPaste(event);
+      } else {
+        this.onNavigatorPaste(event);
+      }
+    },
+    checkIfSupportedMediaFileExtension: function (code, string) {
+      if (code === 'image') {
+        return (/\.(jpe?g?|png|webp|jfif|gif)/).test(string);
+      }
+      if (code === 'video') {
+        return (/\.(webm|mp4)/).test(string);
+      }
+      return false;
+    },
+    uploadFile: function () {
+      const uploadData = new formData();
+      const self = this;
 
       uploadData.append('image', this.file);
 
       axios.post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data' }}).then((response) => {
-        var orig = response.data.original_file;
-        var thumb = response.data.thumbnail_file;
+        const orig = response.data.original_file;
+        const thumb = response.data.thumbnail_file;
 
-        self.message = self.message + '\n' + `[![](${thumb})](${orig})`;
+        self.message = `${self.message}\n[![](${thumb})](${orig})`;
         self.image = null;
       }).catch((error) => {
-        self.$buefy.toast.open(`Произошла ошибка при отправке изображения: ${error}`);
+        const fileExtension = error.response.data.original_file.match(/(.\w*$)/)[0];
+        const fileTypeName = this.checkIfSupportedMediaFileExtension('image', fileExtension)
+          ? 'изображения'
+          : this.checkIfSupportedMediaFileExtension('video', fileExtension)
+          ? 'видео'
+          : 'файла';
+
+        self.$buefy.toast.open(`Произошла ошибка при отправке ${fileTypeName}: ${error}`);
         self.image = null;
       });
     },
@@ -81,8 +171,8 @@ export default {
 
       this.isLoading = true;
 
-      var self = this;
-      var data = {};
+      const self = this;
+      const data = {};
 
       data['poster']  = this.poster;
       data['subject'] = this.subject;
@@ -113,8 +203,8 @@ export default {
 
       this.isLoading = true;
 
-      var self = this;
-      var data = {};
+      const self = this;
+      const data = {};
 
       data['poster']  = this.poster;
       data['subject'] = this.subject;
@@ -144,7 +234,7 @@ export default {
   },
   watch: {
     'file': function () {
-      this.uploadImage();
+      this.uploadFile();
     }
   }
 }
