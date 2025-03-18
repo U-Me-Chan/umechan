@@ -1,22 +1,32 @@
 <template>
 <div class="box" @paste="handlePasteEvent">
-  <h3 v-if="!parent_id">Создать тред</h3>
-  <h3 v-if="parent_id">Ответить на:</h3>
-  <b-switch v-if="parent_id" v-model="isSage">Не поднимать</b-switch>
+  <div class="form__title">
+    {{ parent_id ? 'Ответить в тред' : 'Создать тред' }}
+  </div>
+  <b-switch class="form__sage-selector" v-if="parent_id" v-model="isSage">Не поднимать</b-switch>
   <b-field label="Имя">
-    <b-input value="Anonymous" v-model="poster"></b-input>
+    <b-input  
+      v-model="poster"
+      lazy
+      custom-class="form__poster-input"
+      placeholder="Anonymous"
+      icon-right="close-circle"
+      icon-right-clickable
+      @icon-right-click="onPosterReset"
+      :data-is-empty="(poster.length > 0).toString()"
+    />
   </b-field>
   <b-field label="Тема">
-    <b-input value="" v-model="subject"></b-input>
+    <b-input v-model="subject" lazy />
   </b-field>
   <b-field label="Сообщение">
-    <b-input max-length="200" type="textarea" v-model="message" ref="message"></b-input>
+    <b-input v-model="message" max-length="200" type="textarea" ref="message" lazy/>
   </b-field>
   <b-field label="Медиафайлы">
-    <div class="file-uploader__wrap">
+    <div class="form__file-uploader-wrap">
       <b-upload v-model="files" class="file-label" drag-drop multiple>
         <span class="file-cta">
-          <b-icon class="file-icon" icon="upload"></b-icon>
+          <b-icon class="file-icon" icon="upload"/>
           <span class="file-label">PNG JPEG WEBM MP4 GIF</span>
         </span>
       </b-upload>
@@ -25,8 +35,13 @@
       </span>
     </div>
   </b-field>
-  <b-button v-if="parent_id" v-bind:loading="isLoading" @click="createReply" type="is-primary" expanded>Ответить</b-button>
-  <b-button v-if="!parent_id" v-bind:loading="isLoading" @click="createThread" type="is-primary" expanded>Создать</b-button>
+  <b-button
+    type="is-primary"
+    v-bind:loading="isLoading"
+    @click="defineOutputData(parent_id ? 'reply' : 'thread')"
+    expanded>
+    {{ parent_id ? 'Ответить' : 'Создать'}}
+  </b-button>
 </div>
 </template>
 
@@ -58,6 +73,9 @@ export default {
       this.subject = '';
       this.message = '';
       this.isSage = false;
+    },
+    onPosterReset: function() {
+      this.poster = '';
     },
     onNavigatorPaste: async function (event) {
       try {
@@ -172,16 +190,27 @@ export default {
     },
     handleUploadFile: async function () {
       if (this.files.length > 0) {
+        this.isLoading = true;
+
         return Promise
           .all(this.files.map((file) => this.sendFile(file).then((filename) => { this.filesNames.push(filename); })))
           .then(() => {
             this.files = [];
+          })
+          .finally(() => {
+            this.isLoading = false;
           });
       }
       return Promise.reject(CLPBRD_ERR.empty);
     },
-    createReply: function () {
-      if (this.message.length == 0) {
+    createReply: function (outputData) {
+      return axios.put(`${config.chan_url}/v2/post/${this.parent_id}`, outputData);
+    },
+    createThread: function (outputData) {
+      return axios.post(`${config.chan_url}/v2/post`, outputData);
+    },
+    defineOutputData: function (type) {
+      if (this.message.length < 1) {
         this.$buefy.toast.open('Нельзя отправить пустое сообщение!');
         return;
       }
@@ -190,62 +219,40 @@ export default {
 
       const self = this;
       const outputData = {};
+      const isNewThread = type === 'thread';
 
       outputData['poster']  = this.poster;
       outputData['subject'] = this.subject;
       outputData['message'] = this.message;
       outputData['tag']     = this.tag;
 
-      if (this.isSage) {
+      if (isNewThread && this.isSage) {
         outputData['sage'] = true;
       }
 
-      axios
-        .put(config.chan_url + '/v2/post/' + this.parent_id, outputData)
+      const appropriatePromise = isNewThread ? this.createThread : this.createReply;
+
+      appropriatePromise(outputData)
         .then(({ data }) => {
-          self.$buefy.toast.open('Отправлено!');
           self.init();
-
-          self.isLoading = false;
-
           bus.$emit('form:success', [data]);
+          localStorage.setItem('poster', outputData['poster']);
+          self.$buefy.toast.open('Отправлено!');
         })
         .catch((error) => {
           self.$buefy.toast.open(`Ошибка: ${error}`);
+        })
+        .finally(() => {
+          self.isLoading = false;
         });
-    },
-    createThread: function () {
-      if (this.message.length == 0) {
-        this.$buefy.toast.open('Нельзя отправить пустое сообщение!');
-
-        return;
-      }
-
-      this.isLoading = true;
-
-      const self = this;
-      const data = {};
-
-      data['poster']  = this.poster;
-      data['subject'] = this.subject;
-      data['message'] = this.message;
-      data['tag']     = this.tag;
-
-      axios.post(config.chan_url + '/v2/post', data).then((response) => {
-        self.$buefy.toast.open('Отправлено!');
-        self.init();
-
-        self.isLoading = false;
-
-        bus.$emit('form:success', [response.data]);
-      }).catch((error) => {
-        self.$buefy.toast.open(`Ошибка: ${error}`);
-      });
     }
   },
   data: function () {
+    const posterData = localStorage.getItem('poster');
+    const poster = posterData !== null ? posterData : '';
+
     return {
-      poster: 'Anonymous',
+      poster,
       subject: '',
       isSage: false,
       files: [],
@@ -262,14 +269,26 @@ export default {
 </script>
 
 <style scoped>
-.reply-message {
-    margin-left: 20px;
+.form__title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.5rem;
 }
 
-.file-uploader__wrap {
+.form__sage-selector {
+    margin-bottom: 0.75rem;
+}
+
+.form__file-uploader-wrap {
     display: grid;
     align-items: center;
     grid-template-columns: max-content auto;
-    gap: 1em;
+    gap: 0.75em;
+}
+</style>
+
+<style>
+.form__poster-input[data-is-empty="false"] + .icon {
+    visibility: hidden;
 }
 </style>
