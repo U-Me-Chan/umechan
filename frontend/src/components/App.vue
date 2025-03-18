@@ -1,12 +1,12 @@
 <template>
 <div id="app">
-  <div class="board-list">
-    <a :href="'/board/' + board.tag" class="board-link" v-for="board in boards" @click="selectBoard(board.tag, $event)" :key="board.id" v-bind:class="{ active: tag === board.tag }">
+  <header class="board-list">
+    <a :href="`/board/${board.tag}`" class="board-link" v-for="board in boards" @click="selectBoard(board.tag, $event)" :key="board.id" v-bind:class="{ active: tag === board.tag }">
       {{ board.name }} {{ board.new_posts_count ? `(+${board.new_posts_count})` : '' }}
     </a>
-  </div>
+  </header>
 
-  <div class="columns-wrap">
+  <main class="columns-wrap">
     <div class="main-content">
       <b-loading :can-cancel="true" v-model="isLoading" :isFullPage="true"></b-loading>
       <router-view/>
@@ -19,7 +19,7 @@
         <AuthPanel/>
       </div>
     </div>
-  </div>
+  </main>
 
   <footer class="footer-wrap">
     <div class="footer-content has-text-centered">
