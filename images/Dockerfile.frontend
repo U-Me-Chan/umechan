@@ -1,4 +1,4 @@
-FROM node:16-bullseye as front-builder
+FROM node:16-bullseye AS front-builder
 WORKDIR /app
 COPY ./frontend ./
 ARG API_URL
