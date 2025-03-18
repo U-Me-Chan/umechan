@@ -27,7 +27,7 @@ export default {
     },
     formattedMessage: function () {
       marked.use({
-        gfm: false,
+        gfm: true,
         breaks: true,
         extensions: [
           {
