@@ -254,7 +254,7 @@ export default {
         .then(({ data }) => {
           self.init();
           bus.$emit('form:success', [data]);
-          localStorage.setItem('poster', outputData['poster']);
+          self.setPoster(outputData['poster']);
           self.$buefy.toast.open('Отправлено!');
         })
         .catch((error) => {
