@@ -49,6 +49,8 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USERNAME=${MYSQL_USERNAME}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - FILESTORE_TELEGRAM_BOT_TOKEN=${FILESTORE_TELEGRAM_BOT_TOKEN}
+      - FILESTORE_TELEGRAM_CHAT_ID=${FILESTORE_TELEGRAM_CHAT_ID}
     volumes:
       - './filestore:/var/www/html'
       - './data/files:/var/www/html/files'
