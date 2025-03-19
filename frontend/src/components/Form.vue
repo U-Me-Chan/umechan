@@ -3,7 +3,13 @@
   <div class="form__title">
     {{ parent_id ? 'Ответить в тред' : 'Создать тред' }}
   </div>
-  <b-switch class="form__sage-selector" v-if="parent_id" v-model="isSage">Не поднимать</b-switch>
+  <b-switch
+    class="form__sage-selector"
+    v-if="parent_id"
+    v-model="isSage"
+  >
+    Не поднимать
+  </b-switch>
   <b-field label="Имя">
     <b-input  
       v-model="poster"
@@ -17,17 +23,32 @@
     />
   </b-field>
   <b-field label="Тема">
-    <b-input v-model="subject" lazy />
+    <b-input
+      v-model="subject"
+      lazy
+    />
   </b-field>
   <b-field label="Сообщение">
-    <b-input v-model="message" max-length="200" type="textarea" ref="message" lazy/>
+    <b-input
+      v-model="message"
+      type="textarea"
+      ref="message"
+      lazy
+    />
   </b-field>
   <b-field label="Медиафайлы">
     <div class="form__file-uploader-wrap">
-      <b-upload v-model="files" class="file-label" drag-drop multiple>
+      <b-upload
+        v-model="files"
+        v-filesize="filesize"
+        class="file-label"
+        accept="image/png, image/jpeg, image/gif, video/webm, video/mp4"
+        drag-drop
+        multiple
+      >
         <span class="file-cta">
           <b-icon class="file-icon" icon="upload"/>
-          <span class="file-label">PNG JPEG WEBM MP4 GIF</span>
+          <span class="file-label">PNG JPEG GIF WEBM MP4</span>
         </span>
       </b-upload>
       <span v-if="filesNames.length > 0">
@@ -66,6 +87,10 @@ export default {
     message: {
       type: String,
       default: ''
+    },
+    filesize: {
+      type: String,
+      default: `${25 * 1024 * 1024}`
     }
   },
   methods: {
@@ -156,19 +181,14 @@ export default {
         this.onNavigatorPaste(event);
       }
     },
-    checkIfSupportedMediaFileExtension: function (code, string) {
-      if (code === 'image') {
-        return (/\.(jpe?g?|png|webp|jfif|gif)/).test(string);
-      }
-      if (code === 'video') {
-        return (/\.(webm|mp4)/).test(string);
-      }
-      return false;
-    },
     sendFile: async function (file) {
       const self = this;
+
+      if (file.size > self.filesize) {
+        return Promise.reject('Превышен максимальный размер файла в 25 мегабайт');
+      }
       const uploadData = new formData();
-      
+
       uploadData.append('image', file);
 
       return axios
@@ -181,30 +201,24 @@ export default {
           self.image = null;
 
           return file.name;
-        })
-        .catch((error) => {
-          const fileExtension = error.response.data.original_file.match(/(.\w*$)/)[0];
-          const fileTypeName = this.checkIfSupportedMediaFileExtension('image', fileExtension)
-            ? 'изображения'
-            : this.checkIfSupportedMediaFileExtension('video', fileExtension)
-            ? 'видео'
-            : 'файла';
-
-          self.$buefy.toast.open(`Произошла ошибка при отправке ${fileTypeName}: ${error}`);
-          self.image = null;
         });
     },
     handleUploadFile: async function () {
       if (this.files.length > 0) {
         this.isLoading = true;
 
+        const self = this;
+
         return Promise
-          .all(this.files.map((file) => this.sendFile(file).then((filename) => { this.filesNames.push(filename); })))
+          .all(self.files.map((file) => self.sendFile(file).then((filename) => { self.filesNames.push(filename); })))
           .then(() => {
-            this.files = [];
+            self.files = [];
+          })
+          .catch((error) => {
+            self.$buefy.toast.open(`Ошибка загрузки файла: ${error}`);
           })
           .finally(() => {
-            this.isLoading = false;
+            self.isLoading = false;
           });
       }
       return Promise.reject(CLPBRD_ERR.empty);
@@ -220,23 +234,21 @@ export default {
         this.$buefy.toast.open('Нельзя отправить пустое сообщение!');
         return;
       }
-
       this.isLoading = true;
 
       const self = this;
       const outputData = {};
       const isNewThread = type === 'thread';
 
-      outputData['poster']  = this.poster;
-      outputData['subject'] = this.subject;
-      outputData['message'] = this.message;
-      outputData['tag']     = this.tag;
+      outputData['poster']  = self.poster;
+      outputData['subject'] = self.subject;
+      outputData['message'] = self.message;
+      outputData['tag']     = self.tag;
 
-      if (isNewThread && this.isSage) {
+      if (isNewThread && self.isSage) {
         outputData['sage'] = true;
       }
-
-      const appropriatePromise = isNewThread ? this.createThread : this.createReply;
+      const appropriatePromise = isNewThread ? self.createThread : self.createReply;
 
       appropriatePromise(outputData)
         .then(({ data }) => {
@@ -262,6 +274,11 @@ export default {
       filesNames: [],
       isLoading: false
     }
+  },
+  directives: {
+    filesize: ((el, binding) => {
+      el.querySelector('input').size = binding.value;
+    })
   },
   watch: {
     'files': function () {
