@@ -74,6 +74,12 @@ export default {
       this.message = '';
       this.isSage = false;
     },
+    getPoster: function() {
+      return localStorage.getItem('poster');
+    },
+    setPoster: function (value) {
+      return localStorage.setItem('poster', value);
+    },
     onPosterReset: function() {
       this.poster = '';
     },
@@ -248,11 +254,8 @@ export default {
     }
   },
   data: function () {
-    const posterData = localStorage.getItem('poster');
-    const poster = posterData !== null ? posterData : '';
-
     return {
-      poster,
+      poster: this.getPoster(),
       subject: '',
       isSage: false,
       files: [],
