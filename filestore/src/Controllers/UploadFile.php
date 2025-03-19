@@ -44,7 +44,7 @@ class UploadFile implements IController
 
         $data = new DTOUploadedFile("{$this->static_url}/{$filename}", "{$this->static_url}/{$thumbname}");
 
-        $this->telegram_sender->send("Загружен новый файл: {$this->static_url}/{$filename}}");
+        $this->telegram_sender->send("Загружен новый файл: {$this->static_url}/{$filename}");
 
         return new Response($data);
     }
