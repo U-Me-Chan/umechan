@@ -13,6 +13,7 @@ use IH\Exceptions\FileNotUploaded;
 use IH\Services\FileUploader;
 use IH\Services\TelegramSender;
 use IH\Services\ThumbnailCreator;
+use Throwable;
 
 class UploadFile implements IController
 {
@@ -44,7 +45,10 @@ class UploadFile implements IController
 
         $data = new DTOUploadedFile("{$this->static_url}/{$filename}", "{$this->static_url}/{$thumbname}");
 
-        $this->telegram_sender->send("Загружен новый файл: {$this->static_url}/{$filename}");
+        try {
+            $this->telegram_sender->send("Загружен новый файл: {$this->static_url}/{$filename}");
+        } catch (Throwable) {
+        }
 
         return new Response($data);
     }
