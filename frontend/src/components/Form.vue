@@ -13,7 +13,6 @@
       icon-right="close-circle"
       icon-right-clickable
       @icon-right-click="onPosterReset"
-      :data-is-empty="(poster.length > 0).toString()"
     />
   </b-field>
   <b-field label="Тема">
@@ -68,20 +67,25 @@ export default {
       default: ''
     }
   },
+  mounted: function () {
+    this.init();
+  },
   methods: {
     init: function () {
       this.subject = '';
       this.message = '';
       this.isSage = false;
+      this.poster = this.getPoster();
     },
     getPoster: function() {
-      return localStorage.getItem('poster');
+      return localStorage.getItem('poster') ?? config.default_poster;
     },
     setPoster: function (value) {
-      return localStorage.setItem('poster', value);
+      localStorage.setItem('poster', value);
     },
     onPosterReset: function() {
-      this.poster = '';
+      localStorage.removeItem('poster');
+      this.poster = config.default_poster;
     },
     onNavigatorPaste: async function (event) {
       try {
@@ -255,8 +259,8 @@ export default {
   },
   data: function () {
     return {
-      poster: this.getPoster(),
       subject: '',
+      poster: config.default_poster,
       isSage: false,
       files: [],
       filesNames: [],
@@ -287,11 +291,5 @@ export default {
     align-items: center;
     grid-template-columns: max-content auto;
     gap: 0.75em;
-}
-</style>
-
-<style>
-.form__poster-input[data-is-empty="false"] + .icon {
-    visibility: hidden;
 }
 </style>

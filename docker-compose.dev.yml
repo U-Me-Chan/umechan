@@ -12,6 +12,10 @@ services:
     volumes:
       - './data/db:/var/lib/mysql'
       - './data/dumps:/tmp/dumps'
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
   api:
     build:
       dockerfile: images/Dockerfile.api.dev
@@ -19,7 +23,8 @@ services:
     container_name: umechan-api
     restart: always
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - '.env'
     environment:
@@ -52,6 +57,9 @@ services:
     volumes:
       - './filestore:/var/www/html'
       - './data/files:/var/www/html/files'
+    depends_on:
+      db:
+        condition: service_healthy
   nginx:
     build:
       dockerfile: images/Dockerfile.frontend.dev

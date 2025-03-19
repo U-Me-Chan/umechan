@@ -9,6 +9,7 @@ RUN echo "VUE_APP_API_URL=${API_URL}" > .env.production
 RUN echo "VUE_APP_FILESTORE_URL=${FILESTORE_URL}" >> .env.production
 RUN echo "VUE_APP_ICECAST_URL=${ICECAST_URL}" >> .env.production
 RUN echo "VUE_APP_BASE_URL=${BASE_URL}" >> .env.production
+RUN echo "VUE_APP_DEFAULT_POSTER=${DEFAULT_NAME}" >> .env.production
 RUN npm i && npm run build
 
 FROM nginx:alpine
