@@ -134,6 +134,7 @@ services:
         - FILESTORE_URL=${FILESTORE_URL}
         - ICECAST_URL=${ICECAST_URL}
         - BASE_URL=${BASE_URL}
+        - DEFAULT_POSTER=${DEFAULT_NAME}
     env_file:
       - '.env'
     container_name: umechan-frontend

@@ -100,10 +100,12 @@ export default {
       this.isSage = false;
     },
     getPoster: function() {
-      return localStorage.getItem('poster');
+      const poster = localStorage.getItem('poster');
+
+      return (poster === 'undefined' || poster === null) ? config.default_poster : poster;
     },
     setPoster: function (value) {
-      return localStorage.setItem('poster', value);
+      localStorage.setItem('poster', value);
     },
     onPosterReset: function() {
       this.poster = '';
