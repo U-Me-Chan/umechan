@@ -84,11 +84,11 @@ export default {
       track_id: 0,
       estimate: 0,
       duration: 1
-    }
+    };
   },
   methods: {
     formatDuration: function (value) {
-      return formatDuration(value)
+      return formatDuration(value);
     },
     estimateTrack: function (track_id, operator) {
       const data = {};
@@ -100,9 +100,9 @@ export default {
         .then(() => {
           this.$buefy.toast.open('Отправлено!');
         })
-        .catch ((error) => {
+        .catch((error) => {
           this.$buefy.toast.open(`Ошибка: ${error}`);
-        })
+        });
     },
     updateMetadata: function() {
       axios
