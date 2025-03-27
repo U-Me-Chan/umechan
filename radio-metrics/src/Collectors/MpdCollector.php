@@ -16,9 +16,9 @@ class MpdCollector implements ICollector
         private int $timeout = 5
     ) {
         $this->mphpd = new MphpD([
-            'host'    => $hostname,
-            'port'    => $port,
-            'timeout' => $timeout
+            'host'    => $this->hostname,
+            'port'    => $this->port,
+            'timeout' => $this->timeout
         ]);
     }
 

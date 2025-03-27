@@ -72,7 +72,7 @@ export default {
         
         bus.$emit('boards.update', [response.data.payload.thread_data.board.tag]);
         bus.$emit('app.loader', [false]);
-
+        
         document.title = 'U III E : /' + response.data.payload.thread_data.board.tag + '/' + response.data.payload.thread_data.subject;
       }).catch((error) => {
         console.log(error);
@@ -94,20 +94,18 @@ export default {
     this.id = this.$route.params.id;
     this.init();
   },
-  mounted: function () {
-    setTimeout(() => {
-      var section = this.$router.currentRoute.hash.replace('#', '');
-      
-      if (section) {
-        this.scrollTo(section, 'post');
-      } else {
-        this.scrollTo('thread-top');
-      }
-    }, 1500);
+  updated: function () {
+    var section = this.$router.currentRoute.hash.replace('#', '');
     
+    if (section) {
+      this.scrollTo(section, 'post');
+    } else {
+      this.scrollTo('thread-top');
+    }
     var self = this;
+
+    console.debug('updated');
     
-    // FIXME: use vues, Luke
     bus.$on('form:success', () => self.init());
   },
   watch:  {
@@ -119,9 +117,7 @@ export default {
         var section = this.$router.currentRoute.hash.replace('#', '');
         
         if (section) {
-          setTimeout(() => {
-            this.scrollTo(section, 'post');
-          }, 1500);
+          this.scrollTo(section, 'post');
         }
       }
     }
@@ -176,6 +172,6 @@ h3 {
 }
 
 .post-active {
-    border: 3px dotted blue;
+    border: 2px dotted blue;
 }
 </style>

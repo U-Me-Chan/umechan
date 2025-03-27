@@ -25,14 +25,6 @@ class Router
         $routeInfo = $dispatcher->dispatch($req->getMethod(), $req->getUri()->getPath());
 
         switch ($routeInfo[0]) {
-            case RouteDispatcher::NOT_FOUND:
-            case RouteDispatcher::METHOD_NOT_ALLOWED:
-                $res = Response::json([]);
-                $res = $res->withStatus(Response::STATUS_NOT_FOUND);
-
-                return $res;
-
-                break;
             case RouteDispatcher::FOUND:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
@@ -45,17 +37,16 @@ class Router
 
                     return $res;
                 }
+            default:
+                $res = Response::json([]);
+                $res = $res->withStatus(Response::STATUS_NOT_FOUND);
 
-                break;
+                return $res;
         }
     }
 
     public function addRoute(string $method, string $path, callable $callback): void
     {
-        if (!is_callable($callback)) {
-            throw new \InvalidArgumentException();
-        }
-
         $this->route_collector->addRoute($method, $path, $callback);
     }
 }

@@ -6,6 +6,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
 use Ridouchire\RadioMetrics\ICache;
 use Ridouchire\RadioMetrics\Exceptions\EntityNotFound;
+use Ridouchire\RadioMetrics\Storage\Entites\Track;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
 
 final class EstimateTrack

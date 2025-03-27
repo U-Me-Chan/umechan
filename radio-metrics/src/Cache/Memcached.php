@@ -13,7 +13,7 @@ class Memcached implements ICache
         private int $port = 11211
     ) {
         $this->memcached = new \Memcached();
-        $this->memcached->addServer($hostname, $port);
+        $this->memcached->addServer($this->hostname, $this->port);
     }
 
     public function set(string $key, mixed $value): void

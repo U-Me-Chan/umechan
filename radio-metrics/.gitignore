@@ -1,0 +1,5 @@
+.dir-locals.el
+vendor/*
+logs/*
+local.env.php
+test.db
