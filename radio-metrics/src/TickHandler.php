@@ -46,7 +46,6 @@ class TickHandler
             $this->logger->debug('Пытаемся найти композицию в БД');
 
             try {
-
                 /** @var Track */
                 $track = $this->trackRepository->findOne([
                     'hash' => $this->md5Hash->get($filepath)
@@ -55,6 +54,10 @@ class TickHandler
                 $this->logger->debug('Нашли композицию в БД по её md5-хешу');
             } catch (EntityNotFound) {
                 $this->logger->error('Трек не найден: ' . $filepath);
+
+                return;
+            } catch (RuntimeException) {
+                $this->logger->error('Не могу вычислить хеш-сумму для файла композиции: ' . $filepath);
 
                 return;
             }

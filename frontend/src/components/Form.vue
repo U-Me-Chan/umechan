@@ -90,7 +90,7 @@ export default {
     },
     filesize: {
       type: String,
-      default: `${25 * 1024 * 1024}`
+      default: config.max_filesize
     }
   },
   methods: {

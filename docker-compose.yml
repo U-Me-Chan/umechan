@@ -1,0 +1,223 @@
+name: umechan
+services:
+  nginx:
+    build:
+      dockerfile: images/web-server/Dockerfile
+      context: .
+      args:
+        - MAX_FILESIZE=${MAX_FILESIZE}
+        - API_URL=${API_URL}
+        - FILESTORE_URL=${FILESTORE_URL}
+        - ICECAST_URL=${ICECAST_URL}
+        - DEFAULT_POSTER=${DEFAULT_NAME}
+        - BASE_URL=${BASE_URL}
+      target: ${TARGET}
+    container_name: umechan-frontend
+    restart: always
+    depends_on:
+      - api
+    env_file:
+      - '.env'
+    volumes:
+      - "./data/files:/var/www/html/files"
+    ports:
+      - '80:80'
+    profiles:
+      - production
+      - chan
+      - ${TARGET:-}
+  db:
+    image: mysql:8.3.0
+    container_name: umechan-db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    env_file:
+      - '.env'
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - './data/db:/var/lib/mysql'
+    profiles:
+      - production
+      - chan
+      - ${TARGET:-}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+  api:
+    build:
+      dockerfile: images/chan-api/Dockerfile
+      context: .
+      target: production
+    container_name: umechan-api
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - '.env'
+    environment:
+      - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USERNAME=${MYSQL_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - PHINX_HOSTNAME=${MYSQL_HOSTNAME}
+      - PHINX_DATABASE=${MYSQL_DATABASE}
+      - PHINX_USER=${MYSQL_USERNAME}
+      - PHINX_PASSWORD=${MYSQL_PASSWORD}
+      - ADMINISTATOR_KEY=${ADMINISTRATOR_KEY}
+      - DEFAULT_NAME=${DEFAULT_NAME}
+      - BASE_URL=${BASE_URL}
+    volumes:
+      - './data/logs:/var/log'
+    profiles:
+      - production
+      - chan
+      - ${TARGET:-}
+  filestore:
+    build:
+      dockerfile: images/chan-filestore/Dockerfile
+      context: .
+      args:
+        - MAX_FILESIZE=${MAX_FILESIZE}
+      target: production
+    container_name: umechan-filestore
+    restart: always
+    env_file:
+      - '.env'
+    environment:
+      - STATIC_URL=${STATIC_URL}
+      - ADMINISTRATOR_KEY=${ADMINISTRATOR_KEY}
+      - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USERNAME=${MYSQL_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - './data/files:/var/www/html/files'
+      - './data/logs:/var/log'
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - production
+      - chan
+      - ${TARGET:-}
+  radio-db-importer:
+    build:
+      dockerfile: images/radio-db-importer/Dockerfile
+      context: .
+      args:
+        - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+        - MYSQL_USERNAME=${MYSQL_USERNAME}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    container_name: umechan-radio-db-importer
+    restart: 'no'
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - '.env'
+    environment:
+      - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USERNAME=${MYSQL_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - '$DIR_OF_CONVERTIBLE_FILES_PATH:/var/lib/convert:rw'
+      - '$DIR_OF_TAGME_FILES_PATH:/var/lib/tagme:rw'
+      - '$MUSIC_DIR_PATH:/var/lib/music:rw'
+      - './data/logs/:/db-importer/logs:rw'
+    profiles:
+      - production
+  radio-scheduler:
+    build:
+      dockerfile: images/radio-scheduler/Dockerfile
+      context: .
+      args:
+        - MPD_HOSTNAME=${MPD_HOSTNAME}
+        - MPD_PORT=${MPD_PORT}
+        - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+        - MYSQL_USERNAME=${MYSQL_USERNAME}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    container_name: umechan-radio-scheduler
+    restart: always
+    env_file:
+      - '.env'
+    volumes:
+      - './data/logs/:/scheduler/logs'
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - production
+  radio-metrics:
+    build:
+      dockerfile: images/radio-metrics/Dockerfile
+      context: .
+      args:
+        - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+        - MYSQL_USERNAME=${MYSQL_USERNAME}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - RADIO_API_URL=${RADIO_API_URL}
+        - RADIO_CHAN_API_URL=${DOMAIN}
+        - RADIO_LOG_LEVEL=${RADIO_LOG_LEVEL}
+        - MPD_HOSTNAME=${MPD_HOSTNAME}
+        - MPD_PORT=${MPD_PORT}
+        - MPD_DATABASE_PATH=${MPD_DATABASE_PATH}
+    container_name: umechan-radio-metrics
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - '.env'
+    environment:
+      - PHINX_HOSTNAME=${MYSQL_HOSTNAME}
+      - PHINX_DATABASE=${MYSQL_DATABASE}
+      - PHINX_USER=${MYSQL_USERNAME}
+      - PHINX_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - './data/logs:/usr/local/share/metrics/logs'
+      - '/home/ridouchire/Music:/var/lib/music'
+    profiles:
+      - production
+  promtail:
+    container_name: umechan-promtail
+    image: grafana/promtail:latest
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - './data/logs:/var/log:ro'
+    restart: always
+    profiles:
+      - production
+  loki:
+    container_name: umechan-loki
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: always
+    profiles:
+      - production
+  grafana:
+    container_name: umechan-grafana
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./ddata/grafana:/var/lib/grafana"
+    restart: always
+    profiles:
+      - production
+  memcached:
+    container_name: umechan-memcached
+    image: memcached
+    command:
+      - --conn-limit=1024
+      - --memory-limit=64
+      - --threads=4
+    profiles:
+      - production

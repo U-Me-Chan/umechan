@@ -64,11 +64,11 @@ class Track extends AEntity
         $estimate = (int) ceil($this->estimate / $this->duration);
 
         if ($estimate < 0)  {
-            $this->estimate = ceil($this->estimate * 2);
+            $this->estimate = ceil($this->estimate * 2); // @phpstan-ignore assign.propertyType
         } else if ($estimate == 0 || $estimate == 1 || $estimate == 2) {
             $this->estimate = $this->estimate - ($this->duration * 3);
         } else {
-            $this->estimate = ceil($this->estimate / 2);
+            $this->estimate = ceil($this->estimate / 2); // @phpstan-ignore assign.propertyType
         }
     }
 

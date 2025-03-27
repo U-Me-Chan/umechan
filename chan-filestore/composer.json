@@ -1,0 +1,30 @@
+{
+    "name": "ridouchire/image-hosting",
+    "description": "Image hosting for U-Me project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ridouchire",
+            "email": "ridouchire@gmail.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/ridouchire/rweb.git"
+        }
+    ],
+    "require": {
+        "ridouchire/rweb": "dev-master",
+        "ext-imagick": "*",
+        "catfan/medoo": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "IH\\": "src"
+        }
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1"
+    }
+}
