@@ -24,7 +24,7 @@ class GetFilelist implements IController
                 '..' .DIRECTORY_SEPARATOR .
                 '..' . DIRECTORY_SEPARATOR .
                 'files' . DIRECTORY_SEPARATOR .
-                '[!{thumb}]*',
+                '[!{thumb,deleted}]*',
             GLOB_BRACE
         );
 
