@@ -210,7 +210,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - "./ddata/grafana:/var/lib/grafana"
+      - "./data/grafana:/var/lib/grafana"
     restart: always
     profiles:
       - production
