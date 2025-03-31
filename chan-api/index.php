@@ -43,29 +43,24 @@ $app['request'] = new Request($_SERVER, $_POST, $_FILES);
 $app['router'] = new Router();
 
 /** @var Medoo */
-$db = function ($app) { // @phpstan-ignore varTag.nativeType
-    return new Medoo([
-        'database_type' => 'mysql',
-        'database_name' => $app['config']['db']['database'],
-        'server'        => $app['config']['db']['hostname'],
-        'username'      => $app['config']['db']['username'],
-        'password'      => $app['config']['db']['password'],
-        'charset'       => 'utf8mb4',
-        'collation'     => 'utf8mb4_unicode_ci'
-    ]);
-};
+$db = new Medoo([
+    'database_type' => 'mysql',
+    'database_name' => $app['config']['db']['database'],
+    'server'        => $app['config']['db']['hostname'],
+    'username'      => $app['config']['db']['username'],
+    'password'      => $app['config']['db']['password'],
+    'charset'       => 'utf8mb4',
+    'collation'     => 'utf8mb4_unicode_ci'
+]);
 
-$board_repo = new BoardRepository($db);
-$post_repo  = new PostRepository($db);
-
-$board_storage = new BoardStorage($db);
-$post_storage = new PostStorage($db, $board_storage);
-
-$passport_storage = new PassportStorage($db);
-
+$board_repo  = new BoardRepository($db);
+$post_repo   = new PostRepository($db);
 $events_repo = new EventRepository($db);
 
-$event_storage = new EventStorage($db);
+$board_storage    = new BoardStorage($db);
+$post_storage     = new PostStorage($db, $board_storage);
+$passport_storage = new PassportStorage($db);
+$event_storage    = new EventStorage($db);
 
 /** @var Router */
 $r = $app['router'];
