@@ -9,3 +9,4 @@ data/convert
 data/logs/*
 .env
 .projectile
+docker-compose.override.yml
