@@ -3,15 +3,10 @@
 </template>
 
 <script>
-import { marked }  from 'marked';
+import { parse } from '../..//utils/post_parser'
 
 export default {
   name: 'Message',
-  data: function () {
-    return {
-      isMessageFull: false
-    }
-  },
   props: {
     message: {
       type: String,
@@ -19,54 +14,8 @@ export default {
     }
   },
   computed: {
-    headMessage: function () {
-      return this.message.slice(0, 600);
-    },
-    isLongMessage: function () {
-      return this.message.lenght > 600 ? true : false;
-    },
     formattedMessage: function () {
-      marked.use({
-        gfm: true,
-        breaks: true,
-        extensions: [
-          {
-            name: 'replier',
-            level: 'block',
-            tokenizer(src) {
-              const rule = /(&gt;){2}([0-9]+)/gmi;
-              const match = rule.exec(src);
-
-              if (match) {
-                const text = src.replace(match[0], match => {
-                  return `<a href='#${match.slice('&gt;&gt;'.length)}'>>>${match.slice('&gt;&gt;'.length)}</a>`;
-                });
-
-                const token = {
-                  type: 'replier',
-                  raw: src,
-                  text: text,
-                  tokens: this.lexer.blockTokens(text, [])
-                }
-
-                return token;
-              }
-            },
-            renderer(token) {
-              return `${this.parser.parse(token.tokens)}`
-            }
-          },
-          {
-            name: 'link',
-            level: 'inline',
-            renderer (token) {
-              return `<a href='${token.href}' target='_blank'>${token.href}</a>`;
-            }
-          }
-        ]
-      });
-
-      return marked.parse(this.message);
+      return parse(this.message)
     }
   }
 }

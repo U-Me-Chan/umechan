@@ -3,7 +3,11 @@
 namespace Ridouchire\RadioMetrics\Utils;
 
 use InvalidArgumentException;
+use Ridouchire\RadioMetrics\Utils\Phpstan\EnvironmentMixin;
 
+/**
+ * @mixin EnvironmentMixin
+ */
 class Environment
 {
     private array $map = [];
@@ -46,7 +50,7 @@ class Environment
         return null;
     }
 
-    private function assignValues(array $dataset, $key = null)
+    private function assignValues(array $dataset, ?string $key = null): void
     {
         foreach ($dataset as $field => $value) {
             if (is_array($value)) {

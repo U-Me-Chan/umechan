@@ -27,6 +27,8 @@ class TrackRepository implements IRepository
      * @param string $filters[$title]  Подстрока для поиска по названию
      *
      * @return array
+     *
+     * @phpstan-ignore parameter.phpDocType
      */
     public function findMany(array $filters = []): array
     {
@@ -53,7 +55,7 @@ class TrackRepository implements IRepository
         }
 
         /** @var array */
-        $track_datas = $this->db->select('tracks', '*', array_merge($conditions, $limiting));
+        $track_datas = $this->db->select('tracks', '*', array_merge($conditions, $limiting)); // @phpstan-ignore arguments.count,argument.type
 
         $tracks = [];
 
@@ -76,6 +78,8 @@ class TrackRepository implements IRepository
      * @throws EntityNotFound           Если композиции не найдено
      *
      * @return Track
+     *
+     * @phpstan-ignore parameter.phpDocType
      */
     public function findOne(array $filters = []): Track
     {
@@ -122,7 +126,7 @@ class TrackRepository implements IRepository
      */
     public function save($track): int
     {
-        if (!$track instanceof Track) {
+        if (!$track instanceof Track) { // @phpstan-ignore instanceof.alwaysTrue
             throw new \InvalidArgumentException();
         }
 
@@ -133,7 +137,7 @@ class TrackRepository implements IRepository
         if ($id == 0) {
             $this->db->insert('tracks', $track_data);
 
-            return $this->db->id();
+            return $this->db->id(); // @phpstan-ignore return.type
         }
 
         $this->db->update('tracks', $track_data, ['id' => $id]);
@@ -153,7 +157,7 @@ class TrackRepository implements IRepository
      */
     public function delete($track): bool
     {
-        if (!$track instanceof Track) {
+        if (!$track instanceof Track) { // @phpstan-ignore instanceof.alwaysTrue
             throw new \InvalidArgumentException();
         }
 

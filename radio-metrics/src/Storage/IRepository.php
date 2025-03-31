@@ -14,6 +14,8 @@ interface IRepository
      * @param int   $filters[$limit]  Количество сущностей в ответе
      *
      * @return array
+     *
+     * @phpstan-ignore parameter.phpDocType
      */
     public function findMany(array $filters = []): array;
 
@@ -31,7 +33,7 @@ interface IRepository
     /**
      * Сохраняет состояние сущности, возвращает её идентификатор
      *
-     * @param AEntity Сущность
+     * @param AEntity $entity Сущность
      *
      * @return int
      */
@@ -40,7 +42,7 @@ interface IRepository
     /**
      * Удаляет сущность
      *
-     * @param AEntity Сущность
+     * @param AEntity $entity Сущность
      *
      * @return bool
      */

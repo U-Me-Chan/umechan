@@ -3,7 +3,7 @@
 namespace Ridouchire\RadioMetrics\Services;
 
 use FloFaber\MphpD\MphpD;
-use FloFaber\MPDException;
+use FloFaber\MphpD\MPDException;
 use FloFaber\MphpD\Filter;
 use Monolog\Logger;
 
@@ -62,20 +62,20 @@ class Mpd
      *
      * @param string $dir Относительный путь
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      *
      * @return int
      */
-    public function getCountSongsInDirectory(string $pls): int
+    public function getCountSongsInDirectory(string $dir): int
     {
         /** @var array|false */
-        $pls_data = $this->getConnection()->db()->count(new Filter('file', 'contains', "{$pls}/"));
+        $dir_data = $this->getConnection()->db()->count(new Filter('file', 'contains', "{$dir}/"));
 
-        if (!$pls_data) {
-            throw new \RuntimeException("MPD: ошибка при попытке подсчёта количества композиций в {$pls}");
+        if (!$dir_data) {
+            throw new \RuntimeException("MPD: ошибка при попытке подсчёта количества композиций в {$dir}");
         }
 
-        return $pls_data['songs'];
+        return $dir_data['songs'];
     }
 
     /**
@@ -126,7 +126,7 @@ class Mpd
         $current_song_position = $current_song_data['pos'];
 
         /** @var bool */
-        $res = $this->getConnection()->queue()->move($current_song_position, 0);
+        $res = $this->getConnection()->queue()->move($current_song_position, "0");
 
         $this->log->debug('MPD: Перемещаю текущий трек в начало очереди');
 

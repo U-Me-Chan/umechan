@@ -27,6 +27,8 @@ class RecordRepository implements IRepository
      * @param int   $filters[$limit]    Количество возвращаемых записей
      *
      * @return array
+     *
+     * @phpstan-ignore parameter.phpDocType
      */
     public function findMany(array $filters = []): array
     {
@@ -47,11 +49,11 @@ class RecordRepository implements IRepository
             return [[], 0];
         }
 
-        $record_datas = $this->db->select('records', '*', array_merge($conditions, $limiting));
+        $record_datas = $this->db->select('records', '*', array_merge($conditions, $limiting)); // @phpstan-ignore arguments.count,argument.type
 
         $records = [];
 
-        foreach ($record_datas as $record_data) {
+        foreach ($record_datas as $record_data) { // @phpstan-ignore foreach.nonIterable
             $records[] = Record::fromArray($record_data);
         }
 
@@ -69,6 +71,8 @@ class RecordRepository implements IRepository
      * @throws InvalidArgumentException Если список фильтров пустов или некорректен
      *
      * @return Record
+     *
+     * @phpstan-ignore parameter.phpDocType
      */
     public function findOne(array $filters = []): Record
     {
@@ -107,7 +111,7 @@ class RecordRepository implements IRepository
      */
     public function save($record): int
     {
-        if (!$record instanceof Record) {
+        if (!$record instanceof Record) { // @phpstan-ignore instanceof.alwaysTrue
             throw new \InvalidArgumentException("Это не запись о слушателях трека");
         }
 
@@ -116,7 +120,7 @@ class RecordRepository implements IRepository
 
         $this->db->insert('records', $record_data);
 
-        return $this->db->id();
+        return $this->db->id(); // @phpstan-ignore return.type
     }
 
     /**
@@ -131,7 +135,7 @@ class RecordRepository implements IRepository
      */
     public function delete($record): bool
     {
-        if (!$record instanceof Record) {
+        if (!$record instanceof Record) { // @phpstan-ignore instanceof.alwaysTrue
             throw new \InvalidArgumentException("Это не запись о слушателях трека");
         }
 
