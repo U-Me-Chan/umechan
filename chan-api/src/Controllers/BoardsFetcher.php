@@ -11,7 +11,8 @@ class BoardsFetcher
 {
     public function __construct(
         private BoardStorage $board_repo,
-        private Medoo $db
+        private Medoo $db,
+        private string $exclude_tags
     ) {
     }
 
@@ -27,7 +28,7 @@ class BoardsFetcher
         $results['boards'] = $this->board_repo->find();
 
         /** @var array */
-        $exclude_tags = $req->getParams('exclude_tags') ? $req->getParams('exclude_tags') : ['und', 'fap'];
+        $exclude_tags = $req->getParams('exclude_tags') ? $req->getParams('exclude_tags') : explode(',', $this->exclude_tags);
         /** @var int */
         $limit = $req->getParams('limit') ? $req->getParams('limit') : 20;
         /** @var int */

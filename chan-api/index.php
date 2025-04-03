@@ -65,14 +65,14 @@ $event_storage    = new EventStorage($db);
 /** @var Router */
 $r = $app['router'];
 
-$r->addRoute('GET', '/board/all', new BoardsFetcher($board_storage, $db));
+$r->addRoute('GET', '/board/all', new BoardsFetcher($board_storage, $db, $_ENV['EXCLUDE_TAGS']));
 $r->addRoute('GET', '/board/{tag}', new PostBoardFetcher($board_storage, $post_storage));
 $r->addRoute('GET', '/post/{id:[0-9]+}', new PostFetcher($post_repo));
 $r->addRoute('POST', '/post', new PostCreator($post_repo, $board_repo, $events_repo));
 $r->addRoute('DELETE', '/post/{id:[0-9]+}', new PostDeleter($post_repo, $events_repo));
 $r->addRoute('GET', '/events', new EventFetcher($events_repo));
 
-$r->addRoute('GET', '/v2/board', new GetBoardList($board_storage));
+$r->addRoute('GET', '/v2/board', new GetBoardList($board_storage, $_ENV['EXCLUDE_TAGS']));
 $r->addRoute('GET', '/v2/board/{tags:[a-z\+]+}', new GetThreadList($post_storage));
 
 $r->addRoute('GET', '/v2/post/{id:[0-9]+}', new GetThread($post_storage));

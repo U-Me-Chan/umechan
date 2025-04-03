@@ -9,13 +9,14 @@ use PK\Boards\BoardStorage;
 final class GetBoardList
 {
     public function __construct(
-        private BoardStorage $storage
+        private BoardStorage $storage,
+        private string $exclude_tags
     ) {
     }
 
     public function __invoke(Request $req): Response
     {
-        $exclude_tags = $req->getParams('exclude_tags') ? $req->getParams('exclude_tags') : ['fap', 'und'];
+        $exclude_tags = $req->getParams('exclude_tags') ? $req->getParams('exclude_tags') : explode(',', $this->exclude_tags);
 
         foreach ($exclude_tags as $k => $tag) {
             if (empty($tag)) {
