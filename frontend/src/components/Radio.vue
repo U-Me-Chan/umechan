@@ -4,7 +4,6 @@
     class="radio-default-player"
     ref="audioPlayer"
     preload="none"
-    controls
     :src="streamUrl">
     Ваш браузер не поддерживает возможность воспроизведения аудио. Попробуйте слушать внешним плеером.
     <a :href="m3uUrl">Плейлист для внешнего плеера</a>
@@ -25,7 +24,7 @@
     <b-tooltip
       label="Пауза/Воспроизведение"
       class="radio-button-play"
-      :class="{ 'radio-button-plan-active' : isPlaying }">
+      :class="{ 'radio-button-play-active' : isPlaying }">
       <a href="#" @click="togglePlay">⏯</a>
     </b-tooltip>
 
@@ -182,7 +181,7 @@ radio-default-player {
     border-radius: 5px;
 }
 
-.radio__track-title marquee {
+.radio-track-title marquee {
     margin-left: 0;
     margin-right: 0;
 }
@@ -191,20 +190,20 @@ radio-default-player {
     box-shadow: inset 2px 1px 2px 1px #8e8ed2;
 }
 
-.radio__buttons-wrap,
-.radio__track-title {
+.radio-buttons-wrap,
+.radio-track-title {
     display: flex;
     justify-content: space-around;
     align-items: center;
 }
 
-radio__button-play {
+radio-button-play {
     cursor: pointer;
     font-size: 20px;
     padding: 1px;
     border-radius: 5px;
 }
-.radio__button-play_active {
+.radio-button-play-active {
     box-shadow: inset 1px 1px 1px 1px grey;
 }
 </style>
