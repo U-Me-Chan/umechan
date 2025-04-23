@@ -42,13 +42,13 @@
         v-model="files"
         v-filesize="filesize"
         class="file-label"
-        accept="image/png, image/jpeg, image/gif, video/webm, video/mp4"
+        accept="image/png, image/jpeg, image/gif, video/webm, video/mp4, image/webp"
         drag-drop
         multiple
       >
         <span class="file-cta">
           <b-icon class="file-icon" icon="upload"/>
-          <span class="file-label">PNG JPEG GIF WEBM MP4</span>
+          <span class="file-label">PNG JPEG WEBP GIF WEBM MP4</span>
         </span>
       </b-upload>
       <span v-if="filesNames.length > 0">
