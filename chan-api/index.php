@@ -34,7 +34,7 @@ require_once "vendor/autoload.php";
 /** @var array */
 $config = require "config.php";
 
-define('BASE_URL', preg_quote($_ENV['BASE_URL'], '/'));
+define('BASE_URL', "https?\:\/\/" . preg_quote($_ENV['DOMAIN'], '/'));
 
 /** @var array|Application */
 $app = new Application($config); // @phpstan-ignore varTag.nativeType
