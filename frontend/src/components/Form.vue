@@ -247,7 +247,7 @@ export default {
       outputData['message'] = self.message;
       outputData['tag']     = self.tag;
 
-      if (isNewThread && self.isSage) {
+      if (!isNewThread && self.isSage) {
         outputData['sage'] = true;
       }
       const appropriatePromise = isNewThread ? self.createThread : self.createReply;
