@@ -40,9 +40,10 @@ class TickHandler
             return;
         }
 
-        if ($this->cache->get('current_track') == false ||
-            $this->cache->get('current_track')['path'] !== $filepath
-        ) {
+        $cached_track_data = $this->cache->get('current_track');
+        $cached_estimate   = $this->cache->get('estimate') ?? 0;
+
+        if ($cached_track_data == null || $cached_track_data['path'] !== $filepath) {
             $this->logger->debug('Пытаемся найти композицию в БД');
 
             try {
@@ -62,7 +63,14 @@ class TickHandler
                 return;
             }
 
-            $this->logger->debug('Трек изменился', ['track' => $track->toArray(), 'old_track' => $this->cache->get('current_track')]);
+            $this->logger->debug('Трек изменился', ['track' => $track->toArray(), 'old_track' => $cached_track_data]);
+
+            if ($cached_track_data !== null) {
+                $_track = Track::fromArray($cached_track_data);
+                $_track->increaseEstimate($cached_estimate);
+
+                $this->trackRepository->save($_track);
+            }
 
             $this->logger->debug('Увеличиваю счётчик проигрываний');
             $track->bumpPlayCount();
@@ -77,7 +85,7 @@ class TickHandler
             $this->cache->set('current_track', $track->toArray());
             $this->cache->set('estimate', $track->getEstimate());
         } else {
-            $track = Track::fromArray($this->cache->get('current_track'));
+            $track = Track::fromArray($cached_track_data);
         }
 
         try {
@@ -102,7 +110,6 @@ class TickHandler
         $this->recordRepository->save($record);
 
         $this->logger->debug('Текущие данные', ['track' => $track->toArray(), 'listeners' => $listeners]);
-
         $this->logger->debug('Конец цикла коллекционирования');
     }
 

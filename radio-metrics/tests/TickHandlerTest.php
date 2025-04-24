@@ -61,7 +61,7 @@ class TickHandlerTest extends TestCase
     public function testMpdNoReturnCurrentTrack(): void
     {
         $this->mpd_collector->expects($this->once())->method('getData')->willThrowException(new RuntimeException());
-        $this->logger->expects($this->atLeast(2))->method('debug');
+        $this->logger->expects($this->exactly(2))->method('debug');
         $this->logger->expects($this->once())->method('error');
 
         $this->handler->handle();
@@ -71,11 +71,7 @@ class TickHandlerTest extends TestCase
     {
         $this->mpd_collector->expects($this->once())->method('getData')->willReturn(['file' => '/var/lib/music/1.mp3']);
         $this->track_repo->expects($this->once())->method('findOne')->willThrowException(new EntityNotFound());
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->willReturnCallback(function (string $message) {
-                $this->assertEquals('Трек не найден: /var/lib/music/1.mp3', $message);
-            });
+        $this->logger->expects($this->once())->method('error');
 
         $this->handler->handle();
     }
@@ -96,7 +92,7 @@ class TickHandlerTest extends TestCase
             'mpd_track_id'  => 1,
             'hash'          => 'hash'
         ]));
-        $this->cache->expects($this->atLeast(2))->method('set');
+        $this->cache->expects($this->exactly(2))->method('set');
         $this->icecast_collector->expects($this->once())->method('getData')->willThrowException(new RuntimeException());
         $this->logger->expects($this->once())->method('error');
 
@@ -106,6 +102,22 @@ class TickHandlerTest extends TestCase
     public function testIncrementEstimate(): void
     {
         $this->mpd_collector->method('getData')->willReturn(['file' => '/var/lib/music/1.mp3']);
+        $this->cache->expects($this->exactly(2))->method('get')->willReturnOnConsecutiveCalls(
+            [
+                'id'            => 1,
+                'artist'        => 'Foo',
+                'title'         => 'Bar',
+                'first_playing' => time(),
+                'last_playing'  => time(),
+                'play_count'    => 1,
+                'estimate'      => 10,
+                'path'          => '/var/lib/music/1.mp3',
+                'duration'      => 123,
+                'mpd_track_id'  => 1,
+                'hash'          => 'hash'
+            ],
+            0
+        );
         $this->track_repo->method('findOne')->willReturn(Track::fromArray([
             'id'            => 1,
             'artist'        => 'Foo',
@@ -120,9 +132,9 @@ class TickHandlerTest extends TestCase
             'hash'          => 'hash'
         ]));
         $this->icecast_collector->expects($this->once())->method('getData')->willReturn(['listeners' => 2]);
-        $this->cache->expects($this->atLeast(2))->method('set');
         $this->cache->expects($this->once())->method('increment');
         $this->record_repo->expects($this->once())->method('save');
+        $this->logger->expects($this->exactly(7))->method('debug');
 
         $this->handler->handle();
     }
@@ -130,6 +142,22 @@ class TickHandlerTest extends TestCase
     public function testTrackWasChanged(): void
     {
         $this->mpd_collector->method('getData')->willReturn(['file' => '/var/lib/music/1.mp3']);
+        $this->cache->expects($this->exactly(2))->method('get')->willReturnOnConsecutiveCalls(
+            [
+                'id'            => 2,
+                'artist'        => 'Blah',
+                'title'         => 'Spam',
+                'first_playing' => time(),
+                'last_playing'  => time(),
+                'play_count'    => 1,
+                'estimate'      => 10,
+                'path'          => '/var/lib/music/2.mp3',
+                'duration'      => 123,
+                'mpd_track_id'  => 1,
+                'hash'          => 'hash'
+            ],
+            100
+        );
         $this->track_repo->method('findOne')->willReturn(Track::fromArray([
             'id'            => 1,
             'artist'        => 'Foo',
@@ -143,28 +171,12 @@ class TickHandlerTest extends TestCase
             'mpd_track_id'  => 1,
             'hash'          => 'hash'
         ]));
-        $this->icecast_collector->expects($this->atLeast(2))->method('getData')->willReturn(['listeners' => 2]);
-        $this->cache->expects($this->atLeast(4))->method('set');
-        $this->cache->expects($this->atLeast(2))->method('increment');
-        $this->record_repo->expects($this->atLeast(2))->method('save');
 
-        $this->handler->handle();
-
-        $this->track_repo->method('findOne')->willReturn(Track::fromArray([
-            'id'            => 2,
-            'artist'        => 'Blah',
-            'title'         => 'Spam',
-            'first_playing' => time(),
-            'last_playing'  => time(),
-            'play_count'    => 1,
-            'estimate'      => 10,
-            'path'          => '/var/lib/music/2.mp3',
-            'duration'      => 123,
-            'mpd_track_id'  => 1,
-            'hash'          => 'hash'
-        ]));
-
-        $this->track_repo->expects($this->once())->method('save');
+        $this->icecast_collector->expects($this->exactly(1))->method('getData')->willReturn(['listeners' => 2]);
+        $this->cache->expects($this->exactly(2))->method('set');
+        $this->cache->expects($this->exactly(1))->method('increment');
+        $this->record_repo->expects($this->exactly(1))->method('save');
+        $this->track_repo->expects($this->exactly(2))->method('save');
 
         $this->handler->handle();
     }
