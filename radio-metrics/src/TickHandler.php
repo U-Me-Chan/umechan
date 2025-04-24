@@ -83,7 +83,7 @@ class TickHandler
             $this->logger->debug('Обновляю данные трека', ['track' => $track->toArray()]);
 
             $this->cache->set('current_track', $track->toArray());
-            $this->cache->set('estimate', $track->getEstimate());
+            $this->cache->set('estimate', 0);
         } else {
             $track = Track::fromArray($cached_track_data);
         }
