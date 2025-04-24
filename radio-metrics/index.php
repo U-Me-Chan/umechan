@@ -12,7 +12,6 @@ use Ridouchire\RadioMetrics\Http\Controllers\EstimateTrack;
 use Ridouchire\RadioMetrics\Storage\DbConnector;
 use Ridouchire\RadioMetrics\Storage\RecordRepository;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
-use Ridouchire\RadioMetrics\Services\Mpd;
 use Ridouchire\RadioMetrics\TickHandler;
 use Ridouchire\RadioMetrics\Http\Controllers\GetInfo;
 use Ridouchire\RadioMetrics\Http\Router;
@@ -55,8 +54,6 @@ $tickHandler = new TickHandler($logger, $mpdCollector, $icecastCollector, $track
 Loop::addPeriodicTimer(1, function () use ($tickHandler) {
     $tickHandler->handle();
 }); // FIXME: я лох
-
-$mpd = new Mpd($logger, $env->mpd_hostname, $env->mpd_port);
 
 $r = new Router();
 $r->addRoute('GET', '/metrics/info', new GetInfo($cache));
