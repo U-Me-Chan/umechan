@@ -59,6 +59,11 @@ class Track extends AEntity
         $this->estimate = $this->estimate + $value;
     }
 
+    public function setEstimate(int $estimate): void
+    {
+        $this->estimate = $estimate;
+    }
+
     public function decreaseEstimate(): void
     {
         $estimate = (int) ceil($this->estimate / $this->duration);

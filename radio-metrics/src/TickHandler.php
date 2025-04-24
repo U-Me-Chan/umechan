@@ -66,8 +66,8 @@ class TickHandler
             $this->logger->debug('Трек изменился', ['track' => $track->toArray(), 'old_track' => $cached_track_data]);
 
             if ($cached_track_data !== null) {
-                $_track = Track::fromArray($cached_track_data);
-                $_track->increaseEstimate($cached_estimate);
+                $_track = $this->trackRepository->findOne(['hash' => $cached_track_data['hash']]);
+                $_track->setEstimate($cached_estimate);
 
                 $this->trackRepository->save($_track);
             }
