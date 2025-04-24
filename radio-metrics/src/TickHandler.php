@@ -67,7 +67,7 @@ class TickHandler
 
             if ($cached_track_data !== null) {
                 $_track = $this->trackRepository->findOne(['hash' => $cached_track_data['hash']]);
-                $_track->setEstimate($cached_estimate);
+                $_track->increaseEstimate($cached_estimate);
 
                 $this->trackRepository->save($_track);
             }
