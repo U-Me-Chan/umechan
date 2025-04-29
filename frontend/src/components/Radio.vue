@@ -1,40 +1,54 @@
 <template>
-<div class="radios">
-  <div class="radio-controls">
-    <audio ref="audioPlayer" preload="none" controls :src="streamUrl">
-      Ваш браузер не поддерживает возможность воспроизведения аудио. Попробуйте слушать внешним плеером.
-      <a :href="m3uUrl">Плейлист для внешнего плеера</a>
-    </audio>
-    <div>
-      <span v-bind:class="{ 'track-title-actived': isPlaying }" class="track-title">
-        <marquee hspace="15px" direction="rigth" scrollamount="4">{{title}}
-          <span v-if="isPlaying">{{formatDuration(duration)}}</span>
-        </marquee>
+<div class="radio-wrap">
+  <audio
+    class="radio-default-player"
+    ref="audioPlayer"
+    preload="none"
+    :src="streamUrl">
+    Ваш браузер не поддерживает возможность воспроизведения аудио. Попробуйте слушать внешним плеером.
+    <a :href="m3uUrl">Плейлист для внешнего плеера</a>
+  </audio>
+
+  <div
+    class="radio-track-title"
+    v-bind:class="{ 'radio-track-tittle-active': isPlaying }">
+    <marquee hspace="15px" direction="rigth" scrollamount="4">
+      {{ title }}
+      <span v-if="isPlaying">
+        {{ formatDuration(duration) }}
       </span>
-      <span v-bind:class="{ 'button-play-actived': isPlaying }" class="button-play button-custom" @click="togglePlay()">
-        <b-tooltip label="Пауза/Воспроизведение">
-          ⏯
-        </b-tooltip>
-      </span>
-      <span class="button-custom">
-        <b-tooltip label="Плюс треку">
-          <a href="#" @click="estimateTrack(track_id, 'plus')">💜</a>
-        </b-tooltip>
-      </span>
-      <span class="button-custom">
-        <b-tooltip label="Минус треку">
-          <a href="#" @click="estimateTrack(track_id, 'minus')">❌</a>
-        </b-tooltip>
-      </span>
-      <span class="button-custom">
-        <b-tooltip label="Заказать трек">
-          <a href="#" @click="goToOrderTrack()">📝</a>
-        </b-tooltip>
-      </span>
-    </div>
-    <span><input class="volume-slider" type="range" min="0" max="100" v-model="volume" @change="setVolume"></span>
+    </marquee>
   </div>
-  <br/>
+
+  <div class="radio-buttons-wrap">
+    <b-tooltip
+      label="Пауза/Воспроизведение"
+      class="radio-button-play"
+      :class="{ 'radio-button-play-active' : isPlaying }">
+      <a href="#" @click="togglePlay">⏯</a>
+    </b-tooltip>
+
+    <b-tooltip label="Плюс треку">
+      <a href="#" @click="upvoteTrack">💜</a>
+    </b-tooltip>
+
+    <b-tooltip label="Минус треку">
+      <a href="#" @click="downvoteTrack">❌</a>
+    </b-tooltip>
+
+    <b-tooltip label="Заказать трек">
+      <a href="#" @click="goToOrderTrack">📝</a>
+    </b-tooltip>
+  </div>
+
+  <input
+    class="radio-volume-slider"
+    type="range"
+    min="0"
+    ref="volumeSlider"
+    max="100"
+    v-model="volume"
+    @change="changeVolume(volume)"/>
 </div>
 </template>
 
@@ -45,15 +59,21 @@ import { formatDuration } from '../utils/duration_formatter'
 
 export default {
   name: 'Radio',
+  props: {
+    initialVolume: {
+      type: String,
+      default: '20'
+    }
+  },
   data: function () {
     return {
       title: 'Включите воспроизведение для обновление информации',
       listeners: 0,
-      streamUrl: config.icecast_url + '/stream',
-      m3uUrl: config.icecast_url + '/stream.m3u',
+      streamUrl: `${config.icecast_url}/stream`,
+      m3uUrl: `${config.icecast_url}/stream.m3u`,
       isPlaying: false,
       metadataInterval: null,
-      volume: 20,
+      volume: this.initialVolume,
       track_id: 0,
       estimate: 0,
       duration: 1
@@ -61,102 +81,129 @@ export default {
   },
   methods: {
     formatDuration: function (value) {
-      return formatDuration(value)
+      return formatDuration(value);
     },
     estimateTrack: function (track_id, operator) {
-      let self = this;
-      let data = {};
-
+      const data = {};
       data['operator'] = operator;
 
-      axios.post(config.base_url + '/metrics/tracks/' + track_id, data, { 'headers': { 'Content-type': 'application/json' }}).then(() => {
-        self.$buefy.toast.open('Отправлено!');
-      }).catch ((error) => {
-        self.$buefy.toast.open(`Ошибка: ${error}`);
-      })
+      axios.post(`${config.base_url}/metrics/tracks/$track_id`, data, { 'headers': { 'Content-type': 'application/json'}}).then(() => {
+        this.$buefy.toast.open('Отправлено!');
+      }).catch((error) => {
+        this.$buefy.toast.open(`Ошибка: ${error}`);
+      });
     },
     updateMetadata: function() {
-      var self = this;
-
-      axios.get(config.base_url + '/metrics/info')
-        .then((response) => {
-          self.title    = response.data.artist + ' - ' + response.data.title;
-          self.track_id = response.data.id;
-          self.estimate = response.data.estimate;
-          self.duration = response.data.duration;
+      axios.get(`${config.base_url}/metrics/info`)
+        .then(({ data }) => {
+          this.title    = `${data.artist} - ${data.title}`;
+          this.track_id = data.id;
+          this.estimate = data.estimate;
+          this.duration = data.duration;
         })
-        .catch(() => {
+        .catch((error) => {
+          this.$buefy.toast.open(`Ошибка: ${error}`);
         })
     },
-    goToOrderTrack: function () {
+    upvoteTrack: function (event) {
       event.preventDefault();
-      this.$router.push('/tracks')
+      this.estimateTrack(this.track_id, 'plus');
+    },
+    downvoteTrack: function (event) {
+      event.preventDefault();
+      this.estimateTrack(this.track_id, 'minus');
+    },
+    goToOrderTrack: function (event) {
+      event.preventDefault();
+      this.$router.push('/tracks');
     },
     togglePlay: function () {
       if (this.isPlaying) {
         this.$refs.audioPlayer.pause();
-        this.isPlaying = false;
-        clearInterval(this.metadataInterval)
-
-        return;
+        clearInterval(this.metadataInterval);
       }
 
-      this.$refs.audioPlayer.play();
-      this.isPlaying = true;
-      this.updateMetadata();
-      this.metadataInterval = setInterval(() => this.updateMetadata(), 5000);
+      if (!this.isPlaying) {
+        this.$refs.audioPlayer.play();
+        this.updateMetadata();
+        this.metadataInterval = setInterval(() => this.updateMetadata(), 5000);
+      }
 
-      return;
+      this.isPlaying = !this.isPlaying;
     },
-    setVolume: function () {
-      console.log(this.volume, this.volume /100);
-      this.$refs.audioPlayer.volume = this.volume / 100;
+    changeVolume: function (value) {
+      this.$refs.audioPlayer.volume = value / 100;
+      this.volume = value;
+      this.saveVolume(value);
+    },
+    init: function () {
+      this.changeVolume(this.getVolume());
+    },
+    getVolume: function () {
+      const volume = localStorage.getItem('radio-volume');
+
+      return (volume === 'undefined' || volume === null) ? this.initialVolume : volume;
+    },
+    saveVolume: function (value) {
+      localStorage.setItem('radio-volume', value);
     }
+  },
+  mounted: function () {
+    this.init();
   }
 }
 </script>
 
-<style>
-h1 {
+<style scoped>
+
+.radio-wrap {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-audio {
-    border: 5px solid grey;
-    border-radius: 10% 30% 10% 40%;
+radio-default-player {
     display: none;
 }
 
-.button-play {
-    cursor: pointer;
-    font-size: 20px;
-    padding: 1px;
-    border-radius: 15%;
+.radio-volume-slider {
+    width: 100%;
 }
 
-.button-play-actived {
-    box-shadow: inset 1px 1px 1px 1px grey;
+.radio-track-title {
+    background-color: #e8ffff;
+    font-size: 15px;
+    padding: 5px;
+    height: 38px;
+    border: 1px solid black;
+    border-radius: 5px;
 }
 
-.track-title-actived {
+.radio-track-title marquee {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.radio-track-title_active {
     box-shadow: inset 2px 1px 2px 1px #8e8ed2;
 }
 
-.volume-slider {
-    width: 280px;
-    margin-top: 20px;
+.radio-buttons-wrap,
+.radio-track-title {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 }
 
-.track-title {
-    background-color: #e8ffff;
-    font-size: 15px;
-    border: 1px solid black;
-    padding: 3px;
-    border-radius: 5% 5% 10% 5%;
+radio-button-play {
+    cursor: pointer;
+    font-size: 20px;
+    padding: 1px;
+    border-radius: 5px;
 }
-
-.button-custom {
-    margin-left: 20px;
-    margin-right: 20px;
+.radio-button-play-active {
+    box-shadow: inset 1px 1px 1px 1px grey;
 }
 </style>
