@@ -21,7 +21,7 @@ class PostStorage
         $conditions = [
             'parent_id' => null,
             'ORDER' => [
-                'is_sticky'  => 'ASC',
+                'is_sticky'  => 'ASC', // порядок сортировки зависит от порядка указания значений для колонки с типом enum в MySQL
                 'updated_at' => 'DESC'
             ]
         ];
@@ -109,16 +109,16 @@ class PostStorage
         $post_data = $post->toArray();
         unset($post_data['id']);
 
-        $name = $this->db->get('passports', 'name', ['hash' => hash('sha512', $post_data['poster'])]);
-
-        if ($name !== null) {
-            $post_data['is_verify'] = 'yes';
-            $post_data['poster'] = $name;
-        } else {
-            $post_data['is_verify'] = 'no';
-        }
-
         if ($id == 0) {
+            $name = $this->db->get('passports', 'name', ['hash' => hash('sha512', $post_data['poster'])]);
+
+            if ($name !== null) {
+                $post_data['is_verify'] = 'yes';
+                $post_data['poster']    = $name;
+            } else {
+                $post_data['is_verify'] = 'no';
+            }
+
             $this->db->insert('posts', $post_data);
 
             return $this->db->id();

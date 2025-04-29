@@ -2,6 +2,7 @@
 
 namespace PK\Posts\Controllers;
 
+use InvalidArgumentException;
 use PK\Events\Event\Event;
 use PK\Events\EventStorage;
 use PK\Events\Event\EventType;
@@ -22,8 +23,8 @@ final class CreateReply
     {
         $parent_id = $vars['id'];
 
-        if ($req->getParams('message') == null) {
-            return new Response([], 400);
+        if (!$req->getParams('message')) {
+            return (new Response([], 400))->setException(new InvalidArgumentException('Необходимо передать message'));
         }
 
         try {
@@ -50,20 +51,20 @@ final class CreateReply
             $this->post_storage->save($thread);
 
             $this->event_storage->save(Event::fromArray([
-                "id" => 0,
-                "event_type" => EventType::ThreadUpdateTriggered->name,
-                "timestamp" => time(),
-                "post_id" => $parent_id,
-                "board_id" => null,
+                'id'         => 0,
+                'event_type' => EventType::ThreadUpdateTriggered->name,
+                'timestamp'  => time(),
+                'post_id'    => $parent_id,
+                'board_id'   => null,
             ]));
         }
 
         $this->event_storage->save(Event::fromArray([
-            "id" => 0,
-            "event_type" => EventType::PostCreated->name,
-            "timestamp" => time(),
-            "post_id" => $post->id,
-            "board_id" => null,
+            'id'         => 0,
+            'event_type' => EventType::PostCreated->name,
+            'timestamp'  => time(),
+            'post_id'    => $post->id,
+            'board_id'   => null,
         ]));
 
         return new Response(['post_id' => $id, 'password' => $post->password], 201);
