@@ -4,7 +4,6 @@ use PHPUnit\Framework\TestCase;
 use PK\Router;
 use PK\Http\Response;
 use PK\Http\Request;
-use PK\Exceptions\Http\NotFound;
 
 class RouterTest extends TestCase
 {
@@ -13,9 +12,7 @@ class RouterTest extends TestCase
     protected function setUp(): void
     {
         $this->router = new Router();
-        $this->router->addRoute('GET', '/test', function (Request $req) {
-            return new Response([], 200);
-        });
+        $this->router->addRoute('GET', '/test', fn() => new Response([], 200));
     }
 
     public function testHandleNotFound(): void
@@ -23,7 +20,7 @@ class RouterTest extends TestCase
         $server['REQUEST_METHOD'] = 'GET';
         $server['REQUEST_URI']    = '/404';
 
-        $this->assertEquals((new Response([], 404))->setException(new NotFound()), $this->router->handle(new Request($server)));
+        $this->assertEquals(new Response([], 404), $this->router->handle(new Request($server)));
     }
 
     public function testHandleFound(): void

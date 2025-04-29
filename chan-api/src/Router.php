@@ -6,7 +6,6 @@ use FastRoute\RouteParser\Std as RouteParser;
 use FastRoute\DataGenerator\GroupCountBased as DataGenerator;
 use FastRoute\RouteCollector;
 use FastRoute\Dispatcher\GroupCountBased as RouteDispatcher;
-use PK\Exceptions\Http\NotFound;
 use PK\Http\Request;
 use PK\Http\Response;
 
@@ -29,7 +28,7 @@ class Router
 
         switch ($routeInfo[0]) {
             case RouteDispatcher::NOT_FOUND:
-                return (new Response([], 404))->setException(new NotFound());
+                return new Response([], 404);
             case RouteDispatcher::METHOD_NOT_ALLOWED:
                 return new Response([], 405);
             case RouteDispatcher::FOUND:
