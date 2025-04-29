@@ -68,9 +68,11 @@ class Post implements \JsonSerializable
     public function toArray(): array
     {
         $data = get_object_vars($this);
-        $data['board_id'] = $data['board']->id;
 
-        unset($data['board'], $data['replies'], $data['replies_count'], $data['is_verify']);
+        $data['board_id']  = $data['board']->id;
+        $data['is_verify'] = $data['is_verify'] == true ? 'yes' : 'no';
+
+        unset($data['board'], $data['replies'], $data['replies_count']);
 
         return $data;
     }

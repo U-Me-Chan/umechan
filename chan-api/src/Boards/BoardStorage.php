@@ -2,6 +2,7 @@
 
 namespace PK\Boards;
 
+use OutOfBoundsException;
 use Medoo\Medoo;
 use PK\Boards\Board\Board;
 
@@ -49,6 +50,9 @@ class BoardStorage
         return [$threads_count, $new_posts_count];
     }
 
+    /**
+     * @throws OutOfBoundsException Если доска не найдена
+     */
     public function findByTag(string $tag): Board
     {
         $board_data = $this->db->get('boards', '*', ['tag' => $tag]);

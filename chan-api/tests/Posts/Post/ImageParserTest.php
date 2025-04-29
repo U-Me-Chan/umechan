@@ -3,6 +3,8 @@
 use PHPUnit\Framework\TestCase;
 use PK\Posts\Post\ImageParser;
 
+define('BASE_URL', 'https:\/\/scheoble.xyz');
+
 class ImageParserTest extends TestCase
 {
     /**

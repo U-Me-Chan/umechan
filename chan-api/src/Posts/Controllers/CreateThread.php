@@ -2,41 +2,42 @@
 
 namespace PK\Posts\Controllers;
 
+use Exception;
+use InvalidArgumentException;
+use OutOfBoundsException;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Posts\PostStorage;
 use PK\Posts\Post;
 use PK\Boards\Board\Board;
 use PK\Boards\BoardStorage;
-use PK\Events\Event\Event;
-use PK\Events\EventStorage;
-use PK\Events\Event\EventType;
+use PK\Events\Services\EventTrigger;
 
 final class CreateThread
 {
     public function __construct(
         private BoardStorage $board_storage,
         private PostStorage $post_storage,
-        private EventStorage $event_storage,
+        private EventTrigger $event_trigger
     ) {
     }
 
     public function __invoke(Request $req): Response
     {
-        if ($req->getParams('tag') == null) {
-            return (new Response([], 400))->setException(new \InvalidArgumentException("tag not bind param"));
+        if (!$req->getParams('tag')) {
+            return (new Response([], 400))->setException(new InvalidArgumentException("Не передан tag"));
         }
 
-        if ($req->getParams('message') == null) {
-            return (new Response([], 400))->setException(new \InvalidArgumentException("message not bind param"));
+        if (!$req->getParams('message')) {
+            return (new Response([], 400))->setException(new InvalidArgumentException("Не передан message"));
         }
 
-        if (empty($req->getParams('message'))) {
-            return (new Response([], 400))->setException(new \InvalidArgumentException("message param cannot be empty"));
+        try {
+            /** @var Board */
+            $board = $this->board_storage->findByTag($req->getParams('tag'));
+        } catch (OutOfBoundsException) {
+            return (new Response([], 404))->setException(new Exception('Нет доски с таким тегом'));
         }
-
-        /** @var Board */
-        $board = $this->board_storage->findByTag($req->getParams('tag'));
 
         /** @var Post */
         $post = Post::draft($board, null, $req->getParams('message'));
@@ -51,21 +52,8 @@ final class CreateThread
 
         $id = $this->post_storage->save($post);
 
-        $this->event_storage->save(Event::fromArray([
-            "id" => 0,
-            "event_type" => EventType::PostCreated->name,
-            "timestamp" => time(),
-            "post_id" => $id,
-            "board_id" => null,
-        ]));
-
-        $this->event_storage->save(Event::fromArray([
-            "id" => 0,
-            "event_type" => EventType::BoardUpdateTriggered->name,
-            "timestamp" => time(),
-            "post_id" => null,
-            "board_id" => $board->id,
-        ]));
+        $this->event_trigger->triggerPostCreated($id);
+        $this->event_trigger->triggerBoardUpdated($board->id);
 
         return new Response(['post_id' => $id, 'password' => $post->password], 201);
     }
