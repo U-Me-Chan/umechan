@@ -4,8 +4,7 @@ namespace PK\Posts\Controllers;
 
 use InvalidArgumentException;
 use PK\Events\Event\Event;
-use PK\Events\EventStorage;
-use PK\Events\Event\EventType;
+use PK\Events\Services\EventTrigger;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Posts\PostStorage;
@@ -15,7 +14,7 @@ final class CreateReply
 {
     public function __construct(
         private PostStorage $post_storage,
-        private EventStorage $event_storage,
+        private EventTrigger $event_trigger
     ) {
     }
 
@@ -50,22 +49,10 @@ final class CreateReply
 
             $this->post_storage->save($thread);
 
-            $this->event_storage->save(Event::fromArray([
-                'id'         => 0,
-                'event_type' => EventType::ThreadUpdateTriggered->name,
-                'timestamp'  => time(),
-                'post_id'    => $parent_id,
-                'board_id'   => null,
-            ]));
+            $this->event_trigger->triggerThreadUpdated($parent_id);
         }
 
-        $this->event_storage->save(Event::fromArray([
-            'id'         => 0,
-            'event_type' => EventType::PostCreated->name,
-            'timestamp'  => time(),
-            'post_id'    => $post->id,
-            'board_id'   => null,
-        ]));
+        $this->event_trigger->triggerPostCreated($post->id);
 
         return new Response(['post_id' => $id, 'password' => $post->password], 201);
     }

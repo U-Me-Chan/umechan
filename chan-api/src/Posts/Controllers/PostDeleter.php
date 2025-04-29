@@ -3,20 +3,19 @@
 namespace PK\Posts\Controllers;
 
 use Exception;
+use InvalidArgumentException;
 use OutOfBoundsException;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Posts\Post;
-use PK\Events\Event\Event;
-use PK\Events\EventStorage;
-use PK\Events\Event\EventType;
+use PK\Events\Services\EventTrigger;
 use PK\Posts\PostStorage;
 
 class PostDeleter
 {
     public function __construct(
         private PostStorage $post_storage,
-        private EventStorage $event_storage
+        private EventTrigger $event_trigger
     ) {
     }
 
@@ -24,7 +23,7 @@ class PostDeleter
     {
         if (!$req->getParams('password')) {
             return (new Response([], 400))
-                ->setException(new \InvalidArgumentException('Укажите пароль для удаления поста'));
+                ->setException(new InvalidArgumentException('Укажите пароль для удаления поста'));
         }
 
         try {
@@ -44,16 +43,11 @@ class PostDeleter
 Данные удалены пользователем
 EOT;
             $post->message = $message;
+            $post->is_verify = false;
 
             $this->post_storage->save($post);
 
-            $this->event_storage->save(Event::fromArray([
-                'id' => 0,
-                'event_type' => EventType::PostDeleted->name,
-                'timestamp'  => time(),
-                'post_id'    => $post->id,
-                'board_id'   => null
-            ]));
+            $this->event_trigger->triggerPostDeleted($post->id);
 
             return new Response([], 204);
         }

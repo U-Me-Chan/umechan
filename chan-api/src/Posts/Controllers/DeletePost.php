@@ -2,11 +2,11 @@
 
 namespace PK\Posts\Controllers;
 
-use PK\Events\Event\Event;
-use PK\Events\EventStorage;
-use PK\Events\Event\EventType;
+use InvalidArgumentException;
+use OutOfBoundsException;
 use PK\Http\Request;
 use PK\Http\Response;
+use PK\Events\Services\EventTrigger;
 use PK\Posts\PostStorage;
 use PK\Posts\Post;
 
@@ -14,7 +14,7 @@ final class DeletePost
 {
     public function __construct(
         private PostStorage $post_storage,
-        private EventStorage $event_storage,
+        private EventTrigger $event_trigger,
         private string $key
     ) {
     }
@@ -22,11 +22,11 @@ final class DeletePost
     public function __invoke(Request $req, array $vars): Response
     {
         if ($req->getHeaders('HTTP_KEY') == null) {
-            return (new Response([], 401))->setException(new \InvalidArgumentException("Не задан мастер-ключ"));
+            return (new Response([], 401))->setException(new InvalidArgumentException("Не задан мастер-ключ"));
         }
 
         if ($req->getHeaders('HTTP_KEY') !== $this->key) {
-            return (new Response([], 401))->setException(new \InvalidArgumentException("Неверный мастер-ключ"));
+            return (new Response([], 401))->setException(new InvalidArgumentException("Неверный мастер-ключ"));
         }
 
         $reason = $req->getHeaders('HTTP_REASON') ? $req->getHeaders('HTTP_REASON') : 'Не указано';
@@ -46,19 +46,14 @@ final class DeletePost
 
 Данные удалены по причине: {$reason}
 EOT;
+            $post->is_verify = false;
 
             $this->post_storage->save($post);
-            $this->event_storage->save(Event::fromArray([
-                "id" => 0,
-                "event_type" => EventType::PostDeleted->name,
-                "timestamp" => time(),
-                "post_id" => $id,
-                "board_id" => null,
-            ]));
+            $this->event_trigger->triggerPostDeleted($id);
 
             return new Response([], 204);
-        } catch (\OutOfBoundsException $e) {
-            return (new Response([], 404))->setException(new \OutOfBoundsException("Нет такого поста"));
+        } catch (OutOfBoundsException) {
+            return (new Response([], 404))->setException(new OutOfBoundsException("Нет такого поста"));
         }
     }
 }

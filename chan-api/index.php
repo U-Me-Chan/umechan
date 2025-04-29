@@ -12,7 +12,7 @@ use PK\Boards\Controllers\GetBoardList;
 
 use PK\Events\Controllers\GetEventList;
 use PK\Events\EventStorage;
-
+use PK\Events\Services\EventTrigger;
 use PK\Posts\PostStorage;
 use PK\Posts\Controllers\GetThread;
 use PK\Posts\Controllers\GetThreadList;
@@ -55,6 +55,8 @@ $post_storage     = new PostStorage($db, $board_storage);
 $passport_storage = new PassportStorage($db);
 $event_storage    = new EventStorage($db);
 
+$event_trigger = new EventTrigger($event_storage);
+
 /** @var Router */
 $r = $app['router'];
 
@@ -64,11 +66,11 @@ $r->addRoute('GET', '/v2/board', new GetBoardList($board_storage, $app['config']
 $r->addRoute('GET', '/v2/board/{tags:[a-z\+]+}', new GetThreadList($post_storage));
 
 $r->addRoute('GET', '/v2/post/{id:[0-9]+}', new GetThread($post_storage));
-$r->addRoute('POST', '/v2/post', new CreateThread($board_storage, $post_storage, $event_storage));
-$r->addRoute('PUT', '/v2/post/{id:[0-9]+}', new CreateReply($post_storage, $event_storage));
+$r->addRoute('POST', '/v2/post', new CreateThread($board_storage, $post_storage, $event_trigger));
+$r->addRoute('PUT', '/v2/post/{id:[0-9]+}', new CreateReply($post_storage, $event_trigger));
 $r->addRoute('PATCH', '/v2/post/{id:[0-9]+}', new UpdatePost($config['maintenance_key']));
-$r->addRoute('DELETE', '/v2/post/{id:[0-9]+}', new PostDeleter($post_storage, $event_storage));
-$r->addRoute('DELETE', '/_/v2/post/{id:[0-9]+}', new DeletePost($post_storage, $event_storage, $app['config']['maintenance_key']));
+$r->addRoute('DELETE', '/v2/post/{id:[0-9]+}', new PostDeleter($post_storage, $event_trigger));
+$r->addRoute('DELETE', '/_/v2/post/{id:[0-9]+}', new DeletePost($post_storage, $event_trigger, $app['config']['maintenance_key']));
 
 $r->addRoute('GET', '/v2/passport', new GetPassportList($passport_storage));
 $r->addRoute('POST', '/v2/passport', new CreatePassport($passport_storage, $app['config']['default_name']));
