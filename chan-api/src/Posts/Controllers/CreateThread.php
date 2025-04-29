@@ -32,10 +32,6 @@ final class CreateThread
             return (new Response([], 400))->setException(new InvalidArgumentException("Не передан message"));
         }
 
-        if (empty($req->getParams('message'))) {
-            return (new Response([], 400))->setException(new InvalidArgumentException("message не может быть пустым"));
-        }
-
         try {
             /** @var Board */
             $board = $this->board_storage->findByTag($req->getParams('tag'));

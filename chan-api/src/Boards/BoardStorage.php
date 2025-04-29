@@ -2,6 +2,7 @@
 
 namespace PK\Boards;
 
+use OutOfBoundsException;
 use Medoo\Medoo;
 use PK\Boards\Board\Board;
 
