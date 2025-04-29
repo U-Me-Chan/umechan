@@ -20,8 +20,15 @@ class PostStorage
     {
         $conditions = [
             'parent_id' => null,
-            'ORDER' => ['updated_at' => 'DESC']
+            'ORDER' => [
+                'is_sticky'  => 'ASC',
+                'updated_at' => 'DESC'
+            ]
         ];
+
+        if (sizeof($tags) > 1) {
+            unset($conditions['ORDER']['is_sticky']);
+        }
 
         $limit = ['LIMIT' => [$offset, $limit]];
 

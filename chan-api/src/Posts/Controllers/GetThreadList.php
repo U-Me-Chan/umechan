@@ -22,7 +22,7 @@ final class GetThreadList
 
         try {
             list($posts, $count) = $this->storage->find($limit, $offset, $tags);
-        } catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException) {
             return new Response([], 400);
         }
 
