@@ -60,7 +60,7 @@ export default {
 
       var self = this
 
-      axios.delete(config.chan_url + '/v2/post/' + this.id, {
+      axios.delete(config.chan_url + '/_/v2/post/' + this.id, {
         data: {},
         headers: {
           'Key': key,

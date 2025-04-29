@@ -18,13 +18,17 @@ class Request
 
         if (isset($parameters['query'])) {
             parse_str($parameters['query'], $query);
+        } else {
+            $query = [];
         }
 
         $server['CONTENT_TYPE'] = isset($server['CONTENT_TYPE']) ? $server['CONTENT_TYPE'] : '';
 
         if (preg_match('/^application\/json.*/', $server['CONTENT_TYPE'])) {
             $postData = file_get_contents('php://input');
-            $post = json_decode($postData, true);
+            $post = json_decode($postData, true) ?? [];
+        } else {
+            $post = [];
         }
 
         foreach ($server as $name => $value) {
@@ -34,9 +38,9 @@ class Request
         }
 
         $this->params = isset($query) ? array_merge($query, $post) : $post;
-        $this->path = isset($parameters['path']) ? $parameters['path'] : '';
-        $this->path = preg_replace('/\/$/', '', $this->path);
-        $this->files = $files;
+        $this->path   = isset($parameters['path']) ? $parameters['path'] : '';
+        $this->path   = preg_replace('/\/$/', '', $this->path);
+        $this->files  = $files;
     }
 
     public function getMethod(): string

@@ -28,7 +28,7 @@ final class CreateReply
 
         try {
             $thread = $this->post_storage->findById($parent_id);
-        } catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException) {
             return new Response([], 404);
         }
 

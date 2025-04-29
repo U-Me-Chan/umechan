@@ -12,10 +12,10 @@ down:
 development:
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml --profile $(TARGET) up --build -d
 	docker exec umechan-api composer install
-	docker exec umechan-api ./vendor/bin/phinx migrate
 	docker exec umechan-filestore composer install
 	$(MAKE) generate-env
 	$(MAKE) restore-from-dump
+	docker exec umechan-api ./vendor/bin/phinx migrate
 
 restore-from-dump:
 ifeq ($(shell test -e ./data/dumps/dump.sql && echo -n yes),yes)

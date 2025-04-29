@@ -1,6 +1,6 @@
 <?php
 
-namespace PK\Controllers;
+namespace PK\Feed\Controllers;
 
 use Medoo\Medoo;
 use PK\Http\Request;
