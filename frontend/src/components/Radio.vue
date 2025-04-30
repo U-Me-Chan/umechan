@@ -87,7 +87,7 @@ export default {
       const data = {};
       data['operator'] = operator;
 
-      axios.post(`${config.base_url}/metrics/tracks/$track_id`, data, { 'headers': { 'Content-type': 'application/json'}}).then(() => {
+      axios.post(`${config.base_url}/metrics/tracks/${track_id}`, data, { 'headers': { 'Content-type': 'application/json'}}).then(() => {
         this.$buefy.toast.open('Отправлено!');
       }).catch((error) => {
         this.$buefy.toast.open(`Ошибка: ${error}`);
