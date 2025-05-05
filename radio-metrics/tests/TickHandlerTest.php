@@ -180,4 +180,31 @@ class TickHandlerTest extends TestCase
 
         $this->handler->handle();
     }
+
+    public function testCachedDataNotFound(): void
+    {
+        $this->mpd_collector->method('getData')->willReturn(['file' => '/var/lib/music/1.mp3']);
+        $this->cache->method('get')->willReturn(false);
+        $this->track_repo->method('findOne')->willReturn(Track::fromArray([
+            'id'            => 1,
+            'artist'        => 'Foo',
+            'title'         => 'Bar',
+            'first_playing' => time(),
+            'last_playing'  => time(),
+            'play_count'    => 1,
+            'estimate'      => 10,
+            'path'          => '/var/lib/music/1.mp3',
+            'duration'      => 123,
+            'mpd_track_id'  => 1,
+            'hash'          => 'hash'
+        ]));
+        $this->icecast_collector->expects($this->once())->method('getData')->willReturn(['listeners' => 2]);
+        $this->cache->expects($this->once())->method('increment');
+        $this->cache->expects($this->exactly(2))->method('set');
+        $this->track_repo->expects($this->exactly(1))->method('save');
+        $this->record_repo->expects($this->exactly(1))->method('save');
+        $this->logger->expects($this->exactly(13))->method('debug');
+
+        $this->handler->handle();
+    }
 }

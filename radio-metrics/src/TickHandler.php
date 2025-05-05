@@ -40,10 +40,13 @@ class TickHandler
             return;
         }
 
+        /** @var array|false */
         $cached_track_data = $this->cache->get('current_track');
-        $cached_estimate   = $this->cache->get('estimate') ?? 0;
 
-        if ($cached_track_data == null || $cached_track_data['path'] !== $filepath) {
+        /** @var int */
+        $cached_estimate = $this->cache->get('estimate') ?? 0;
+
+        if ($cached_track_data == false || $cached_track_data['path'] !== $filepath) {
             $this->logger->debug('Пытаемся найти композицию в БД');
 
             try {
@@ -65,7 +68,7 @@ class TickHandler
 
             $this->logger->debug('Трек изменился', ['track' => $track->toArray(), 'old_track' => $cached_track_data]);
 
-            if ($cached_track_data !== null) {
+            if (!$cached_track_data === false) {
                 $_track = $this->trackRepository->findOne(['hash' => $cached_track_data['hash']]);
                 $_track->increaseEstimate($cached_estimate);
 
