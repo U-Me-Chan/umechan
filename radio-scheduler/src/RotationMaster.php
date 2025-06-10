@@ -56,6 +56,10 @@ class RotationMaster
 
     public function getRandomStrategy(): string
     {
+        if (sizeof($this->strategies)) {
+            return reset($this->strategies);
+        }
+
         $strategies = array_keys($this->strategies);
         $key =  array_rand($strategies);
 
