@@ -12,7 +12,7 @@ use Ridouchire\RadioScheduler\Mpd;
 
 class GenrePattern implements IRotation
 {
-    public const NAME = 'GenrePattern';
+    public const NAME = 'HolydayRuGenrePattern';
 
     public function __construct(
         private Medoo $db,
