@@ -84,6 +84,7 @@ class GenrePattern implements IRotation
         foreach ($pls_list as $pls) {
             $track_paths = array_merge($track_paths, $this->db->rand('tracks', 'path', [
                 'path[~]'      => "{$pls}/%",
+                'last_playing[<]' => time() + (60 * 60 * 2),
                 'estimate[>=]' => 0,
                 'LIMIT'        => [0, 12]
             ]));

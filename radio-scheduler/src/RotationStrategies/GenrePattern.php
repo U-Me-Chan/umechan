@@ -88,6 +88,7 @@ class GenrePattern implements IRotation
             $track_paths = array_merge($track_paths, $this->db->rand('tracks', 'path', [
                 'path[~]' => "{$pls}/%",
                 'estimate[>=]' => 0,
+                'last_playing[<]' => time() + (60 * 60 * 2),
                 'LIMIT'        => [0, random_int(5, 7)]
             ]));
         }
