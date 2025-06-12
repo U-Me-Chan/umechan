@@ -12,7 +12,7 @@ class Evening implements IGenreSchema
             'Pop Ru Retro/70',
             'Pop Ru Retro/80',
             'Pop Ru Retro/90',
-            'Pop Ru Chill/00'
+            'Pop Ru Chill'
         ];
     }
 
@@ -37,7 +37,7 @@ class Evening implements IGenreSchema
             ],
             [
                 'Pop Ru Retro/90',
-                'Pop Ru Chill/00'
+                'Pop Ru Chill'
             ]
         ];
     }

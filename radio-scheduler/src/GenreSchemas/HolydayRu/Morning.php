@@ -10,7 +10,7 @@ class Morning implements IGenreSchema
     {
         return [
             'Alternative Ru',
-            'Pop Ru Chill/00'
+            'Pop Ru Chill'
         ];
     }
 
@@ -30,7 +30,7 @@ class Morning implements IGenreSchema
     {
         return [
             [
-                'Pop Ru Chill/00',
+                'Pop Ru Chill',
                 'Alternative Ru'
             ]
         ];
