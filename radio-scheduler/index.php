@@ -44,19 +44,16 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-// $jingles     = new Jingles($db);
-// $commercials = new Commercials($db);
+$jingles     = new Jingles($db);
+$commercials = new Commercials($db);
 
-// $genre_pattern_strategy        = new GenrePattern($db, $mpd, $jingles, $log);
-// $by_estimate_in_genre_strategy = new ByEstimateInGenre($db, $jingles, $commercials, $mpd, $log);
-
-$holyday_ru = new HolydayRuGenrePattern($db, $mpd, $log);
+$genre_pattern_strategy        = new GenrePattern($db, $mpd, $jingles, $log);
+$by_estimate_in_genre_strategy = new ByEstimateInGenre($db, $jingles, $commercials, $mpd, $log);
 
 $strategy_master = new RotationMaster($log);
 
-$strategy_master->addStrategy($holyday_ru);
-// $strategy_master->addStrategy($genre_pattern_strategy);
-// $strategy_master->addStrategy($by_estimate_in_genre_strategy);
+$strategy_master->addStrategy($genre_pattern_strategy);
+$strategy_master->addStrategy($by_estimate_in_genre_strategy);
 
 $tickHanlder   = new TickHandler($strategy_master);
 $queue_cropper = new QueueCropper($mpd);
