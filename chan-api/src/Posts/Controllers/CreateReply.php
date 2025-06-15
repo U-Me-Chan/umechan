@@ -35,6 +35,10 @@ final class CreateReply
             $params['subject'] = $req->getParams('subject');
         }
 
+        if ($req->getParams('sage')) {
+            $params['sage'] = $req->getParams('sage');
+        }
+
         try {
             $data = $this->post_facade->createReplyOnThread(
                 $thread_id,

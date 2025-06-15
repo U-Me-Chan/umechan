@@ -38,7 +38,7 @@ class PostFacade
 
         $id = $this->post_storage->save($post);
 
-        if (isset($params['sage']) && !$thread->bump_limit_reached) {
+        if (!$thread->bump_limit_reached && !isset($params['sage'])) {
             $thread->updated_at = time();
 
             $this->post_storage->save($thread);
@@ -46,7 +46,7 @@ class PostFacade
             $this->event_trigger->triggerThreadUpdated($thread_id);
         }
 
-        $this->event_trigger->triggerPostCreated($post->id);
+        $this->event_trigger->triggerPostCreated($id);
 
         return ['post_id' => $id, 'password' => $post->password->clearPasswordToString()];
     }
