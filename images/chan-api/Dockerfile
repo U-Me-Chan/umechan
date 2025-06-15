@@ -1,4 +1,4 @@
-FROM library/php:8.2-fpm AS base
+FROM library/php:8.4-fpm AS base
 RUN apt update -yyq && apt install -yyq zip libzip-dev
 RUN docker-php-ext-install pdo_mysql
 RUN docker-php-ext-install zip

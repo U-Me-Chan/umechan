@@ -1,5 +1,7 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use PK\Posts\Post\ImageParser;
 
@@ -7,9 +9,8 @@ define('BASE_URL', 'https:\/\/scheoble.xyz');
 
 class ImageParserTest extends TestCase
 {
-    /**
-     * @dataProvider dataProvider
-     */
+    #[DataProvider('dataProvider')]
+    #[Test]
     public function test(
         string $orig_message,
         string $expected_message,
@@ -22,7 +23,7 @@ class ImageParserTest extends TestCase
         $this->assertEquals($expected_images, $images);
     }
 
-    public function dataProvider(): array
+    public static function dataProvider(): array
     {
         return [
             [
