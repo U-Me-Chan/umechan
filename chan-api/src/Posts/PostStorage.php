@@ -3,16 +3,22 @@
 namespace PK\Posts;
 
 use Medoo\Medoo;
+use OutOfBoundsException;
 use PDOStatement;
 use PK\Posts\Post;
 use PK\Boards\Board\Board;
 use PK\Boards\BoardStorage;
+use PK\Passports\PassportStorage;
+use PK\Posts\Post\PasswordHash;
+use PK\Posts\Post\PosterKeyHash;
+use PK\Posts\Post\VerifyFlag;
 
 class PostStorage
 {
     public function __construct(
         private Medoo $db,
-        private BoardStorage $board_storage
+        private BoardStorage $board_storage,
+        private PassportStorage $passport_storage
     ) {
     }
 
@@ -54,10 +60,11 @@ class PostStorage
         foreach ($post_datas as $post_data) {
             $post_data['board_data'] = $boards[$post_data['board_id']];
 
-            $replies = $this->db->select('posts', '*', ['parent_id' => $post_data['id'], 'LIMIT' => 3, 'ORDER' => ['id' => 'DESC']]);
             $replies_count = $this->db->count('posts', ['parent_id' => $post_data['id']]);
 
-            if ($replies !== null) {
+            if ($replies_count > 0) {
+                $replies = $this->db->select('posts', '*', ['parent_id' => $post_data['id'], 'LIMIT' => 3, 'ORDER' => ['id' => 'DESC']]);
+
                 foreach (array_reverse($replies) as $reply_data) {
                     $reply_data['board_data'] = $post_data['board_data'];
 
@@ -86,10 +93,11 @@ class PostStorage
 
         $post_data['board_data'] = $board->toArray();
 
-        $replies = $this->db->select('posts', '*', ['parent_id' => $post_data['id']]);
         $replies_count = $this->db->count('posts', ['parent_id' => $post_data['id']]);
 
-        if ($replies !== null) {
+        if ($replies_count > 0) {
+            $replies = $this->db->select('posts', '*', ['parent_id' => $post_data['id']]);
+
             foreach ($replies as $reply_data) {
                 $reply_data['board_data'] = $post_data['board_data'];
 
@@ -104,19 +112,18 @@ class PostStorage
 
     public function save(Post $post): int
     {
-        $id = $post->id;
-
         $post_data = $post->toArray();
+
         unset($post_data['id']);
 
-        if ($id == 0) {
-            $name = $this->db->get('passports', 'name', ['hash' => hash('sha512', $post_data['poster'])]);
+        if ($post->is_draft) {
+            try {
+                $passport = $this->passport_storage->findOne(['hash' => PosterKeyHash::fromString($post_data['poster'])->toString()]);
 
-            if ($name !== null) {
-                $post_data['is_verify'] = 'yes';
-                $post_data['poster']    = $name;
-            } else {
-                $post_data['is_verify'] = 'no';
+                $post_data['poster'] = $passport->name->toString();
+                $post_data['is_verify'] = VerifyFlag::yes->value;
+            } catch (OutOfBoundsException) {
+                $post_data['is_verify'] = VerifyFlag::no->value;
             }
 
             $this->db->insert('posts', $post_data);
@@ -124,9 +131,9 @@ class PostStorage
             return $this->db->id();
         }
 
-        $this->db->update('posts', $post_data, ['id' => $id]);
+        $this->db->update('posts', $post_data, ['id' => $post->id]);
 
-        return $id;
+        return $post->id;
     }
 
     public function delete(int $id): bool

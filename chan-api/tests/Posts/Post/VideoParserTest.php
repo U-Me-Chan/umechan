@@ -1,10 +1,12 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use PK\Posts\Post\VideoParser;
 
 class VideoParserTest extends TestCase
 {
+    #[Test]
     public function test(): void
     {
         $orig_message = '[![](https://scheoble.xyz/files/thumb.test.mp4.jpeg)](https://scheoble.xyz/files/test.mp4)\n';
