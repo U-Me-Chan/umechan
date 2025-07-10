@@ -2,10 +2,21 @@
 
 namespace PK\Passports\Controllers;
 
-use PK\Http\Request;
-use PK\Http\Response;
+use OpenApi\Attributes as OA;
+use PK\Http\Responses\JsonResponse;
+use PK\OpenApi\Schemas\Response;
 use PK\Passports\PassportStorage;
 
+#[OA\Get(
+    path: '/api/v2/passport',
+    operationId: 'getPassportList',
+    summary: 'Получить список зарегистрированных имён',
+    tags: ['passport']
+)]
+#[Response(
+    response: 200,
+    description: 'Список имён',
+)]
 final class GetPassportList
 {
     public function __construct(
@@ -13,11 +24,11 @@ final class GetPassportList
     ) {
     }
 
-    public function __invoke(Request $req): Response
+    public function __invoke(): JsonResponse
     {
         list($passports, $count) = $this->passport_repo->fetch();
 
-        return new Response([
+        return new JsonResponse([
             'passports' => $passports,
             'count'     => $count
         ], 200);

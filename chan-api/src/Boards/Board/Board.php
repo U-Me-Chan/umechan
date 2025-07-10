@@ -2,6 +2,9 @@
 
 namespace PK\Boards\Board;
 
+use OpenApi\Attributes as OA;
+
+#[OA\Schema(schema: 'Board')]
 class Board implements \JsonSerializable
 {
     public function jsonSerialize(): array
@@ -26,10 +29,15 @@ class Board implements \JsonSerializable
     }
 
     private function __construct(
+        #[OA\Property(description: 'Идентификатор')]
         public int $id,
+        #[OA\Property(description: 'Тег')]
         public string $tag,
+        #[OA\Property(description: 'Имя')]
         public string $name,
+        #[OA\Property(description: 'Общее количество тем на доске')]
         public int $threads_count,
+        #[OA\Property(description: 'Количество постов за сутки')]
         public int $new_posts_count
     ) {
     }

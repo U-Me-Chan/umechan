@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use PK\Router;
 use PK\Http\Response;
 use PK\Http\Request;
+use PK\Http\Responses\JsonResponse;
 
 class RouterTest extends TestCase
 {
@@ -14,7 +15,7 @@ class RouterTest extends TestCase
     protected function setUp(): void
     {
         $this->router = new Router();
-        $this->router->addRoute('GET', '/test', fn() => new Response([], 200));
+        $this->router->addRoute('GET', '/test', fn() => new JsonResponse([], 200));
         $this->router->addRoute('GET', '/error', fn() => throw new Exception());
     }
 

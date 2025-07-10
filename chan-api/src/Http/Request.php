@@ -53,14 +53,14 @@ class Request
         return $this->path;
     }
 
-    public function getParams(?string $key = null): mixed
+    public function getParams(?string $key = null, mixed $defaul_value = null): mixed
     {
         if ($key) {
             if (isset($this->params[$key])) {
                 return $this->params[$key];
             }
 
-            return null;
+            return $defaul_value;
         }
 
         return $this->params;

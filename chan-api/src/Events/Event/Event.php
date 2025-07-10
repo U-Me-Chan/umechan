@@ -2,6 +2,10 @@
 
 namespace PK\Events\Event;
 
+use OpenApi\Attributes as OA;
+
+
+#[OA\Schema(schema: 'Event')]
 class Event implements \JsonSerializable
 {
     public static function draft(EventType $type, ?int $post_id = null, ?int $board_id = null): self
@@ -37,10 +41,15 @@ class Event implements \JsonSerializable
     }
 
     private function __construct(
+        #[OA\Property(description: 'Идентификатор')]
         public int $id,
+        #[OA\Property(description: 'Тип')]
         public string $event_type,
+        #[OA\Property(description: 'Метка времени')]
         public int $timestamp,
+        #[OA\Property(description: 'Идентификатор поста', default: null)]
         public ?int $post_id,
+        #[OA\Property(description: 'Идентификатор доски', default: null)]
         public ?int $board_id
     ) {
     }

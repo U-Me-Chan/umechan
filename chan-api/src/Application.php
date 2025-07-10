@@ -3,7 +3,15 @@
 namespace PK;
 
 use Pimple\Container;
+use OpenApi\Attributes as OA;
+use PK\Http\Response;
 
+#[OA\Info(
+    version: '2.1.0',
+    title: 'Pissykaka Public API'
+)]
+#[OA\License(name: 'MIT', identifier: 'MIT')]
+#[OA\Server(url: 'https://scheoble.xyz/', description: 'production server')]
 class Application extends Container
 {
     public static Application $app;
@@ -17,21 +25,17 @@ class Application extends Container
 
     public function run(): void
     {
+        /** @var Response */
         $res = $this['router']->handle($this['request']);
 
         if (!empty($res->getHeaders())) {
-            foreach ($this['request']->getHeaders() as $header) {
+            foreach ($res->getHeaders() as $header) {
                 header($header);
             }
         }
 
-        header('Content-type: application/json');
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: *');
-        header('Access-Control-Allow-Headers: *');
-
         http_response_code($res->getCode());
-        echo json_encode($res->getBody());
+        echo $res->getBody();
 
         exit(0);
     }

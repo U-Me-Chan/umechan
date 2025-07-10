@@ -1,6 +1,7 @@
 <?php
 
 use Medoo\Medoo;
+use OpenApi\Generator;
 use PK\Router;
 use PK\Application;
 use PK\Http\Request;
@@ -13,6 +14,8 @@ use PK\Boards\Controllers\GetBoardList;
 use PK\Events\Controllers\GetEventList;
 use PK\Events\EventStorage;
 use PK\Events\Services\EventTrigger;
+use PK\OpenApi\Controllers\GetOpenApiSpecification;
+use PK\OpenApi\Controllers\GetRedocPage;
 use PK\Posts\PostStorage;
 use PK\Posts\Controllers\GetThread;
 use PK\Posts\Controllers\GetThreadList;
@@ -87,6 +90,9 @@ $r->addRoute('DELETE', '/_/v2/post/{id:[0-9]+}', new DeletePost($post_facade, $m
 $r->addRoute('GET', '/v2/passport', new GetPassportList($passport_storage));
 $r->addRoute('POST', '/v2/passport', new CreatePassport($passport_storage, $default_name));
 
-$r->addRoute('GET', '/v2/events', new GetEventList($event_storage));
+$r->addRoute('GET', '/v2/event', new GetEventList($event_storage));
+
+$r->addRoute('GET', '/v2/_/openapi.json', new GetOpenApiSpecification(new Generator()));
+$r->addRoute('GET', '/v2/_/redoc.html', new GetRedocPage($_ENV['DOMAIN']));
 
 $app->run();
