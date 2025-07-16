@@ -5,7 +5,7 @@ namespace PK\Events\Event;
 use OpenApi\Attributes as OA;
 
 
-#[OA\Schema(schema: 'Event')]
+#[OA\Schema]
 class Event implements \JsonSerializable
 {
     public static function draft(EventType $type, ?int $post_id = null, ?int $board_id = null): self

@@ -9,8 +9,7 @@ use PK\Boards\Board\Board;
 abstract class BoardList
 {
     #[OA\Property(
-        description: 'Board list',
-        title: 'board-list',
+        description: 'Список досок',
         type: 'array',
         items: new OA\Items(ref: Board::class)
     )]

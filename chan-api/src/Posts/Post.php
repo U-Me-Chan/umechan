@@ -15,7 +15,7 @@ use PK\Posts\Post\YoutubeParser;
 #[OA\Schema]
 class Post implements \JsonSerializable
 {
-    #[OA\Property]
+    #[OA\Property(description: 'Превышен ли лимит ответов?')]
     public bool $bump_limit_reached {
         get => $this->parent_id == null && $this->replies_count > 500 ? true : false;
     }
@@ -24,12 +24,12 @@ class Post implements \JsonSerializable
         get => $this->id == 0 ? true : false;
     }
 
-    #[OA\Property]
+    #[OA\Property(description: 'Идентификатор доски')]
     public int $board_id {
         get => $this->board_id ?? $this->board->id;
     }
 
-    #[OA\Property(format: 'Y-m-d G:i:s')]
+    #[OA\Property(format: 'Y-m-d G:i:s', description: 'Дата и время')]
     public string $datetime {
         get => date('Y-m-d G:i:s', $this->timestamp + 60 * (60 * 4));
     }

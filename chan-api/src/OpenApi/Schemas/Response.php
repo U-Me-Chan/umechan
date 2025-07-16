@@ -23,6 +23,7 @@ class Response extends OA\Response
                     properties: [
                         $payload_reference ? new OA\Property(
                             property: 'payload',
+                            description: 'Полезная нагрузка',
                             ref: $payload_reference
                         ) : new OA\Property(
                             property: 'payload',
@@ -32,6 +33,7 @@ class Response extends OA\Response
                         ),
                         $error_reference ? new OA\Property(
                             property: 'error',
+                            description: 'Ошибка выполнения запроса',
                             ref: $error_reference
                         ) : new OA\Property(
                             property: 'error',

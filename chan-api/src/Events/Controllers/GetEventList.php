@@ -54,8 +54,7 @@ use PK\OpenApi\Schemas\Response;
 #[Response(
     response: 200,
     description: 'Cписок событий и их общее количество',
-    payload_reference: EventList::class,
-    error_reference: null
+    payload_reference: EventList::class
 )]
 final class GetEventList
 {

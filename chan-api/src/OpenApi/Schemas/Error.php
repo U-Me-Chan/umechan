@@ -23,12 +23,14 @@ class Error extends OA\Response
                     properties: [
                         new OA\Property(
                             property: 'payload',
+                            description: 'Полезная нагрузка',
                             type: 'array',
                             default: [],
                             items: new OA\Items()
                         ),
                         new OA\Property(
                             property: 'error',
+                            description: 'Ошибка выполнения запроса',
                             type: 'object',
                             properties: [
                                 new OA\Property(
@@ -48,15 +50,4 @@ class Error extends OA\Response
             )
         );
     }
-
-    // #[OA\Property]
-    // public string $type;
-    // #[OA\Property]
-    // public string $message;
-    // #[OA\Property]
-    // public string $file;
-    // #[OA\Property]
-    // public int $line;
-    // #[OA\Property(items: new OA\Items(type: 'string'))]
-    // public array $trace;
 }
