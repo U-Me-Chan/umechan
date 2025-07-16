@@ -10,7 +10,7 @@ use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Response;
 
 #[OA\Get(
-    path: '/api/v2/events',
+    path: '/api/v2/event',
     operationId: 'getEventList',
     summary: 'Получить список событий на чане',
     tags: ['event'],
