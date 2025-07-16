@@ -45,6 +45,7 @@ use PK\OpenApi\Schemas\Response;
                 type: 'integer',
                 format: 'int64',
                 maxLength: 10,
+                minLength: 10,
                 default: 0
             )
         )
