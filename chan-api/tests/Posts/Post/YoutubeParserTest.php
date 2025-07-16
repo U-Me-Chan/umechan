@@ -1,19 +1,20 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use PK\Posts\Post\YoutubeParser;
 
 class YoutubeParserTest extends TestCase
 {
-    /**
-     * @dataProvider dpForTestParse
-     */
+    #[Test]
+    #[DataProvider('dpForTestParse')]
     public function testParse(string $message, array $expected): void
     {
         $this->assertEquals($expected, YoutubeParser::parse($message));
     }
 
-    public function dpForTestParse(): array
+    public static function dpForTestParse(): array
     {
         return [
             [

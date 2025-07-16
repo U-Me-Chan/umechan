@@ -3,6 +3,7 @@
 namespace PK\Passports;
 
 use Medoo\Medoo;
+use OutOfBoundsException;
 use PK\Passports\Passport\Passport;
 
 class PassportStorage
@@ -29,11 +30,25 @@ class PassportStorage
         return [$passports, $count];
     }
 
-    public function findOne(array $filters = []): void
+    public function findOne(array $filters = []): Passport
     {
-        if (empty($filters)) {
+        $conditions = [];
+
+        if (isset($filters['hash'])) {
+            $conditions['hash'] = $filters['hash'];
+        }
+
+        if (empty($conditions)) {
             throw new \InvalidArgumentException();
         }
+
+        $passport_data = $this->db->get('passports', '*', $conditions);
+
+        if (!$passport_data) {
+            throw new OutOfBoundsException();
+        }
+
+        return Passport::fromArray($passport_data);
     }
 
     public function save(Passport $passport): void

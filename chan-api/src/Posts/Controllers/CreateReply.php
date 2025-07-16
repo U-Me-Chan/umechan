@@ -3,57 +3,109 @@
 namespace PK\Posts\Controllers;
 
 use InvalidArgumentException;
-use PK\Events\Event\Event;
-use PK\Events\Services\EventTrigger;
+use OutOfBoundsException;
+use OpenApi\Attributes as OA;
 use PK\Http\Request;
-use PK\Http\Response;
-use PK\Posts\PostStorage;
-use PK\Posts\Post;
+use PK\Http\Responses\JsonResponse;
+use PK\OpenApi\Schemas\Error;
+use PK\OpenApi\Schemas\Response;
+use PK\Posts\OpenApi\Schemas\PostCreated;
+use PK\Posts\Services\PostFacade;
 
+#[OA\Put(
+    path: '/api/v2/post/{id}',
+    operationId: 'putReplyToThread',
+    summary: 'Ответить в тред',
+    tags: ['post'],
+    parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            description: 'Идентификатор треда',
+            required: true,
+            schema: new OA\Schema(
+                type: 'integer',
+                format: 'int64'
+            )
+        )
+    ],
+    requestBody: new OA\RequestBody(
+        content: new OA\JsonContent(
+            required: [
+                'message'
+            ],
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                ),
+                new OA\Property(
+                    property: 'subject',
+                    type: 'string',
+                ),
+                new OA\Property(
+                    property: 'poster',
+                    type: 'string',
+                ),
+                new OA\Property(
+                    property: 'sage',
+                    type: 'boolean',
+                ),
+            ]
+        ),
+    )
+)]
+#[Response(
+    200,
+    'Содержит идентификатор созданного поста и его пароль для удаления',
+    payload_reference: PostCreated::class
+)]
+#[Error(
+    400,
+    'Ошибка разбора параметров запроса',
+    InvalidArgumentException::class,
+    'Необходимо передать message'
+)]
 final class CreateReply
 {
     public function __construct(
-        private PostStorage $post_storage,
-        private EventTrigger $event_trigger
+        private PostFacade $post_facade
     ) {
     }
 
-    public function __invoke(Request $req, array $vars): Response
+    public function __invoke(Request $req, array $vars): JsonResponse
     {
-        $parent_id = $vars['id'];
+        $thread_id = $vars['id'];
 
         if (!$req->getParams('message')) {
-            return (new Response([], 400))->setException(new InvalidArgumentException('Необходимо передать message'));
+            return (new JsonResponse([], 400))
+                ->setException(new InvalidArgumentException('Необходимо передать message'));
         }
 
-        try {
-            $thread = $this->post_storage->findById($parent_id);
-        } catch (\OutOfBoundsException) {
-            return new Response([], 404);
-        }
-
-        $post = Post::draft($thread->board, $parent_id, $req->getParams('message'));
+        $params = [];
 
         if ($req->getParams('poster')) {
-            $post->poster = $req->getParams('poster');
+            $params['poster'] = $req->getParams('poster');
         }
 
         if ($req->getParams('subject')) {
-            $post->subject = $req->getParams('subject');
+            $params['subject'] = $req->getParams('subject');
         }
 
-        $id = $this->post_storage->save($post);
-
-        if ($thread->replies_count < 500 && !$req->getParams('sage')) {
-            $thread->updated_at = time();
-
-            $this->post_storage->save($thread);
-
-            $this->event_trigger->triggerThreadUpdated($parent_id);
+        if ($req->getParams('sage')) {
+            $params['sage'] = $req->getParams('sage');
         }
 
-        $this->event_trigger->triggerPostCreated($post->id);
+        try {
+            $data = $this->post_facade->createReplyOnThread(
+                $thread_id,
+                $req->getParams('message'),
+                $params
+            );
+        } catch (OutOfBoundsException) {
+            return new JsonResponse([], 404);
+        }
 
-        return new Response(['post_id' => $id, 'password' => $post->password], 201);
+        return new JsonResponse($data, 201);
     }
 }
