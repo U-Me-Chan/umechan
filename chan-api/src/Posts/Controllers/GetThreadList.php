@@ -44,6 +44,16 @@ use PK\Posts\PostStorage;
                 type: 'integer',
                 format: 'int64'
             )
+        ),
+        new OA\Parameter(
+            name: 'exclude_tags[]',
+            in: 'query',
+            description: 'Исключаемые теги досок',
+            required: false,
+            schema: new OA\Schema(
+                type: 'array',
+                items: new OA\Items(type: 'string')
+            )
         )
     ]
 )]
@@ -61,7 +71,8 @@ final class GetThreadList
 {
     public function __construct(
         private PostStorage $post_storage,
-        private BoardStorage $board_storage
+        private BoardStorage $board_storage,
+        private array $exclude_tags
     ) {
     }
 
@@ -72,12 +83,20 @@ final class GetThreadList
 
         $tags = explode('+', $vars['tags']);
 
+        $exclude_tags = $req->getParams('exclude_tags', $this->exclude_tags);
+
         try {
             list($posts, $count) = $this->post_storage->find($limit, $offset, $tags);
         } catch (\OutOfBoundsException) {
             return new JsonResponse([], 400);
         }
 
-        return new JsonResponse(['count' => $count, 'posts' => $posts, 'boards' => $this->board_storage->find()]);
+        $boards = $this->board_storage->find($exclude_tags);
+
+        return new JsonResponse([
+            'count' => $count,
+            'posts' => $posts,
+            'boards' => $boards
+        ]);
     }
 }
