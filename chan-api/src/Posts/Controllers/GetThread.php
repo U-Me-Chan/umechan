@@ -28,6 +28,16 @@ use PK\Posts\Post;
                 type: 'integer',
                 format: 'int64'
             )
+        ),
+        new OA\Parameter(
+            name: 'exclude_tags[]',
+            in: 'query',
+            description: 'Исключаемые теги досок',
+            required: false,
+            schema: new OA\Schema(
+                type: 'array',
+                items: new OA\Items(type: 'string')
+            )
         )
     ]
 )]
@@ -45,7 +55,8 @@ final class GetThread
 {
     public function __construct(
         private PostStorage $storage,
-        private BoardStorage $board_storage
+        private BoardStorage $board_storage,
+        private array $exclude_tags
     ) {
     }
 
@@ -54,6 +65,8 @@ final class GetThread
         /** @var int */
         $id = $vars['id'];
 
+        $exclude_tags = $req->getParams('exclude_tags', $this->exclude_tags);
+
         try {
             /** @var Post */
             $post = $this->storage->findById($id);
@@ -61,6 +74,8 @@ final class GetThread
             return (new JsonResponse([], 404))->setException($e);
         }
 
-        return new JsonResponse(['thread_data' => $post, 'boards' => $this->board_storage->find()]);
+        $boards = $this->board_storage->find($exclude_tags);
+
+        return new JsonResponse(['thread_data' => $post, 'boards' => $boards]);
     }
 }

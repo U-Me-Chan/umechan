@@ -42,13 +42,7 @@ final class GetBoardList
 
     public function __invoke(Request $req): JsonResponse
     {
-        $exclude_tags = $req->getParams('exclude_tags') ?? $this->exclude_tags;
-
-        foreach ($exclude_tags as $k => $tag) {
-            if (empty($tag)) {
-                unset($exclude_tags[$k]);
-            }
-        }
+        $exclude_tags = $req->getParams('exclude_tags', $this->exclude_tags);
 
         $boards = $this->storage->find($exclude_tags);
 
