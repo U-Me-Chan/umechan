@@ -1,6 +1,6 @@
 <?php
 
-namespace PK;
+namespace PK\RequestHandlers;
 
 use Exception;
 use FastRoute\RouteParser\Std as RouteParser;
@@ -10,8 +10,9 @@ use FastRoute\Dispatcher\GroupCountBased as RouteDispatcher;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\Http\Responses\JsonResponse;
+use PK\RequestHandler;
 
-class Router
+class Router extends RequestHandler
 {
     private const PREFIX = '/api';
 
@@ -22,7 +23,7 @@ class Router
         $this->route_collector = new RouteCollector(new RouteParser(), new DataGenerator());
     }
 
-    public function handle(Request $req): Response
+    protected function processing(Request $req): Response
     {
         $dispatcher = new RouteDispatcher($this->route_collector->getData());
 

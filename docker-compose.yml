@@ -224,3 +224,4 @@ services:
       - --threads=4
     profiles:
       - production
+      - chan

@@ -43,6 +43,22 @@ class Request
         $this->path   = preg_replace('/\/$/', '', $this->path);
     }
 
+    public function getSerializedToJson(): string
+    {
+        return json_encode(
+            [
+                'path'   => $this->getPath(),
+                'params' => $this->getParams()
+            ],
+            JSON_UNESCAPED_UNICODE
+        );
+    }
+
+    public function getHash(): string
+    {
+        return hash('sha256', $this->getSerializedToJson());
+    }
+
     public function getMethod(): string
     {
         return $this->method;

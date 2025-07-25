@@ -96,7 +96,7 @@ export default {
 
     bus.$on('form:success', function () {
       self.isFormVisible = false;
-      self.init();
+      self.init(true);
     })
   },
   created: function () {
@@ -126,7 +126,7 @@ export default {
     selectThread: function (id) {
       this.$router.push('/thread/' + id);
     },
-    init: function () {
+    init: function (no_cache = false) {
       this.threads = [];
       var self = this;
       var offset = (this.current - 1) * this.perPage;
@@ -135,7 +135,8 @@ export default {
       axios.get(config.chan_url + '/v2/board/' + this.tag, {
         params: {
           offset: offset,
-          limit: this.perPage
+          limit: this.perPage,
+          no_cache: no_cache
         }
       }).then((response) => {
         self.count = response.data.payload.count;

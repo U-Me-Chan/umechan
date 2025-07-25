@@ -47,6 +47,7 @@ class PostFacade
         }
 
         $this->event_trigger->triggerPostCreated($id);
+        $this->board_storage->updateCounters($thread->board->id);
 
         return ['post_id' => $id, 'password' => $post->password->clearPasswordToString()];
     }
@@ -72,6 +73,8 @@ class PostFacade
 
         $this->event_trigger->triggerPostCreated($id);
         $this->event_trigger->triggerBoardUpdated($board->id);
+
+        $this->board_storage->updateCounters($board->id);
 
         return ['post_id' => $id, 'password' => $post->password->clearPasswordToString()];
     }

@@ -94,8 +94,8 @@ final class GetThreadList
         $boards = $this->board_storage->find($exclude_tags);
 
         return new JsonResponse([
-            'count' => $count,
-            'posts' => $posts,
+            'count'  => $count,
+            'posts'  => $posts,
             'boards' => $boards
         ]);
     }

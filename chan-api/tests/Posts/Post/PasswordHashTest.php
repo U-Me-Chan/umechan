@@ -19,7 +19,7 @@ class PasswordHashTest extends TestCase
     {
         $hash = PasswordHash::generate('test');
 
-        $this->assertNotNull($hash->clearPasswordToString());
+        $this->assertNotNull($hash->clearPasswordToString()); // @phpstan-ignore method.alreadyNarrowedType
         $this->assertEquals('test', $hash->clearPasswordToString());
         $this->assertEquals(hash('sha256', 'test'), $hash->toString());
         $this->assertTrue($hash->isEqualTo('test'));

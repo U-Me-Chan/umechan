@@ -9,7 +9,6 @@ use PK\Posts\Post;
 use PK\Boards\Board\Board;
 use PK\Boards\BoardStorage;
 use PK\Passports\PassportStorage;
-use PK\Posts\Post\PasswordHash;
 use PK\Posts\Post\PosterKeyHash;
 use PK\Posts\Post\VerifyFlag;
 
@@ -27,87 +26,146 @@ class PostStorage
         $conditions = [
             'parent_id' => null,
             'ORDER' => [
-                'is_sticky'  => 'ASC', // порядок сортировки зависит от порядка указания значений для колонки с типом enum в MySQL
-                'updated_at' => 'DESC'
+                'posts.is_sticky'  => 'ASC', // порядок сортировки зависит от порядка указания значений для колонки с типом enum в MySQL
+                'posts.updated_at' => 'DESC'
             ]
         ];
 
         if (sizeof($tags) > 1) {
-            unset($conditions['ORDER']['is_sticky']);
+            unset($conditions['ORDER']['posts.is_sticky']);
         }
 
         $limit = ['LIMIT' => [$offset, $limit]];
 
-        $boards = [];
+        $boards = $this->board_storage->find(tags: $tags);
 
-        foreach ($tags as $tag) {
-            $board = $this->board_storage->findByTag($tag);
+        $conditions['posts.board_id'] = array_map(fn(Board $board) => $board->id, $boards);
 
-            $boards[$board->id] = $board->toArray();
-        }
+        $count = $this->db->count('posts', $conditions);
 
-        $conditions['board_id'] = array_keys($boards);
-
-        $post_datas = $this->db->select('posts', '*', array_merge($conditions, $limit));
-        $count      = $this->db->count('posts', $conditions);
-
-        if ($post_datas == null) {
+        if ($count == 0) {
             return [[], 0];
         }
 
-        $posts = [];
+        $thread_datas = $this->db->select(
+            'posts',
+            [
+                '[>]boards' => ['board_id' => 'id']
+            ],
+            [
+                'posts.id',
+                'posts.poster',
+                'posts.subject',
+                'posts.message',
+                'posts.timestamp',
+                'posts.parent_id',
+                'posts.updated_at',
+                'posts.estimate',
+                'posts.is_verify',
+                'posts.is_sticky',
+                'posts.password',
+                'board_data' => [
+                    'boards.id(board_id)',
+                    'boards.tag',
+                    'boards.name',
+                    'boards.threads_count',
+                    'boards.new_posts_count'
+                ],
+            ],
+            array_merge($conditions, $limit)
+        );
 
-        foreach ($post_datas as $post_data) {
-            $post_data['board_data'] = $boards[$post_data['board_id']];
+        $threads = [];
 
-            $replies_count = $this->db->count('posts', ['parent_id' => $post_data['id']]);
+        foreach ($thread_datas as $thread_data) {
+            $thread_data['replies_count'] = $this->db->count('posts', ['parent_id' => $thread_data['id']]);
 
-            if ($replies_count > 0) {
-                $replies = $this->db->select('posts', '*', ['parent_id' => $post_data['id'], 'LIMIT' => 3, 'ORDER' => ['id' => 'DESC']]);
+            $thread_data['replies'] = array_map(
+                fn(array $post_data) => Post::fromArray($post_data),
+                array_reverse($this->db->select(
+                    'posts',
+                    [
+                        '[>]boards' => ['board_id' => 'id']
+                    ],
+                    [
+                        'posts.id',
+                        'posts.poster',
+                        'posts.subject',
+                        'posts.message',
+                        'posts.timestamp',
+                        'posts.parent_id',
+                        'posts.updated_at',
+                        'posts.estimate',
+                        'posts.is_verify',
+                        'posts.is_sticky',
+                        'posts.password',
+                        'board_data' => [
+                            'boards.id(board_id)',
+                            'boards.tag',
+                            'boards.name',
+                            'boards.threads_count',
+                            'boards.new_posts_count'
+                        ]
+                    ],
+                    [
+                        'posts.parent_id' => $thread_data['id'],
+                        'LIMIT' => 3,
+                        'ORDER' => ['id' => 'DESC']
+                    ]
+                ))
+            );
 
-                foreach (array_reverse($replies) as $reply_data) {
-                    $reply_data['board_data'] = $post_data['board_data'];
-
-                    $post_data['replies'][] = Post::fromArray($reply_data);
-                }
-
-                $post_data['replies_count'] = $replies_count;
-            }
-
-            $posts[] = Post::fromArray($post_data);
+            $threads[] = Post::fromArray($thread_data);
         }
 
-        return [$posts, $count];
+        return [$threads, $count];
     }
 
     public function findById(int $id): Post
     {
-        $post_data = $this->db->get('posts', '*', ['id' => $id]);
+        $thread_and_replies_datas = $this->db->select(
+            'posts',
+            [
+                '[>]boards' => ['board_id' => 'id']
+            ],
+            [
+                'posts.id',
+                'posts.poster',
+                'posts.subject',
+                'posts.message',
+                'posts.timestamp',
+                'posts.parent_id',
+                'posts.updated_at',
+                'posts.estimate',
+                'posts.is_verify',
+                'posts.is_sticky',
+                'posts.password',
+                'board_data' => [
+                    'boards.id(board_id)',
+                    'boards.tag',
+                    'boards.name',
+                    'boards.threads_count',
+                    'boards.new_posts_count'
+                ],
+            ],
+            [
+                'OR' => [
+                    'posts.id' => $id,
+                    'posts.parent_id' => $id
+                ]
+            ]
+        );
 
-        if ($post_data == null) {
-            throw new \OutOfBoundsException();
+        if (empty($thread_and_replies_datas)) {
+            throw new OutOfBoundsException('Нет такой нити');
         }
 
-        /** @var Board */
-        $board = $this->board_storage->findById($post_data['board_id']);
+        $thread_data = array_shift($thread_and_replies_datas);
 
-        $post_data['board_data'] = $board->toArray();
+        $thread_data['replies']       = array_map(fn(array $post_data) => Post::fromArray($post_data), $thread_and_replies_datas);
+        $thread_data['replies_count'] = $this->db->count('posts', ['parent_id' => $thread_data['id']]);
 
-        $replies_count = $this->db->count('posts', ['parent_id' => $post_data['id']]);
-
-        if ($replies_count > 0) {
-            $replies = $this->db->select('posts', '*', ['parent_id' => $post_data['id']]);
-
-            foreach ($replies as $reply_data) {
-                $reply_data['board_data'] = $post_data['board_data'];
-
-                $post_data['replies'][] = Post::fromArray($reply_data);
-            }
-
-            $post_data['replies_count'] = $replies_count;
-        }
-
-        return Post::fromArray($post_data);
+        return Post::fromArray($thread_data);
     }
 
     public function save(Post $post): int

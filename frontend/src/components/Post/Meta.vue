@@ -11,7 +11,7 @@
   </a>
 
   <b-button v-if="isShowButtons" type="is-text" size="is-small" @click="isFormVisible = !isFormVisible">Ответить</b-button>
-  <b-button type="is-text" size="is-small" @click="deletePost(id, $event)">Удалить</b-button>
+  <b-button v-if="is_admin" type="is-text" size="is-small" @click="deletePost(id, $event)">Удалить</b-button>
   <b-modal v-model="isFormVisible">
     <Form v-if="isFormVisible"
           :parent_id="!parentId ? id : parentId"
@@ -60,6 +60,11 @@ export default {
       event.preventDefault();
 
       this.$router.push('/admin/delete-post/' + id);
+    }
+  },
+  computed: {
+    is_admin: function () {
+      return this.$cookie.get('admin_key') ? true : false; // FIXME: нужен единый источник подобной информации
     }
   },
   data: function () {

@@ -2,11 +2,30 @@
 
 namespace PK\Boards\Board;
 
+use InvalidArgumentException;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(schema: 'Board')]
 class Board implements \JsonSerializable
 {
+    public static function fromArray(array $state): self
+    {
+        $id = match(true) {
+            isset($state['id'])       => $state['id'],
+            isset($state['board_id']) => $state['board_id'],
+            default                   => throw new InvalidArgumentException()
+        };
+
+
+        return new self(
+            $id,
+            $state['tag'],
+            $state['name'],
+            $state['threads_count'],
+            $state['new_posts_count']
+        );
+    }
+
     public function jsonSerialize(): array
     {
         return get_object_vars($this);
@@ -15,17 +34,6 @@ class Board implements \JsonSerializable
     public function toArray(): array
     {
         return $this->jsonSerialize();
-    }
-
-    public static function fromArray(array $state): self
-    {
-        return new self(
-            $state['id'],
-            $state['tag'],
-            $state['name'],
-            $state['threads_count'],
-            $state['new_posts_count']
-        );
     }
 
     private function __construct(

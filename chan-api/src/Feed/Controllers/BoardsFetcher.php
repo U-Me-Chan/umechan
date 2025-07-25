@@ -73,13 +73,6 @@ class BoardsFetcher
     ) {
     }
 
-    /**
-     * Обрабатывает запрос списка досок и последних постов
-     *
-     * @param Request $req
-     *
-     * @return Response
-     */
     public function __invoke(Request $req): JsonResponse
     {
         /** @var array */

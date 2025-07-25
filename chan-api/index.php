@@ -2,7 +2,7 @@
 
 use Medoo\Medoo;
 use OpenApi\Generator;
-use PK\Router;
+use PK\RequestHandlers\Router;
 use PK\Application;
 use PK\Http\Request;
 
@@ -29,6 +29,7 @@ use PK\Passports\Controllers\CreatePassport;
 use PK\Passports\Controllers\GetPassportList;
 use PK\Passports\PassportStorage;
 use PK\Posts\Services\PostFacade;
+use PK\RequestHandlers\MemcachedRequestHandler;
 
 require_once "vendor/autoload.php";
 
@@ -37,28 +38,22 @@ $config = require "config.php";
 
 define('BASE_URL', "https?\:\/\/" . preg_quote($_ENV['DOMAIN'], '/'));
 
-/** @var array|Application */
-$app = new Application($config); // @phpstan-ignore varTag.nativeType
-
 /** @var string[] */
-$exclude_tags = explode(',', $app['config']['exclude_tags']);
+$exclude_tags = explode(',', $config['exclude_tags']);
 
 /** @var string */
-$maintenance_key = $app['config']['maintenance_key'];
+$maintenance_key = $config['maintenance_key'];
 
 /** @var string */
-$default_name = $app['config']['default_name'];
-
-$app['request'] = new Request($_SERVER, $_POST, $_FILES);
-$app['router']  = new Router();
+$default_name = $config['default_name'];
 
 /** @var Medoo */
 $db = new Medoo([
     'database_type' => 'mysql',
-    'database_name' => $app['config']['db']['database'],
-    'server'        => $app['config']['db']['hostname'],
-    'username'      => $app['config']['db']['username'],
-    'password'      => $app['config']['db']['password'],
+    'database_name' => $config['db']['database'],
+    'server'        => $config['db']['hostname'],
+    'username'      => $config['db']['username'],
+    'password'      => $config['db']['password'],
     'charset'       => 'utf8mb4',
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
@@ -73,7 +68,7 @@ $event_trigger = new EventTrigger($event_storage);
 $post_facade = new PostFacade($post_storage, $board_storage, $event_trigger);
 
 /** @var Router */
-$r = $app['router'];
+$r = new Router();
 
 $r->addRoute('GET', '/board/all', new BoardsFetcher($board_storage, $db, $exclude_tags));
 
@@ -95,4 +90,11 @@ $r->addRoute('GET', '/v2/event', new GetEventList($event_storage));
 $r->addRoute('GET', '/v2/_/openapi.json', new GetOpenApiSpecification(new Generator()));
 $r->addRoute('GET', '/v2/_/redoc.html', new GetRedocPage($_ENV['DOMAIN']));
 
-$app->run();
+$app = new Application(
+    new MemcachedRequestHandler(sucessor: $r),
+    $config
+);
+
+$request = new Request($_SERVER, $_POST);
+
+$app->run($request);

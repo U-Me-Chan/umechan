@@ -5,6 +5,7 @@ namespace PK;
 use Pimple\Container;
 use OpenApi\Attributes as OA;
 use PK\Http\Response;
+use PK\Http\Request;
 
 #[OA\Info(
     version: '2.1.0',
@@ -16,18 +17,25 @@ class Application extends Container
 {
     public static Application $app;
 
-    public function __construct(array $config)
-    {
+    public function __construct(
+        private RequestHandler $request_handler,
+        array $config,
+    ) {
         self::$app = $this;
         self::$app['config'] = $config;
         self::$app = $this;
     }
 
-    public function run(): void
+    public function run(Request $request): void
     {
         /** @var Response */
-        $res = $this['router']->handle($this['request']);
+        $res = $this->request_handler->handle($request);
 
+        $this->send($res);
+    }
+
+    private function send(Response $res): never
+    {
         if (!empty($res->getHeaders())) {
             foreach ($res->getHeaders() as $header) {
                 header($header);

@@ -13,7 +13,7 @@ class BoardStorage
     ) {
     }
 
-    public function find(array $exclude_tags = []): array
+    public function find(array $exclude_tags = [], array $tags = []): array
     {
         $conditions = [
             'ORDER' => ['tag' => 'ASC']
@@ -23,31 +23,17 @@ class BoardStorage
             $conditions['tag[!]'] = $exclude_tags;
         }
 
+        if (!empty($tags)) {
+            $conditions['tag'] = $tags;
+        }
+
         $board_datas = $this->db->select('boards', '*', $conditions);
 
         if (!$board_datas) {
             return [];
         }
 
-        $boards = [];
-
-        foreach ($board_datas as $board_data) {
-            list ($threads_count, $new_posts_count) = $this->getCounters($board_data['id']);
-            $board_data['threads_count'] = $threads_count;
-            $board_data['new_posts_count'] = $new_posts_count;
-
-            $boards[] = Board::fromArray($board_data);
-        }
-
-        return $boards;
-    }
-
-    private function getCounters(int $id): array
-    {
-        $threads_count   = $this->db->count('posts', ['board_id' => $id, 'parent_id' => null]);
-        $new_posts_count = $this->db->count('posts', ['board_id' => $id, 'timestamp[>]' => time() - (60 * 60 * 24)]);
-
-        return [$threads_count, $new_posts_count];
+        return array_map(fn(array $board_data) => Board::fromArray($board_data), $board_datas);
     }
 
     /**
@@ -61,10 +47,6 @@ class BoardStorage
             throw new \OutOfBoundsException();
         }
 
-        list ($threads_count, $new_posts_count) = $this->getCounters($board_data['id']);
-        $board_data['threads_count'] = $threads_count;
-        $board_data['new_posts_count'] = $new_posts_count;
-
         return Board::fromArray($board_data);
     }
 
@@ -75,10 +57,6 @@ class BoardStorage
         if ($board_data == null) {
             throw new \OutOfBoundsException();
         }
-
-        list ($threads_count, $new_posts_count) = $this->getCounters($board_data['id']);
-        $board_data['threads_count'] = $threads_count;
-        $board_data['new_posts_count'] = $new_posts_count;
 
         return Board::fromArray($board_data);
     }
@@ -100,5 +78,18 @@ class BoardStorage
         $this->db->update('boards', $board_data, ['id' => $id]);
 
         return $id;
+    }
+
+    public function updateCounters(int $id): void
+    {
+        $threads_count   = $this->db->count('posts', ['board_id' => $id, 'parent_id' => null]);
+        $new_posts_count = $this->db->count('posts', ['board_id' => $id, 'timestamp[>]' => time() - (60 * 60 * 24)]);
+
+        $board = $this->findById($id);
+
+        $board->new_posts_count = $new_posts_count;
+        $board->threads_count   = $threads_count;
+
+        $this->save($board);
     }
 }

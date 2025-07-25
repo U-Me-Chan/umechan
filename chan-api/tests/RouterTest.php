@@ -3,7 +3,7 @@
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use PK\Router;
+use PK\RequestHandlers\Router;
 use PK\Http\Response;
 use PK\Http\Request;
 use PK\Http\Responses\JsonResponse;
