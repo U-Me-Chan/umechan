@@ -132,12 +132,17 @@ export default {
       var offset = (this.current - 1) * this.perPage;
       bus.$emit('app.loader', [true]);
 
+      const params = {
+        offset: offset,
+        limit:  this.perPage
+      }
+
+      if (no_cache) {
+        params.no_cache = true
+      }
+
       axios.get(config.chan_url + '/v2/board/' + this.tag, {
-        params: {
-          offset: offset,
-          limit: this.perPage,
-          no_cache: no_cache
-        }
+        params: params
       }).then((response) => {
         self.count = response.data.payload.count;
         self.threads = response.data.payload.posts;
