@@ -2,11 +2,11 @@
 
 namespace PK\Posts;
 
+use InvalidArgumentException;
 use Medoo\Medoo;
 use OutOfBoundsException;
 use PDOStatement;
 use PK\Posts\Post;
-use PK\Boards\Board\Board;
 use PK\Boards\BoardStorage;
 use PK\Passports\PassportStorage;
 use PK\Posts\Post\PosterKeyHash;
@@ -24,24 +24,36 @@ class PostStorage
     public function find(int $limit = 20, int $offset = 0, array $tags = []): array
     {
         $conditions = [
-            'parent_id' => null,
-            'ORDER' => [
-                'posts.is_sticky'  => 'ASC', // порядок сортировки зависит от порядка указания значений для колонки с типом enum в MySQL
-                'posts.updated_at' => 'DESC'
-            ]
+            'posts.parent_id' => null,
+            'boards.tag' => $tags
         ];
 
-        if (sizeof($tags) > 1) {
-            unset($conditions['ORDER']['posts.is_sticky']);
+        $ordering = [
+            'ORDER' => [
+                'posts.updated_at' => 'DESC'
+            ],
+        ];
+
+        if (sizeof($tags) == 1) {
+            $ordering['ORDER']['posts.is_sticky'] = 'ASC'; // порядок сортировки зависит от порядка указания значений для колонки с типом enum в MySQL
+        }
+
+        if ($limit > 100) {
+            throw new InvalidArgumentException('Не допускается такой большой запрос');
         }
 
         $limit = ['LIMIT' => [$offset, $limit]];
 
-        $boards = $this->board_storage->find(tags: $tags);
-
-        $conditions['posts.board_id'] = array_map(fn(Board $board) => $board->id, $boards);
-
-        $count = $this->db->count('posts', $conditions);
+        $count = $this->db->count(
+            'posts',
+            [
+                '[>]boards' => ['board_id' => 'id']
+            ],
+            [
+                'posts.id'
+            ],
+            $conditions
+        );
 
         if ($count == 0) {
             return [[], 0];
@@ -50,7 +62,8 @@ class PostStorage
         $thread_datas = $this->db->select(
             'posts',
             [
-                '[>]boards' => ['board_id' => 'id']
+                '[>]boards'   => ['board_id' => 'id'],
+                '[>]posts(r)' => ['posts.id' => 'parent_id']
             ],
             [
                 'posts.id',
@@ -64,6 +77,8 @@ class PostStorage
                 'posts.is_verify',
                 'posts.is_sticky',
                 'posts.password',
+                'posts.board_id',
+                'boards.tag',
                 'board_data' => [
                     'boards.id(board_id)',
                     'boards.tag',
@@ -71,15 +86,22 @@ class PostStorage
                     'boards.threads_count',
                     'boards.new_posts_count'
                 ],
+                'replies_count' => Medoo::raw('COUNT(r.id)')
             ],
-            array_merge($conditions, $limit)
+            array_merge(
+                $conditions,
+                $limit,
+                [
+                    'GROUP' => [
+                        'posts.id',
+                    ]
+                ], $ordering
+            )
         );
 
         $threads = [];
 
         foreach ($thread_datas as $thread_data) {
-            $thread_data['replies_count'] = $this->db->count('posts', ['parent_id' => $thread_data['id']]);
-
             $thread_data['replies'] = array_map(
                 fn(array $post_data) => Post::fromArray($post_data),
                 array_reverse($this->db->select(
@@ -126,7 +148,8 @@ class PostStorage
         $thread_and_replies_datas = $this->db->select(
             'posts',
             [
-                '[>]boards' => ['board_id' => 'id']
+                '[>]boards' => ['board_id' => 'id'],
+                '[>]posts(r)' => ['posts.id' => 'parent_id']
             ],
             [
                 'posts.id',
@@ -146,7 +169,7 @@ class PostStorage
                     'boards.name',
                     'boards.threads_count',
                     'boards.new_posts_count'
-                ],
+                ]
             ],
             [
                 'OR' => [

@@ -32,7 +32,7 @@ class JsonResponse implements Response
 
     public function setPreformattedJson(string $json): void
     {
-        $this->json = $json;
+        $this->json                 = $json;
         $this->is_preformatted_json = true;
     }
 

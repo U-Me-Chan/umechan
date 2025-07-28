@@ -38,6 +38,15 @@ use PK\Posts\Post;
                 type: 'array',
                 items: new OA\Items(type: 'string')
             )
+        ),
+        new OA\Parameter(
+            name: 'no_board_list',
+            in: 'query',
+            description: 'Не возвращать список досок в ответе',
+            required: false,
+            schema: new OA\Schema(
+                type: 'string'
+            )
         )
     ]
 )]
@@ -65,7 +74,8 @@ final class GetThread
         /** @var int */
         $id = $vars['id'];
 
-        $exclude_tags = $req->getParams('exclude_tags', $this->exclude_tags);
+        $exclude_tags  = $req->getParams('exclude_tags', $this->exclude_tags);
+        $no_board_list = $req->getParams('no_board_list') ? true : false;
 
         try {
             /** @var Post */
@@ -74,7 +84,11 @@ final class GetThread
             return (new JsonResponse([], 404))->setException($e);
         }
 
-        $boards = $this->board_storage->find($exclude_tags);
+        if (!$no_board_list) {
+            $boards = $this->board_storage->find($exclude_tags);
+        } else {
+            $boards = [];
+        }
 
         return new JsonResponse(['thread_data' => $post, 'boards' => $boards]);
     }

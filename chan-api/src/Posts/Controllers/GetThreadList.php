@@ -33,7 +33,9 @@ use PK\Posts\PostStorage;
             description: 'Количество тредов в ответе',
             schema: new OA\Schema(
                 type: 'integer',
-                format: 'int64'
+                format: 'int64',
+                maxLength: 100,
+                default: 20
             )
         ),
         new OA\Parameter(
@@ -42,7 +44,8 @@ use PK\Posts\PostStorage;
             description: 'Смещение в списке относительно первого треда',
             schema: new OA\Schema(
                 type: 'integer',
-                format: 'int64'
+                format: 'int64',
+                default: 0
             )
         ),
         new OA\Parameter(
@@ -53,6 +56,15 @@ use PK\Posts\PostStorage;
             schema: new OA\Schema(
                 type: 'array',
                 items: new OA\Items(type: 'string')
+            )
+        ),
+        new OA\Parameter(
+            name: 'no_board_list',
+            in: 'query',
+            description: 'Не возвращать список досок в ответе',
+            required: false,
+            schema: new OA\Schema(
+                type: 'string'
             )
         )
     ]
@@ -78,8 +90,9 @@ final class GetThreadList
 
     public function __invoke(Request $req, array $vars): JsonResponse
     {
-        $limit  = $req->getParams('limit') ? $req->getParams('limit') : 20;
-        $offset = $req->getParams('offset') ? $req->getParams('offset') : 0;
+        $limit         = $req->getParams('limit') ? $req->getParams('limit') : 20;
+        $offset        = $req->getParams('offset') ? $req->getParams('offset') : 0;
+        $no_board_list = $req->getParams('no_board_list') ? true : false;
 
         $tags = explode('+', $vars['tags']);
 
@@ -91,7 +104,11 @@ final class GetThreadList
             return new JsonResponse([], 400);
         }
 
-        $boards = $this->board_storage->find($exclude_tags);
+        if (!$no_board_list) {
+            $boards = $this->board_storage->find($exclude_tags);
+        } else {
+            $boards = [];
+        }
 
         return new JsonResponse([
             'count'  => $count,
