@@ -85,15 +85,12 @@ export default {
     },
     updateData: function () {
       var self = this;
-      self.isLoading = true;
 
       axios.get(config.chan_url + '/v2/board').then((response) => {
         self.boards = response.data.payload.boards;
-        self.isLoading = false;
       }).catch((error) => {
         self.$buefy.toast.open('Произошла ошибка при запросе данных с сервера')
         console.log(error);
-        self.isLoading = false;
       })
     }
   }
