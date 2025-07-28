@@ -25,18 +25,16 @@ class PostStorage
     {
         $conditions = [
             'posts.parent_id' => null,
-            'boards.tag' => $tags
+            'boards.tag'      => $tags
         ];
 
-        $ordering = [
-            'ORDER' => [
-                'posts.updated_at' => 'DESC'
-            ],
-        ];
+        $ordering = [];
 
         if (sizeof($tags) == 1) {
-            $ordering['ORDER']['posts.is_sticky'] = 'ASC'; // порядок сортировки зависит от порядка указания значений для колонки с типом enum в MySQL
+            $ordering['ORDER']['is_sticky'] = 'ASC'; // порядок сортировки зависит от порядка указания значений для колонки с типом enum в MySQL
         }
+
+        $ordering['ORDER']['posts.updated_at'] = 'DESC'; // важно сохранять порядок передачи колонок для сортировки
 
         if ($limit > 100) {
             throw new InvalidArgumentException('Не допускается такой большой запрос');
@@ -63,7 +61,7 @@ class PostStorage
             'posts',
             [
                 '[>]boards'   => ['board_id' => 'id'],
-                '[>]posts(r)' => ['posts.id' => 'parent_id']
+                '[>]posts(r)' => ['id'       => 'parent_id']
             ],
             [
                 'posts.id',
@@ -86,16 +84,13 @@ class PostStorage
                     'boards.threads_count',
                     'boards.new_posts_count'
                 ],
-                'replies_count' => Medoo::raw('COUNT(r.id)')
+                'replies_count' => Medoo::raw('COUNT(r.id)'),
             ],
             array_merge(
                 $conditions,
                 $limit,
-                [
-                    'GROUP' => [
-                        'posts.id',
-                    ]
-                ], $ordering
+                $ordering,
+                ['GROUP' => 'posts.id']
             )
         );
 
