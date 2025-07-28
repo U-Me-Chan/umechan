@@ -99,9 +99,8 @@ export default {
     
     if (section) {
       this.scrollTo(section, 'post');
-    } else {
-      this.scrollTo('thread-top');
     }
+
     var self = this;
 
     console.debug('updated');

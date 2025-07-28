@@ -41,6 +41,7 @@
         :videos="post.media.videos"
         :replies="post.replies"
         :repliesCount="post.replies_count"
+        :isBumpLimitReached="post.bump_limit_reached"
       />
     </section>
   </div>

@@ -1,7 +1,14 @@
 <template>
 <div id="app">
   <header class="board-list">
-    <a :href="`/board/${board.tag}`" class="board-link" v-for="board in boards" @click="selectBoard(board.tag, $event)" :key="board.id" v-bind:class="{ active: tag === board.tag }">
+    <a
+      :href="`/board/${board.tag}`"
+      class="board-link"
+      v-for="board in boards"
+      @click="selectBoard(board.tag, $event)"
+      :key="board.id"
+      v-bind:class="{ active: tag === board.tag }"
+      >
       {{ board.name }} {{ board.new_posts_count ? `(+${board.new_posts_count})` : '' }}
     </a>
   </header>
@@ -11,6 +18,7 @@
       <b-loading :can-cancel="true" v-model="isLoading" :isFullPage="true"></b-loading>
       <router-view/>
     </div>
+
     <div class="side-content-fixed">
       <div class="radios-panel-wrap">
         <Radio class="radio-content"/>
@@ -48,13 +56,11 @@ export default {
     return {
       boards: [],
       tag: '',
-      posts: [],
       isLoading: false,
       title: 'U III E'
     }
   },
   created: function () {
-    this.isLoading = true;
     this.updateData();
     document.title = this.title;
 
@@ -71,13 +77,6 @@ export default {
       self.isLoading = args[0]
     })
   },
-  computed: {
-    allTags: function () {
-      return this.boards.map(function (board) {
-        return board.tag;
-          }).join('+');
-        }
-  },
   methods: {
     selectBoard: function (tag, event) {
       event.preventDefault();
@@ -86,21 +85,16 @@ export default {
     },
     updateData: function () {
       var self = this;
+      self.isLoading = true;
 
       axios.get(config.chan_url + '/v2/board').then((response) => {
         self.boards = response.data.payload.boards;
-        bus.tags = self.boards.map(function (board) {
-          return board.tag;
-        });
         self.isLoading = false;
       }).catch((error) => {
         self.$buefy.toast.open('Произошла ошибка при запросе данных с сервера')
         console.log(error);
         self.isLoading = false;
       })
-    },
-    saveAdminKey: function () {
-      
     }
   }
 }
