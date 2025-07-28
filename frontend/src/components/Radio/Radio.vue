@@ -54,8 +54,8 @@
 
 <script>
 const axios = require('axios');
-const config = require('../../config');
-import { formatDuration } from '../utils/duration_formatter'
+const config = require('../../../config');
+import { formatDuration } from '../../utils/duration_formatter'
 
 export default {
   name: 'Radio',

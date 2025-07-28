@@ -65,19 +65,19 @@ const routes = [
     },
     {
       path: '/admin/files',
-      component: () => import('./components/Files.vue')
+      component: () => import('./components/Admin/Files.vue')
     },
     {
       path: '/admin/files/:page',
-      component: () => import('./components/Files.vue')
+      component: () => import('./components/Admin/Files.vue')
     },
     {
       path: '/tracks',
-      component: () => import('./components/Tracks.vue')
+      component: () => import('./components/Radio/Tracks.vue')
     },
     {
       path: '/admin/delete-post/:id',
-      component: () => import('./components/DeletePost.vue')
+      component: () => import('./components/Admin/DeletePost.vue')
     }
 ];
 

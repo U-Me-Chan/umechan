@@ -22,9 +22,9 @@
 
 <script>
 import axios from 'axios'
-import Post from './Post.vue'
+import Post from '../Post.vue'
 
-const config = require('../../config')
+const config = require('../../../config')
 
 export default {
   name: 'DeletePost',

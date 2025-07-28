@@ -42,8 +42,8 @@
 <script>
 import axios from 'axios'
 import { bus } from '../bus'
-import Radio from './Radio.vue'
-import AuthPanel from './AuthPanel.vue'
+import Radio from './Radio/Radio.vue'
+import AuthPanel from './Admin/AuthPanel.vue'
 
 const config = require('../../config')
 

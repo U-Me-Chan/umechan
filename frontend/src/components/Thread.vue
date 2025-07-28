@@ -48,7 +48,7 @@ export default {
       
       bus.$emit('app.loader', [true]);
       
-      axios.get(config.chan_url + '/v2/post/' + this.id).then((response) => {
+      axios.get(config.chan_url + '/v2/post/' + this.id + '/?no_board_list=true').then((response) => {
         if (response.data.payload.thread_data.parent_id !== null) {
           self.id = response.data.payload.thread_data.parent_id;
           self.init();

@@ -97,7 +97,7 @@ export default {
 
     bus.$on('form:success', function () {
       self.isFormVisible = false;
-      self.init(true);
+      self.init(0, true);
     })
   },
   created: function () {
@@ -127,15 +127,16 @@ export default {
     selectThread: function (id) {
       this.$router.push('/thread/' + id);
     },
-    init: function (no_cache = false) {
+    init: function (page, no_cache = false) {
       this.threads = [];
       var self = this;
       var offset = (this.current - 1) * this.perPage;
       bus.$emit('app.loader', [true]);
 
       const params = {
-        offset: offset,
-        limit:  this.perPage
+        offset:        offset,
+        limit:         this.perPage,
+        no_board_list: true
       }
 
       if (no_cache) {

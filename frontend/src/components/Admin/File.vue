@@ -9,9 +9,9 @@
 
 <script>
 const axios = require('axios')
-const config = require('../../config')
+const config = require('../../../config')
 
-import { bus } from '../bus'
+import { bus } from '../../bus'
 
 export default {
   name: 'File',
