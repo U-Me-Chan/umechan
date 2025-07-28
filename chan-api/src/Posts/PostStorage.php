@@ -149,7 +149,6 @@ class PostStorage
             'posts',
             [
                 '[>]boards' => ['board_id' => 'id'],
-                '[>]posts(r)' => ['posts.id' => 'parent_id']
             ],
             [
                 'posts.id',
