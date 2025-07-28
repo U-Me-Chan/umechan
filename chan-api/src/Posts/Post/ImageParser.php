@@ -9,7 +9,7 @@ final class ImageParser extends PostMessageParser
     private const REGEXP = '/'.
         self::SKIP_CODE_BLOCK_REGEXP .
         '|' .
-        '\[\!\[\]\((?<preview>' .
+        '\[\!\[([a-z\W]+)?\]\((?<preview>' .
         self::BASE_URL .
         '\/files\/thumb\.\w+\.(jpe?g?|png|webp|jfif))\)\]\((?<link>' .
         self::BASE_URL .

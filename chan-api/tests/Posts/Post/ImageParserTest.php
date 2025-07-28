@@ -19,8 +19,8 @@ class ImageParserTest extends TestCase
     {
         list($images, $message) = ImageParser::parse($orig_message);
 
-        $this->assertEquals($expected_message, $message);
-        $this->assertEquals($expected_images, $images);
+        $this->assertEquals($expected_message, $message, 'Сообщение не очищено');
+        $this->assertEquals($expected_images, $images, 'Список изображений не соответствует ожидаемому');
     }
 
     public static function dataProvider(): array
@@ -68,6 +68,16 @@ class ImageParserTest extends TestCase
             ],
             [
                 '[![](https://scheoble.xyz/files/thumb.test.jfif)](https://scheoble.xyz/files/test.jfif)',
+                '',
+                [
+                    [
+                        'preview' => 'https://scheoble.xyz/files/thumb.test.jfif',
+                        'link'    => 'https://scheoble.xyz/files/test.jfif'
+                    ]
+                ]
+            ],
+            [
+                '[![test.jf?s.if](https://scheoble.xyz/files/thumb.test.jfif)](https://scheoble.xyz/files/test.jfif)',
                 '',
                 [
                     [

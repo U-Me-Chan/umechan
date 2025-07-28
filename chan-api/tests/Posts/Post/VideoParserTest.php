@@ -9,8 +9,8 @@ class VideoParserTest extends TestCase
     #[Test]
     public function test(): void
     {
-        $orig_message = '[![](https://scheoble.xyz/files/thumb.test.mp4.jpeg)](https://scheoble.xyz/files/test.mp4)\n';
-        $orig_message .= '\n[![](https://scheoble.xyz/files/thumb.test.webm.jpeg)](https://scheoble.xyz/files/test.webm)\n';
+        $orig_message = '[![test](https://scheoble.xyz/files/thumb.test.mp4.jpeg)](https://scheoble.xyz/files/test.mp4)\n';
+        $orig_message .= '\n[![kek?](https://scheoble.xyz/files/thumb.test.webm.jpeg)](https://scheoble.xyz/files/test.webm)\n';
 
         list($videos, $message) = VideoParser::parse($orig_message);
 

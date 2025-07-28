@@ -18,24 +18,36 @@ class YoutubeParserTest extends TestCase
     {
         return [
             [
-                'https://youtu.be/sdd22s',
+                'https://youtu.be/short_link?si=sadkskadkask',
                 [
                     [
                         [
-                            'link'    => 'https://youtu.be/sdd22s',
-                            'preview' => "https://i1.ytimg.com/vi/sdd22s/hqdefault.jpg"
+                            'link'    => 'https://youtu.be/short_link',
+                            'preview' => "https://i1.ytimg.com/vi/short_link/hqdefault.jpg"
                         ]
                     ],
                     ''
                 ]
             ],
             [
-                'https://www.youtube.com/watch?v=sdd22s',
+                'https://www.youtube.com/watch?v=long_link&si=sdcakeodkdk3003',
                 [
                     [
                         [
-                            'link'    => 'https://youtu.be/sdd22s',
-                            'preview' => 'https://i1.ytimg.com/vi/sdd22s/hqdefault.jpg'
+                            'link'    => 'https://youtu.be/long_link',
+                            'preview' => 'https://i1.ytimg.com/vi/long_link/hqdefault.jpg'
+                        ]
+                    ],
+                    ''
+                ]
+            ],
+            [
+                'https://youtube.com/shorts/IJf6U07fb5A?si=blahblah',
+                [
+                    [
+                        [
+                            'link' => 'https://youtube.com/shorts/IJf6U07fb5A',
+                            'preview' => 'https://i.ytimg.com/vi/IJf6U07fb5A/maxres2.jpg'
                         ]
                     ],
                     ''

@@ -9,7 +9,7 @@ final class VideoParser extends PostMessageParser
     private const REGEXP = '/' .
         self::SKIP_CODE_BLOCK_REGEXP .
         '|' .
-        '\[\!\[\]\((?<preview>' .
+        '\[\!\[([a-z\W]+)?\]\((?<preview>' .
         self::BASE_URL .
         '\/files\/thumb\.\w+\.(webm|mp4|gif)\.jpeg)\)\]\((?<link>' .
         self::BASE_URL .
