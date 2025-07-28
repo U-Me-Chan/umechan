@@ -31,7 +31,7 @@ use PK\Passports\PassportStorage;
 use PK\Posts\Services\PostFacade;
 use PK\RequestHandlers\MemcachedRequestHandler;
 
-require_once "vendor/autoload.php";
+require_once __DIR__ . "/vendor/autoload.php";
 
 /** @var array */
 $config = require "config.php";

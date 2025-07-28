@@ -8,7 +8,9 @@ services:
     volumes:
       - './chan-api:/var/www/html'
     ports:
-      - '9000:9000'
+      - '9005:9005'
+    environment:
+      PHP_IDE_CONFIG: serverName=PHPSTORM
   filestore:
     build:
       target: base
