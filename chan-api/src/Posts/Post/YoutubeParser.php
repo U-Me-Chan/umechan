@@ -17,7 +17,7 @@ final class YoutubeParser extends PostMessageParser
         self::IDENTIFY_MEDIA_REGEXP .
         ')(\?' .
         self::SOCIAL_TRACKER_MARK_REGEXP .
-        ')'.
+        ')?'.
         '/mi';
 
     private const LONG_REGEXP = '/' .
@@ -25,18 +25,18 @@ final class YoutubeParser extends PostMessageParser
         '|' .
         'https?:\/\/www\.youtube\.com\/watch\?v=(' .
         self::IDENTIFY_MEDIA_REGEXP .
-        ')&' .
+        ')(&' .
         self::SOCIAL_TRACKER_MARK_REGEXP .
-        '/mi';
+        ')?/mi';
 
     private const REELS_REGEXP = '/' .
         self::SKIP_CODE_BLOCK_REGEXP .
         '|' .
         'https?:\/\/youtube\.com\/shorts\/(' .
         self::IDENTIFY_MEDIA_REGEXP .
-        ')\?' .
+        ')(\?' .
         self::SOCIAL_TRACKER_MARK_REGEXP .
-        '/mi';
+        ')?/mi';
 
 
     public static function parse(string $message): array
