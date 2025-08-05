@@ -56,7 +56,7 @@ class RotationMaster
 
     public function getRandomStrategy(): string
     {
-        if (sizeof($this->strategies)) {
+        if (sizeof($this->strategies) == 1) {
             return array_key_last($this->strategies);
         }
 
