@@ -22,6 +22,43 @@ class PostFacade
     /**
      * @throws OutOfBoundsException
      */
+    public function getThread(int $id, array $exclude_tags = [], bool $no_board_list = false): array
+    {
+        $thread = $this->post_storage->findById($id);
+
+        if (!$no_board_list) {
+            $boards = $this->board_storage->find($exclude_tags);
+        } else {
+            $boards = [];
+        }
+
+        return [$thread, $boards];
+    }
+
+    /**
+     * @throws OutOfBoundsException
+     */
+    public function getThreadList(
+        array $tags,
+        int $limit = 20,
+        int $offset = 0,
+        array $exclude_tags = [],
+        bool $no_board_list = false
+    ): array {
+        list($threads, $count) = $this->post_storage->find($limit, $offset, $tags);
+
+        if (!$no_board_list) {
+            $boards = $this->board_storage->find($exclude_tags);
+        } else {
+            $boards = [];
+        }
+
+        return [$threads, $count, $boards];
+    }
+
+    /**
+     * @throws OutOfBoundsException
+     */
     public function createReplyOnThread(int $thread_id, string $message, array $params = []): array
     {
         $thread = $this->post_storage->findById($thread_id);

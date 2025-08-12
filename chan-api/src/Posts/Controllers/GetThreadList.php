@@ -4,13 +4,12 @@ namespace PK\Posts\Controllers;
 
 use OpenApi\Attributes as OA;
 use OutOfBoundsException;
-use PK\Boards\BoardStorage;
-use PK\Posts\OpenApi\Schemas\ThreadList;
 use PK\Http\Request;
 use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Error;
 use PK\OpenApi\Schemas\Response;
-use PK\Posts\PostStorage;
+use PK\Posts\OpenApi\Schemas\ThreadList;
+use PK\Posts\Services\PostFacade;
 
 #[OA\Get(
     path: '/api/v2/board/{tags}',
@@ -82,8 +81,7 @@ use PK\Posts\PostStorage;
 final class GetThreadList
 {
     public function __construct(
-        private PostStorage $post_storage,
-        private BoardStorage $board_storage,
+        private PostFacade $post_facade,
         private array $exclude_tags
     ) {
     }
@@ -98,21 +96,11 @@ final class GetThreadList
 
         $exclude_tags = $req->getParams('exclude_tags', $this->exclude_tags);
 
-        try {
-            list($posts, $count) = $this->post_storage->find($limit, $offset, $tags);
-        } catch (\OutOfBoundsException) {
-            return new JsonResponse([], 400);
-        }
-
-        if (!$no_board_list) {
-            $boards = $this->board_storage->find($exclude_tags);
-        } else {
-            $boards = [];
-        }
+        list($threads, $count, $boards) = $this->post_facade->getThreadList($tags, $limit, $offset, $exclude_tags, $no_board_list);
 
         return new JsonResponse([
             'count'  => $count,
-            'posts'  => $posts,
+            'posts'  => $threads,
             'boards' => $boards
         ]);
     }

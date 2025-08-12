@@ -73,9 +73,9 @@ $r = new Router();
 $r->addRoute('GET', '/board/all', new BoardsFetcher($board_storage, $db, $exclude_tags));
 
 $r->addRoute('GET', '/v2/board', new GetBoardList($board_storage, $exclude_tags));
-$r->addRoute('GET', '/v2/board/{tags:[a-z\+]+}', new GetThreadList($post_storage, $board_storage, $exclude_tags));
+$r->addRoute('GET', '/v2/board/{tags:[a-z\+]+}', new GetThreadList($post_facade, $exclude_tags));
 
-$r->addRoute('GET', '/v2/post/{id:[0-9]+}', new GetThread($post_storage, $board_storage, $exclude_tags));
+$r->addRoute('GET', '/v2/post/{id:[0-9]+}', new GetThread($post_facade, $exclude_tags));
 $r->addRoute('POST', '/v2/post', new CreateThread($post_facade));
 $r->addRoute('PUT', '/v2/post/{id:[0-9]+}', new CreateReply($post_facade));
 $r->addRoute('PATCH', '/v2/post/{id:[0-9]+}', new UpdatePost($maintenance_key));
