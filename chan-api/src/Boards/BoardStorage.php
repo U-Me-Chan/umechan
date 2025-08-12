@@ -4,6 +4,7 @@ namespace PK\Boards;
 
 use OutOfBoundsException;
 use Medoo\Medoo;
+use PK\Base\Timestamp;
 use PK\Boards\Board\Board;
 
 class BoardStorage
@@ -82,8 +83,23 @@ class BoardStorage
 
     public function updateCounters(int $id): void
     {
-        $threads_count   = $this->db->count('posts', ['board_id' => $id, 'parent_id' => null]);
-        $new_posts_count = $this->db->count('posts', ['board_id' => $id, 'timestamp[>]' => time() - (60 * 60 * 24)]);
+        $threads_count = $this->db->count('posts', ['board_id' => $id, 'parent_id' => null]);
+
+        $date = Timestamp::draft()->toString();
+
+        $start_timestamp = Timestamp::fromString($date)->toInt();
+        $end_timestamp   = Timestamp::fromString($date);
+        $end_timestamp->increase(days: 1);
+        $end_timestamp = $end_timestamp->toInt();
+
+        $new_posts_count = $this->db->count(
+            'posts',
+            [
+                'board_id'     => $id,
+                'timestamp[>]' => $start_timestamp,
+                'timestamp[<]' => $end_timestamp
+            ]
+        );
 
         $board = $this->findById($id);
 
