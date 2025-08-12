@@ -18,48 +18,48 @@ class YoutubeParserTest extends TestCase
     {
         return [
             [
-                'https://youtu.be/short_link?si=sadkskadkask',
+                'https://youtu.be/IJf6U07fb5A?si=sadkskadkask test',
                 [
                     [
                         [
-                            'link'    => 'https://youtu.be/short_link',
-                            'preview' => "https://i1.ytimg.com/vi/short_link/hqdefault.jpg"
+                            'link'    => 'https://youtu.be/IJf6U07fb5A',
+                            'preview' => "https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg"
+                        ]
+                    ],
+                    ' test'
+                ]
+            ],
+            [
+                'https://youtu.be/IJf6U07fb5A',
+                [
+                    [
+                        [
+                            'link'    => 'https://youtu.be/IJf6U07fb5A',
+                            'preview' => "https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg"
                         ]
                     ],
                     ''
                 ]
             ],
             [
-                'https://youtu.be/short_link',
+                'https://www.youtube.com/watch?v=IJf6U07fb5A&si=sdcakeodkdk3003',
                 [
                     [
                         [
-                            'link'    => 'https://youtu.be/short_link',
-                            'preview' => "https://i1.ytimg.com/vi/short_link/hqdefault.jpg"
+                            'link'    => 'https://youtu.be/IJf6U07fb5A',
+                            'preview' => 'https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg'
                         ]
                     ],
                     ''
                 ]
             ],
             [
-                'https://www.youtube.com/watch?v=long_link&si=sdcakeodkdk3003',
+                'https://www.youtube.com/watch?v=IJf6U07fb5A',
                 [
                     [
                         [
-                            'link'    => 'https://youtu.be/long_link',
-                            'preview' => 'https://i1.ytimg.com/vi/long_link/hqdefault.jpg'
-                        ]
-                    ],
-                    ''
-                ]
-            ],
-            [
-                'https://www.youtube.com/watch?v=long_link',
-                [
-                    [
-                        [
-                            'link'    => 'https://youtu.be/long_link',
-                            'preview' => 'https://i1.ytimg.com/vi/long_link/hqdefault.jpg'
+                            'link'    => 'https://youtu.be/IJf6U07fb5A',
+                            'preview' => 'https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg'
                         ]
                     ],
                     ''
@@ -70,8 +70,8 @@ class YoutubeParserTest extends TestCase
                 [
                     [
                         [
-                            'link' => 'https://youtube.com/shorts/IJf6U07fb5A',
-                            'preview' => 'https://i.ytimg.com/vi/IJf6U07fb5A/maxres2.jpg'
+                            'link'    => 'https://youtu.be/IJf6U07fb5A',
+                            'preview' => 'https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg'
                         ]
                     ],
                     ''
@@ -82,8 +82,8 @@ class YoutubeParserTest extends TestCase
                 [
                     [
                         [
-                            'link' => 'https://youtube.com/shorts/IJf6U07fb5A',
-                            'preview' => 'https://i.ytimg.com/vi/IJf6U07fb5A/maxres2.jpg'
+                            'link'    => 'https://youtu.be/IJf6U07fb5A',
+                            'preview' => 'https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg'
                         ]
                     ],
                     ''
