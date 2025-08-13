@@ -106,4 +106,9 @@ class Track
     {
         return $this->path;
     }
+
+    public function getEstimate(): int
+    {
+        return $this->estimate;
+    }
 }

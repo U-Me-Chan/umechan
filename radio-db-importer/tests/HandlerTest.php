@@ -20,10 +20,13 @@ class HandlerTest extends TestCase
     private Logger|MockObject $logger;
     private TrackRepository|MockObject $track_repo;
     private FileManager|MockObject $file_manager;
+    private PathCutter $path_cutter;
     private string $tmp_mp3_file_path;
     private string $tmp_ogg_file_path;
+    private string $tmp_file_with_negative_estimate;
     private string $dir_of_convertible_files;
     private string $dir_of_files_without_tags;
+    private string $dir_of_negative_estimate;
 
     public function setUp(): void
     {
@@ -31,6 +34,7 @@ class HandlerTest extends TestCase
 
         $this->dir_of_convertible_files  = $tmp_dir . DIRECTORY_SEPARATOR . '/convert';
         $this->dir_of_files_without_tags = $tmp_dir . DIRECTORY_SEPARATOR . '/tagme';
+        $this->dir_of_negative_estimate  = $tmp_dir . DIRECTORY_SEPARATOR . '/Duplicate';
 
         if (!is_dir($this->dir_of_convertible_files)) {
             mkdir($this->dir_of_convertible_files);
@@ -40,11 +44,19 @@ class HandlerTest extends TestCase
             mkdir($this->dir_of_files_without_tags);
         }
 
-        $this->tmp_mp3_file_path = $tmp_dir . DIRECTORY_SEPARATOR . '1.mp3';
-        $this->tmp_ogg_file_path = $tmp_dir . DIRECTORY_SEPARATOR . '1.ogg';
+        if (!is_dir($this->dir_of_negative_estimate)) {
+            mkdir($this->dir_of_negative_estimate);
+        }
+
+        @mkdir($tmp_dir . '/Test');
+
+        $this->tmp_mp3_file_path               = $tmp_dir . DIRECTORY_SEPARATOR . 'Test/1.mp3';
+        $this->tmp_ogg_file_path               = $tmp_dir . DIRECTORY_SEPARATOR . 'Test/1.ogg';
+        $this->tmp_file_with_negative_estimate = $tmp_dir . DIRECTORY_SEPARATOR . 'Test/2.mp3';
 
         @touch($this->tmp_mp3_file_path);
         @touch($this->tmp_ogg_file_path);
+        @touch($this->tmp_file_with_negative_estimate);
 
         /** @var DirectoryIterator|MockObject*/
         $this->dir_iterator = $this->createMock(DirectoryIterator::class);
@@ -58,7 +70,9 @@ class HandlerTest extends TestCase
         /** @var TrackRepository|MockObject */
         $this->track_repo = $this->createMock(TrackRepository::class);
 
-        $this->file_manager = new FileManager($this->dir_of_convertible_files, $this->dir_of_files_without_tags);
+        $this->file_manager = new FileManager($this->dir_of_convertible_files, $this->dir_of_files_without_tags, $this->dir_of_negative_estimate);
+
+        $this->path_cutter = new PathCutter($tmp_dir);
 
         $this->handler = new Handler(
             $this->dir_iterator,
@@ -66,7 +80,7 @@ class HandlerTest extends TestCase
             $this->logger,
             $this->track_repo,
             $this->file_manager,
-            new PathCutter($tmp_dir)
+            $this->path_cutter
         );
     }
 
@@ -184,7 +198,7 @@ class HandlerTest extends TestCase
             ->willReturnCallback(function (Track $track) {
                 $this->assertEquals('Foo', $track->getArtist());
                 $this->assertEquals('Bar', $track->getTitle());
-                $this->assertEquals('1.mp3', $track->getPath());
+                $this->assertEquals('Test/1.mp3', $track->getPath());
             });
 
         $this->logger->expects($this->exactly(4))
@@ -239,5 +253,51 @@ class HandlerTest extends TestCase
         $h = $this->handler;
 
         $h();
+    }
+
+    public function testWithTrackOfNegativeEstimate(): void
+    {
+        $tmp_file = $this->tmp_file_with_negative_estimate;
+
+        $this->dir_iterator->expects($this->once())
+            ->method('getFile')
+            ->willReturnCallback(function () use ($tmp_file) {
+                /** @var SplFileObject|MockObject */
+                $file = $this->getMockBuilder(SplFileObject::class)
+                    ->setConstructorArgs(['php://memory'])
+                    ->getMock();
+                $file->method('getExtension')->willReturn('mp3');
+                $file->method('getPathname')->willReturn($tmp_file);
+                $file->method('getFilename')->willReturn('2.mp3');
+                $file->method('isFile')->willReturn(true);
+
+                return $file;
+            });
+
+        $this->parser->expects($this->once())
+            ->method('readFile')
+            ->willReturnCallback(fn(string $path) => $this->assertEquals($tmp_file, $path));
+
+        $this->parser->method('getArtist')->willReturn('Foo');
+        $this->parser->method('getTitle')->willReturn('Bar');
+        $this->parser->method('getDuration')->willReturn(120);
+
+        $this->track_repo->expects($this->once())
+            ->method('findOne')
+            ->willReturnCallback(function (array $filters) use ($tmp_file) {
+                $this->assertArrayHasKey('hash', $filters);
+
+                return new Track('Foo', 'Bar', 120, $this->path_cutter->cut($tmp_file), Hash::fromString('foo'), -240);
+            });
+
+        $this->logger->expects($this->exactly(2))->method('info');
+
+        $this->dir_iterator->expects($this->once())->method('next');
+
+        $h = $this->handler;
+
+        $h();
+
+        $this->assertTrue(file_exists($this->dir_of_negative_estimate . DIRECTORY_SEPARATOR . '2.mp3'));
     }
 }
