@@ -78,8 +78,6 @@ class GenrePattern implements IRotation
                 throw new \RuntimeException("Неизвестный час: {$hour}");
         }
 
-        shuffle($pls_list);
-
         $this->log->info(self::NAME . ': ставлю ' . implode(',', $pls_list));
 
         $track_paths = [];
@@ -88,7 +86,7 @@ class GenrePattern implements IRotation
             $track_paths = array_merge($track_paths, $this->db->rand('tracks', 'path', [
                 'path[~]' => "{$pls}/%",
                 'estimate[>=]' => 0,
-                'last_playing[<]' => time() + (60 * 60 * 2),
+                'last_playing[<]' => time() + (60 * 60 * 6),
                 'LIMIT'        => [0, random_int(5, 7)]
             ]));
         }

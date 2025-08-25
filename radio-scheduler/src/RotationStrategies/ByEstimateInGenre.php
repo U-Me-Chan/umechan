@@ -88,7 +88,7 @@ class ByEstimateInGenre implements IRotation
         $avg_track_paths = $this->db->select('tracks', 'path', [
             'path[~]' => "{$genre}/%",
             'estimate[>=]' => Medoo::raw("(SELECT AVG(estimate) FROM tracks WHERE path LIKE '{$genre}/%')"),
-            'last_playing[<]' => time() + (60 * 60 * 2),
+            'last_playing[<]' => time() + (60 * 60 * 4),
             'ORDER' => [
                 'last_playing' => 'ASC'
             ],
