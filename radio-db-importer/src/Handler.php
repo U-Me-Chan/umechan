@@ -107,7 +107,7 @@ final class Handler
                 $this->logger->info('У трека обновлён путь');
             }
 
-            if ($track->getEstimate() < 0) {
+            if ($track->isBad()) {
                 $this->logger->info('У трека отрицательная оценка, перемещаю его в директорию Duplicate');
 
                 $track->path = $this->path_cutter->cut($this->file_manager->moveToDirOfNegativeEstimate($file->getPathname(), $file->getFilename()));

@@ -111,4 +111,17 @@ class Track
     {
         return $this->estimate;
     }
+
+    public function isBad(): bool
+    {
+        if ($this->play_count < 10) {
+            return false;
+        }
+
+        if ($this->estimate < (0 - $this->estimate * 10)) {
+            return true;
+        }
+
+        return false;
+    }
 }
