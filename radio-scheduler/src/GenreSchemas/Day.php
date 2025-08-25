@@ -9,11 +9,15 @@ class Day implements IGenreSchema
     public static function getAll(): array
     {
         return [
+            'Alternative High',
             'Alternative High/20',
+            'Alternative Rock',
             'Alternative Rock/20',
             'Ru Angst',
+            'Pop',
             'Pop/20',
             'Pop Ru',
+            'Pop Dance',
             'Pop Dance/20',
             'Pop Ru Dance',
             'Pop Retro Dance'
