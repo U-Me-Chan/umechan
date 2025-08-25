@@ -18,7 +18,6 @@ use Ridouchire\RadioScheduler\QueueCropper;
 use Ridouchire\RadioScheduler\RotationMaster;
 use Ridouchire\RadioScheduler\RotationStrategies\ByEstimateInGenre;
 use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
-use Ridouchire\RadioScheduler\RotationStrategies\HolydayRu\GenrePattern as HolydayRuGenrePattern;
 use Ridouchire\RadioScheduler\TickHandler;
 use Ridouchire\RadioScheduler\Utils\TickCounter;
 
