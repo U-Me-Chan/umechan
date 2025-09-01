@@ -20,7 +20,6 @@ class Day implements IGenreSchema
             'Pop Dance',
             'Pop Dance/20',
             'Pop Ru Dance',
-            'Pop Retro Dance'
         ];
     }
 
@@ -50,7 +49,6 @@ class Day implements IGenreSchema
             ],
             [
                 'Pop Dance/20',
-                'Pop Retro Dance',
                 'Pop Ru Dance'
             ],
         ];
