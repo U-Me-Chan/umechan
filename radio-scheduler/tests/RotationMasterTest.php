@@ -1,69 +1,105 @@
 <?php
 
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Ridouchire\RadioScheduler\IRotation;
 use Ridouchire\RadioScheduler\RotationMaster;
-use Ridouchire\RadioScheduler\RotationStrategies\ByEstimateInGenre;
-use Ridouchire\RadioScheduler\RotationStrategies\GenrePattern;
 
 class RotationMasterTest extends TestCase
 {
     private Logger|MockObject $logger;
-    private GenrePattern|MockObject $genre_pattern_strategy;
-    private ByEstimateInGenre|MockObject $by_estimate_in_genre_strategy;
+    private RotationMaster $rotation_master;
 
     public function setUp(): void
     {
-        $this->logger                        = $this->createMock(Logger::class);
-        $this->genre_pattern_strategy        = $this->createMock(GenrePattern::class);
-        $this->by_estimate_in_genre_strategy = $this->createMock(ByEstimateInGenre::class);
+        /** @var Logger|MockObject */
+        $this->logger = $this->createMock(Logger::class);
+
+        $this->rotation_master = new RotationMaster($this->logger);
     }
 
-    public function testWihtoutStrategies(): void
+    #[Test]
+    public function attemptExecuteWithoutRotations(): void
     {
-        $rotation_master = new RotationMaster($this->logger);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Нет стратегии ротации на данный час');
 
-        $this->expectException(\Exception::class);
-
-        $rotation_master->execute('test');
+        $this->rotation_master->execute();
     }
 
-    public function testStrategyNotFound(): void
+    #[Test]
+    public function attempExecuteWithStrategyIsNotFired(): void
     {
-        $rotation_master = new RotationMaster($this->logger);
-        $rotation_master->addStrategy($this->by_estimate_in_genre_strategy);
+        /** @var IRotation|MockObject */
+        $strategy = $this->createMock(IRotation::class);
+        $strategy->method('isFired')->willReturn(false);
 
-        $this->expectException(\Exception::class);
+        $this->rotation_master->addStrategyByPeriod(0, 23, $strategy);
 
-        $rotation_master->execute('test');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Нет стратегии ротации на данный час');
+
+        $this->rotation_master->execute();
     }
 
-    public function testStrategyExecute(): void
+    #[Test]
+    public function attemptExecuteWithStrategyIsFired(): void
     {
+        /** @var IRotation|MockObject */
+        $strategy = $this->createMock(IRotation::class);
+        $strategy->method('isFired')->willReturn(true);
+
+        $this->rotation_master->addStrategyByPeriod(0, 23, $strategy);
+
         $this->logger->method('info')->willReturnCallback(function (string $message) {
-            $this->assertEquals('Текущая стратегия: ' . GenrePattern::NAME, $message);
+            $this->assertEquals('RotationMaster: была запущена стратегия strategy', $message);
         });
+        $this->logger->expects($this->once())->method('info');
 
-        $rotation_master = new RotationMaster($this->logger);
-        $rotation_master->addStrategy($this->genre_pattern_strategy);
-        $rotation_master->execute(GenrePattern::NAME);
-
-        $this->assertEquals(GenrePattern::NAME, $rotation_master->getCurrentStrategy());
+        $this->rotation_master->execute();
     }
 
-    public function testGetRandomStrategy(): void
+    #[Test]
+    public function attempAddStrategyByPeriodWithInvalidArguments(): void
     {
-        $rotation_master = new RotationMaster($this->logger);
-        $rotation_master->addStrategy($this->genre_pattern_strategy);
-        $rotation_master->addStrategy($this->by_estimate_in_genre_strategy);
+        /** @var IRotation|MockObject */
+        $strategy = $this->createMock(IRotation::class);
 
-        $rotation_master->execute(GenrePattern::NAME);
+        $this->expectException(InvalidArgumentException::class);
 
-        $this->assertContains($rotation_master->getRandomStrategy(), [GenrePattern::NAME, ByEstimateInGenre::NAME]);
+        $this->rotation_master->addStrategyByPeriod(0, 0, $strategy);
+        $this->rotation_master->addStrategyByPeriod(10, 5, $strategy);
+        $this->rotation_master->addStrategyByPeriod(0, 100, $strategy);
+    }
 
-        $rotation_master->execute($rotation_master->getRandomStrategy());
+    #[Test]
+    public function attempAddStrategyByHourWithInvalidArgument(): void
+    {
+        /** @var IRotation|MockObject */
+        $strategy = $this->createMock(IRotation::class);
 
-        $this->assertNotEquals(GenrePattern::NAME, $rotation_master->getCurrentStrategy());
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->rotation_master->addStrategyByHour(25, $strategy);
+        $this->rotation_master->addStrategyByHour(-1, $strategy);
+    }
+
+    #[Test]
+    public function attemptExecuteBySpecificHour(): void
+    {
+        /** @var IRotation|MockObject */
+        $strategy = $this->createMock(IRotation::class);
+        $strategy->method('isFired')->willReturn(true);
+
+        $this->rotation_master->addStrategyByHour(0, $strategy);
+
+        $this->logger->method('info')->willReturnCallback(function (string $message) {
+            $this->assertEquals('RotationMaster: была запущена стратегия strategy', $message);
+        });
+        $this->logger->expects($this->once())->method('info');
+
+        $this->rotation_master->execute(strtotime('2023-02-02 00:00:00'));
     }
 }

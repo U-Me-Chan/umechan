@@ -2,12 +2,13 @@
 
 namespace Ridouchire\RadioScheduler\Http\Controllers;
 
+use DomainException;
+use OutOfBoundsException;
+use RuntimeException;
 use OpenApi\Attributes as OA;
-use Medoo\Medoo;
-use Monolog\Logger;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
-use Ridouchire\RadioScheduler\Mpd;
+use Ridouchire\RadioScheduler\Services\OrderTrackService;
 
 #[OA\Put(
     path: '/radio/queue/{id}',
@@ -94,9 +95,7 @@ use Ridouchire\RadioScheduler\Mpd;
 final class OrderTrack
 {
     public function __construct(
-        private Mpd $mpd,
-        private Medoo $db,
-        private Logger $log
+        private OrderTrackService $order_track_service
     ) {
     }
 
@@ -105,26 +104,25 @@ final class OrderTrack
         $body   = $req->getBody()->getContents();
         $params = json_decode($body, true);
 
-        $track_path = $this->db->get('tracks', 'path', ['id' => $params['track_id']]);
+        try {
+            $this->order_track_service->putTrackInQueue($params['track_id']);
 
-        if (!$track_path) {
+            return Response::json(['status' => 'accepted']);
+        } catch (OutOfBoundsException) {
             $res = Response::json(['status' => 'failed', 'reason' => 'track not found']);
             $res = $res->withStatus(Response::STATUS_BAD_REQUEST);
 
             return $res;
-        }
-
-        $result = $this->mpd->addToQueue($track_path, 1);
-
-        if (!$result) {
+        } catch (RuntimeException) {
             $res = Response::json(['status' => 'failed', 'reason' => 'track no add']);
             $res = $res->withStatus(Response::STATUS_INTERNAL_SERVER_ERROR);
 
             return $res;
+        } catch (DomainException) {
+            $res = Response::json(['status' => 'failed', 'reason' => 'queue is full']);
+            $res = $res->withStatus(Response::STATUS_BAD_REQUEST);
+
+            return $res;
         }
-
-        $this->log->info("OrderTrack: ставлю в очередь файл {$track_path}");
-
-        return Response::json(['status' => 'accepted']);
     }
 }

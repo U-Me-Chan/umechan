@@ -1,8 +1,9 @@
 <?php
 
-namespace Ridouchire\RadioScheduler;
+namespace Ridouchire\RadioScheduler\Services;
 
 use Exception;
+use Ridouchire\RadioScheduler\Services\Mpd;
 
 class QueueCropper
 {
