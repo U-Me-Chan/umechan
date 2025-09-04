@@ -24,7 +24,7 @@ class NewOrLongStandingTracklistGenerator implements ITracklistGenerator
         $tracks_list = $this->db->select('tracks', 'path', [
             'path[~]'        => $genres,
             'ORDER'          => [
-                'play_count' => 'ASC',
+                'last_playing' => 'ASC',
             ],
             'LIMIT' => [0, $tracks_count]
         ]);

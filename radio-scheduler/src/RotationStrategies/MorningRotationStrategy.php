@@ -26,7 +26,7 @@ class MorningRotationStrategy implements IRotation
 
     public function execute(): void
     {
-        $jingle_paths      = $this->random_tracklist_generator->build(['Jingle'], 1);
+        $jingle_paths      = $this->random_tracklist_generator->build(['Jingles'], 1);
         $commercials_paths = $this->random_tracklist_generator->build(['Commercials'], 3);
         $track_paths       = $this->random_tracklist_generator->build([Morning::getRandom()], 10);
 
