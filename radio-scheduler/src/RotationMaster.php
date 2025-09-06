@@ -2,71 +2,78 @@
 
 namespace Ridouchire\RadioScheduler;
 
+use InvalidArgumentException;
 use Monolog\Logger;
+use RuntimeException;
 
 class RotationMaster
 {
     private array $strategies = [];
 
-    private string $current_strategy = '';
-
     public function __construct(
         private Logger $log
     ) {
+        $this->strategies = array_fill(0, 23, []);
     }
 
-    /**
-     * Запускает стратегию ротации очереди радио-потока
-     *
-     * @param string $strategy_name
-     *
-     * @return void
-     */
-    public function execute(string $strategy_name): void
+    public function execute(?int $timestamp = null): void
     {
-        if (empty($this->strategies)) {
-            throw new \Exception("Нет стратегий");
+        $hour = date('G', $timestamp);
+
+        if (!isset($this->strategies[$hour]) || empty($this->strategies[$hour])) {
+            throw new RuntimeException('Нет стратегии ротации на данный час');
         }
 
-        if (!isset($this->strategies[$strategy_name])) {
-            throw new \Exception("RotationMaster: неизвестная стратегия: {$strategy_name}");
+        /** @var IRotation $strategy  */
+        foreach ($this->strategies[$hour] as $strategy) {
+            if ($strategy->isFired($hour)) {
+                $strategy->execute();
+
+                $this->log->info("RotationMaster: была запущена стратегия " . $strategy::NAME);
+
+                return;
+            }
         }
 
-        /** @var IRotation */
-        $strategy = $this->strategies[$strategy_name];
-
-        if ($strategy::NAME !== $this->current_strategy) {
-            $this->log->info('Текущая стратегия: ' . $strategy_name);
-        }
-
-        $this->current_strategy = $strategy::NAME;
-
-        $strategy->execute();
+        throw new RuntimeException('Нет стратегии ротации на данный час');
     }
 
-    public function addStrategy(IRotation $rotation): void
+    public function addStrategyByHour(int $hour, IRotation $rotation): void
     {
-        $this->strategies[$rotation::NAME] = $rotation;
-    }
-
-    public function getCurrentStrategy(): string
-    {
-        return $this->current_strategy;
-    }
-
-    public function getRandomStrategy(): string
-    {
-        if (sizeof($this->strategies) == 1) {
-            return array_key_last($this->strategies);
+        if (!$this->isValidHour($hour)) {
+            throw new InvalidArgumentException();
         }
 
-        $strategies = array_keys($this->strategies);
-        $key =  array_rand($strategies);
+        $this->strategies[$hour][] = $rotation;
+    }
 
-        if ($strategies[$key] == $this->current_strategy) {
-            return $this->getRandomStrategy();
+    public function addStrategyByPeriod(int $from, int $to, IRotation $rotation): void
+    {
+        if (!$this->isValidHour($from)) {
+            throw new InvalidArgumentException();
         }
 
-        return $strategies[$key];
+        if (!$this->isValidHour($to)) {
+            throw new InvalidArgumentException();
+        }
+
+        if ($to < $from) {
+            throw new InvalidArgumentException();
+        }
+
+        if ($from == $to) {
+            throw new InvalidArgumentException();
+        }
+
+        $hours = range($from, $to);
+
+        array_walk($hours, function (int $hour) use ($rotation) {
+            $this->strategies[$hour][] = $rotation;
+        });
+    }
+
+    private function isValidHour(int $hour): bool
+    {
+        return $hour < 0 || $hour > 23 ? false : true;
     }
 }

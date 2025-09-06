@@ -1,14 +1,20 @@
 <?php
 
-namespace Ridouchire\RadioScheduler;
+namespace Ridouchire\RadioScheduler\Services;
 
 use Exception;
+use Ridouchire\RadioScheduler\Services\Mpd;
 
 class QueueCropper
 {
     public function __construct(
         private Mpd $mpd
     ) {
+    }
+
+    public function manualCrop(): bool
+    {
+        return $this->mpd->cropQueue();
     }
 
     public function __invoke(int $timestamp): bool

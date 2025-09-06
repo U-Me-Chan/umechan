@@ -51,6 +51,15 @@ use Ridouchire\RadioScheduler\Http\OpenApi\Schemas\Track;
             schema: new OA\Schema(
                 type: 'string'
             )
+        ),
+        new OA\Parameter(
+            name: 'genre_substr',
+            in: 'query',
+            description: 'Подстрока для поиска по жанру(плейлисту)',
+            required: false,
+            schema: new OA\Schema(
+                type: 'string'
+            )
         )
     ]
 )]
@@ -103,6 +112,10 @@ final class GetTrackList
 
         if (isset($params['title_substr'])) {
             $conditions['title[~]'] = "%{$params['title_substr']}%";
+        }
+
+        if (isset($params['genre_substr'])) {
+            $conditions['path[~]'] = "{$params['genre_substr']}/%";
         }
 
         $order = [

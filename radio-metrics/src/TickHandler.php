@@ -8,9 +8,7 @@ use Ridouchire\RadioMetrics\ICache;
 use Ridouchire\RadioMetrics\Collectors\MpdCollector;
 use Ridouchire\RadioMetrics\Collectors\IcecastCollector;
 use Ridouchire\RadioMetrics\Exceptions\EntityNotFound;
-use Ridouchire\RadioMetrics\Storage\Entites\Record;
 use Ridouchire\RadioMetrics\Storage\Entites\Track;
-use Ridouchire\RadioMetrics\Storage\RecordRepository;
 use Ridouchire\RadioMetrics\Storage\TrackRepository;
 use Ridouchire\RadioMetrics\Utils\Md5Hash;
 
@@ -21,7 +19,6 @@ class TickHandler
         private MpdCollector $mpdCollector,
         private IcecastCollector $icecastCollector,
         private TrackRepository $trackRepository,
-        private RecordRepository $recordRepository,
         private Md5Hash $md5Hash,
         private ICache $cache
     ) {
@@ -106,11 +103,6 @@ class TickHandler
             $this->logger->debug("Увеличиваю оценку трека", ['track' => $track->getName(), 'listeners' => $listeners]);
             $this->cache->increment('estimate', $listeners);
         }
-
-        $this->logger->debug('Сохраняю данные о слушателях трека');
-
-        $record = Record::draft($track->getId(), $listeners);
-        $this->recordRepository->save($record);
 
         $this->logger->debug('Текущие данные', ['track' => $track->toArray(), 'listeners' => $listeners]);
         $this->logger->debug('Конец цикла коллекционирования');
