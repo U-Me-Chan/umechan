@@ -1,6 +1,6 @@
 <?php
 
-namespace Ridouchire\RadioScheduler;
+namespace Ridouchire\RadioScheduler\Services;
 
 use RuntimeException;
 use FloFaber\MphpD\MphpD;

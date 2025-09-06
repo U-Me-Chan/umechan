@@ -22,7 +22,7 @@ final class EstimateTrack
         $body = $req->getBody()->getContents();
         $query_params = json_decode($body, true);
 
-        $client_addr = $req->getServerParams()['REMOTE_ADDR'];
+        $client_addr = $req->getServerParams()['HTTP_USER_AGENT'] ?? 'Unknown';
 
         $last_time_estimate = $this->cache->get($client_addr);
 

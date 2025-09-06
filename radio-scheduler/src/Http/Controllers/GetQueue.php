@@ -5,7 +5,7 @@ namespace Ridouchire\RadioScheduler\Http\Controllers;
 use OpenApi\Attributes as OA;
 use React\Http\Message\Response;
 use Ridouchire\RadioScheduler\Http\OpenApi\Schemas\Queue;
-use Ridouchire\RadioScheduler\Mpd;
+use Ridouchire\RadioScheduler\Services\Mpd;
 
 #[OA\Get(
     path: '/radio/queue',

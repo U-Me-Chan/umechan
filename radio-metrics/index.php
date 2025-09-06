@@ -49,7 +49,7 @@ $recordRepo = new RecordRepository($db);
 
 $cache = new Memcached('memcached', 11211);
 
-$tickHandler = new TickHandler($logger, $mpdCollector, $icecastCollector, $trackRepo, $recordRepo, new Md5Hash($env->mpd_database_path), $cache);
+$tickHandler = new TickHandler($logger, $mpdCollector, $icecastCollector, $trackRepo, new Md5Hash($env->mpd_database_path), $cache);
 
 Loop::addPeriodicTimer(1, function () use ($tickHandler) {
     $tickHandler->handle();
