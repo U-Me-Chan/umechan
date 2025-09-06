@@ -7,27 +7,25 @@ use PK\Http\Response;
 
 class JsonResponse implements Response
 {
-    private array $data;
-    private int $code;
-    private array $headers;
-    private ?Throwable $error;
+    private ?Throwable $error = null;
     private bool $is_preformatted_json = false;
     private string $json;
 
     public function __construct(
-        array $data = [],
-        int $code = 200,
-        array $headers = [
+        private array $data = [],
+        private int $code = 200,
+        private array $headers = [
             'Content-type: application/json',
             'Access-Control-Allow-Origin: *',
             'Acesss-Control-Allow-Methods: *',
             'Access-Control-Allow-Headers: *'
         ]
     ) {
-        $this->data = $data;
-        $this->code = $code;
-        $this->headers = $headers;
-        $this->error = null;
+    }
+
+    public function setHeader(string $header): void
+    {
+        $this->headers[] = $header;
     }
 
     public function setPreformattedJson(string $json): void

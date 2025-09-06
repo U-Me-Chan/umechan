@@ -1,6 +1,7 @@
 <?php
 
 use Medoo\Medoo;
+use Symfony\Component\Console\Application as ConsoleApplication;
 use OpenApi\Generator;
 use PK\RequestHandlers\Router;
 use PK\Application;
@@ -28,7 +29,9 @@ use PK\Posts\Controllers\PostDeleter;
 use PK\Passports\Controllers\CreatePassport;
 use PK\Passports\Controllers\GetPassportList;
 use PK\Passports\PassportStorage;
+use PK\Posts\Console\RestorePostsFromEPDSDump;
 use PK\Posts\Services\PostFacade;
+use PK\Posts\Services\PostRestorator;
 use PK\RequestHandlers\MemcachedRequestHandler;
 
 require_once __DIR__ . "/vendor/autoload.php";
@@ -65,7 +68,16 @@ $post_storage     = new PostStorage($db, $board_storage, $passport_storage);
 
 $event_trigger = new EventTrigger($event_storage);
 
-$post_facade = new PostFacade($post_storage, $board_storage, $event_trigger);
+$post_restorator = new PostRestorator('/tmp/dumps/' . $_ENV['EPDS_DUMP_PATH'], $board_storage, $post_storage);
+$post_facade     = new PostFacade($post_storage, $board_storage, $event_trigger, $post_restorator);
+
+if (PHP_SAPI == 'cli') {
+    $app = new ConsoleApplication('ChanApi');
+
+    $app->add(new RestorePostsFromEPDSDump($post_facade));
+
+    exit($app->run());
+}
 
 /** @var Router */
 $r = new Router();
@@ -90,10 +102,9 @@ $r->addRoute('GET', '/v2/event', new GetEventList($event_storage));
 $r->addRoute('GET', '/v2/_/openapi.json', new GetOpenApiSpecification(new Generator()));
 $r->addRoute('GET', '/v2/_/redoc.html', new GetRedocPage($_ENV['DOMAIN']));
 
-$app = new Application(
-    new MemcachedRequestHandler(sucessor: $r),
-    $config
-);
+$request_sucessor = $_ENV['IS_DEV'] == 'yes' ? $r : new MemcachedRequestHandler(sucessor: $r);
+
+$app = new Application($request_sucessor, $config);
 
 $request = new Request($_SERVER, $_POST);
 

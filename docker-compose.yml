@@ -39,6 +39,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
       - './data/db:/var/lib/mysql'
+      - './data/dumps:/tmp/dumps'
     profiles:
       - production
       - chan
@@ -71,8 +72,11 @@ services:
       - ADMINISTATOR_KEY=${ADMINISTRATOR_KEY}
       - DEFAULT_NAME=${DEFAULT_NAME}
       - BASE_URL=${BASE_URL}
+      - EPDS_DUMP_PATH=${EPDS_DUMP_PATH}
+      - IS_DEV=no
     volumes:
       - './data/logs:/var/log'
+      - './data/dumps:/tmp/dumps'
     profiles:
       - production
       - chan

@@ -138,6 +138,9 @@ class PostStorage
         return [$threads, $count];
     }
 
+    /**
+     * @throws OutOfBoundsException
+     */
     public function findById(int $id): Post
     {
         $thread_and_replies_datas = $this->db->select(
@@ -183,6 +186,14 @@ class PostStorage
         $thread_data['replies_count'] = $this->db->count('posts', ['parent_id' => $thread_data['id']]);
 
         return Post::fromArray($thread_data);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function saveAsIs(Post $post): void
+    {
+        $this->db->insert('posts', $post->toArray());
     }
 
     public function save(Post $post): int

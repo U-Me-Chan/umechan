@@ -1,7 +1,4 @@
 services:
-  db:
-    volumes:
-      - './data/dumps:/tmp/dumps'
   api:
     build:
       target: development
@@ -11,6 +8,7 @@ services:
       - '9005:9005'
     environment:
       PHP_IDE_CONFIG: serverName=PHPSTORM
+      IS_DEV: yes
   filestore:
     build:
       target: base

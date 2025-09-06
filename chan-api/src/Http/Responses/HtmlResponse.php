@@ -15,6 +15,11 @@ class HtmlResponse implements Response
     ) {
     }
 
+    public function setHeader(string $header): void
+    {
+        $this->headers[] = $header;
+    }
+
     public function getHeaders(): array
     {
         return $this->headers;

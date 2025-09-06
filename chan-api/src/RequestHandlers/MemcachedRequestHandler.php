@@ -49,6 +49,8 @@ class MemcachedRequestHandler extends RequestHandler
         $res = $this->cache_map[$req->getHash()];
 
         if ($res !== false && $res instanceof Response) {
+            $res->setHeader('X-Pissykaka-Cache-Response: yes');
+
             return $res;
         }
 

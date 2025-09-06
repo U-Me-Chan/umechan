@@ -3,6 +3,7 @@
 namespace PK\Posts\Services;
 
 use OutOfBoundsException;
+use RuntimeException;
 use PK\Boards\BoardStorage;
 use PK\Events\Services\EventTrigger;
 use PK\Posts\Post;
@@ -15,8 +16,17 @@ class PostFacade
     public function __construct(
         private PostStorage $post_storage,
         private BoardStorage $board_storage,
-        private EventTrigger $event_trigger
+        private EventTrigger $event_trigger,
+        private PostRestorator $post_restorator
     ) {
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    public function restorePostFromEPDSDump(int $timestamp): void
+    {
+        $this->post_restorator->extractPostDatasFromEPDSAndSaveToInternalDatabase($timestamp);
     }
 
     /**

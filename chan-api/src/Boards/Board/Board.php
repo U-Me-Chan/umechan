@@ -21,8 +21,8 @@ class Board implements \JsonSerializable
             $id,
             $state['tag'],
             $state['name'],
-            $state['threads_count'],
-            $state['new_posts_count']
+            $state['threads_count'] ?? 0,
+            $state['new_posts_count'] ?? 0
         );
     }
 
