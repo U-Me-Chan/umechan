@@ -44,10 +44,6 @@ class DayGenreRotation implements IRotation
         $track_paths = array_merge($jingle_paths, $commercials_paths, $track_paths);
 
         array_walk($track_paths, function (string $track_path) {
-            if ($track_path == null) {
-                return;
-            }
-
             $this->mpd->addToQueue($track_path);
 
             $this->logger->info(self::NAME . ": ставлю в очередь {$track_path}");

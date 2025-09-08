@@ -17,12 +17,12 @@ class BestEstimateTracklistGenerator implements ITracklistGenerator
         $genres = array_map(fn(string $genre) => "{$genre}/%", $genres);
 
         $datas =  $this->db->select('tracks', 'path', [
-            'path[~]'      => $genres,
+            'path[~]' => $genres,
             'ORDER' => [
                 'estimate'     => 'DESC',
                 'last_playing' => 'ASC'
             ],
-            'LIMIT'        => [0, $count]
+            'LIMIT' => $count
         ]);
 
         return array_map(fn(array $data) => $data['path'], $datas);

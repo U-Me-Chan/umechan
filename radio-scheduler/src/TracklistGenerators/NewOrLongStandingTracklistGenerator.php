@@ -26,7 +26,7 @@ class NewOrLongStandingTracklistGenerator implements ITracklistGenerator
             'ORDER'          => [
                 'last_playing' => 'ASC',
             ],
-            'LIMIT' => [0, $tracks_count]
+            'LIMIT' => $tracks_count
         ]);
 
         return $tracks_list;

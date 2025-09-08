@@ -19,7 +19,7 @@ class RandomTracklistGenerator implements ITracklistGenerator
         return $this->db->rand('tracks', 'path', [
             'path[~]'      => $genres,
             'estimate[>=]' => 0,
-            'LIMIT'        => [0, $count]
+            'LIMIT'        => $count
         ]);
     }
 }
