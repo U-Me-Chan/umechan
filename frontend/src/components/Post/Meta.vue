@@ -5,6 +5,9 @@
   <b-tag>{{ datetime }}</b-tag>
   <b-tag v-if="board">/{{board.tag}}/</b-tag>
   <b-tag>№{{ id }}</b-tag>
+  <b-tag v-if="isSticky">📌</b-tag>
+  <b-tag v-if="isBumpLimit">🌕</b-tag>
+  <b-tag v-if="repliesCount">∑{{repliesCount}}</b-tag>
   
   <a v-if="isShowButtons && !parentId" :href="'/thread/' + id">
     <b-button type="is-text" size="is-small" @click="selectThread(id, $event)">Открыть</b-button>
@@ -40,6 +43,12 @@ export default {
     subject: String,
     datetime: String,
     isVerify: Boolean,
+    isSticky: Boolean,
+    isBumpLimit: Boolean,
+    repliesCount: {
+      type: [Number, Boolean],
+      default: false
+    },
     parentId: {
       type: [Number, Boolean],
       default: false

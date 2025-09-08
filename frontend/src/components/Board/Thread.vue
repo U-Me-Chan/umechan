@@ -1,22 +1,30 @@
 <template>
 <div class="post card" :id="id" :ref="id">
-  <Meta :id="id" :poster="poster" :subject="subject" :datetime="datetime" :isVerify="isVerify" :parentId="parentId" :board="board"/>
+  <Meta
+    :id="id"
+    :poster="poster"
+    :subject="subject"
+    :datetime="datetime"
+    :isVerify="isVerify"
+    :parentId="parentId"
+    :board="board"
+    :isSticky="isSticky"
+    :isBumpLimit="isBumpLimitReached"
+    :repliesCount="repliesCount"
+    />
+
   <div class="post-body">
     <Media :images="images" :youtubes="youtubes" :videos="videos"/>
     <Message :message="message"/>
   </div>
 
   <div class="replies" v-if="replies.lenght !== 0">
-    <span>Ответов: {{ repliesCount }}</span>
-    <br>
-    <span v-if="isBumpLimitReached" style="color: red">Тред не поднимется, достигнут лимит ответов</span>
-
     <div class="card" :key="post.id" :ref="post.id" v-for="post in replies">
       <Meta :id="post.id" :poster="post.poster" :subject="post.subject" :datetime="post.datetime" :isVerify="post.is_verify" :parentId="post.parent_id"/>
 
       <div class="post-body">
-	<Media :images="post.media.images" :youtubes="post.media.youtubes" :videos="post.media.videos"/>
-	<Message :message="post.truncated_message"/>
+        <Media :images="post.media.images" :youtubes="post.media.youtubes" :videos="post.media.videos"/>
+        <Message :message="post.truncated_message"/>
       </div>
     </div>
   </div>
@@ -56,7 +64,14 @@ export default {
     replies: Array,
     board: Object,
     repliesCount: Number,
-    isBumpLimitReached: Boolean
+    isBumpLimitReached: {
+      type: Boolean,
+      default: false
+    },
+    isSticky: {
+      type: Boolean,
+      default: false
+    }
   }
 }
 </script>
