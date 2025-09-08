@@ -3,7 +3,7 @@
 namespace PK\Events\OpenApi\Schemas;
 
 use OpenApi\Attributes as OA;
-use PK\Events\Event\Event;
+use PK\Events\Event;
 
 #[OA\Schema]
 abstract class EventList

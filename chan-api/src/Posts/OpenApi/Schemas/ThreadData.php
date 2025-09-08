@@ -3,7 +3,7 @@
 namespace PK\Posts\OpenApi\Schemas;
 
 use OpenApi\Attributes as OA;
-use PK\Boards\Board\Board;
+use PK\Boards\Board;
 use PK\Posts\Post;
 
 #[OA\Schema]

@@ -2,7 +2,7 @@
 
 namespace PK\Events\Services;
 
-use PK\Events\Event\Event;
+use PK\Events\Event;
 use PK\Events\Event\EventType;
 use PK\Events\EventStorage;
 

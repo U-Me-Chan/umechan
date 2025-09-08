@@ -3,14 +3,14 @@
 namespace PK\Posts;
 
 use OpenApi\Attributes as OA;
-use PK\Boards\Board\Board;
-use PK\Posts\OpenApi\Schemas\MediaList;
+use PK\Boards\Board;
 use PK\Posts\Post\ImageParser;
 use PK\Posts\Post\PasswordHash;
 use PK\Posts\Post\StickyFlag;
 use PK\Posts\Post\VerifyFlag;
 use PK\Posts\Post\VideoParser;
 use PK\Posts\Post\YoutubeParser;
+use PK\Posts\OpenApi\Schemas\MediaList;
 
 #[OA\Schema]
 class Post implements \JsonSerializable

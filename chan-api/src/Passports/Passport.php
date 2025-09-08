@@ -1,6 +1,6 @@
 <?php
 
-namespace PK\Passports\Passport;
+namespace PK\Passports;
 
 use JsonSerializable;
 use OpenApi\Attributes as OA;

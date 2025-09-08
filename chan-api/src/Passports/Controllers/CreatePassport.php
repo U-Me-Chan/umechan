@@ -7,7 +7,7 @@ use PK\Http\Request;
 use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Error;
 use PK\OpenApi\Schemas\Response;
-use PK\Passports\Passport\Passport;
+use PK\Passports\Passport;
 use PK\Passports\PassportStorage;
 
 #[OA\Post(

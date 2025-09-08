@@ -5,7 +5,7 @@ namespace PK\Boards;
 use OutOfBoundsException;
 use Medoo\Medoo;
 use PK\Base\Timestamp;
-use PK\Boards\Board\Board;
+use PK\Boards\Board;
 
 class BoardStorage
 {

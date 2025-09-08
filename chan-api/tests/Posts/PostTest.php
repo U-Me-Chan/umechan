@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use PK\Boards\Board\Board;
+use PK\Boards\Board;
 use PK\Posts\Post;
 
 class PostTest extends TestCase

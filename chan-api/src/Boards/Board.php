@@ -1,6 +1,6 @@
 <?php
 
-namespace PK\Boards\Board;
+namespace PK\Boards;
 
 use InvalidArgumentException;
 use OpenApi\Attributes as OA;

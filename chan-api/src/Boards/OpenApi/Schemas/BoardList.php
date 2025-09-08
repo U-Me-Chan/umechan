@@ -3,7 +3,7 @@
 namespace PK\Boards\OpenApi\Schemas;
 
 use OpenApi\Attributes as OA;
-use PK\Boards\Board\Board;
+use PK\Boards\Board;
 
 #[OA\Schema]
 abstract class BoardList

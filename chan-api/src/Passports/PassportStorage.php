@@ -4,7 +4,7 @@ namespace PK\Passports;
 
 use Medoo\Medoo;
 use OutOfBoundsException;
-use PK\Passports\Passport\Passport;
+use PK\Passports\Passport;
 
 class PassportStorage
 {

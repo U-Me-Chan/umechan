@@ -4,7 +4,7 @@ namespace PK\Events;
 
 use Medoo\Medoo;
 use PDOStatement;
-use PK\Events\Event\Event;
+use PK\Events\Event;
 
 class EventStorage
 {

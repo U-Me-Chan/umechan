@@ -1,8 +1,9 @@
 <?php
 
-namespace PK\Events\Event;
+namespace PK\Events;
 
 use OpenApi\Attributes as OA;
+use PK\Events\Event\EventType;
 
 
 #[OA\Schema]
