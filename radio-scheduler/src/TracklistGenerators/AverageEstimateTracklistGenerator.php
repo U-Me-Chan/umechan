@@ -34,7 +34,6 @@ class AverageEstimateTracklistGenerator implements ITracklistGenerator
             $tracks_list[] = $this->db->select('tracks', 'path', [
                 'path[~]'         => $genres,
                 'estimate[>=]'    => Medoo::raw("(SELECT AVG(estimate) FROM tracks WHERE path LIKE '{$genre}/%')"), // TODO: у нового плейлиста средняя оценка всегда 0, значит треков не будет
-                'last_playing[<]' => time() - (60 * 60 * 4),
                 'ORDER'           => [
                     'last_playing' => 'ASC'
                 ],
