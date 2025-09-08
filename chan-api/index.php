@@ -30,6 +30,7 @@ use PK\Passports\Controllers\CreatePassport;
 use PK\Passports\Controllers\GetPassportList;
 use PK\Passports\PassportStorage;
 use PK\Posts\Console\RestorePostsFromEPDSDump;
+use PK\Posts\Console\SetStickyThread;
 use PK\Posts\Services\PostFacade;
 use PK\Posts\Services\PostRestorator;
 use PK\RequestHandlers\MemcachedRequestHandler;
@@ -75,6 +76,7 @@ if (PHP_SAPI == 'cli') {
     $app = new ConsoleApplication('ChanApi');
 
     $app->add(new RestorePostsFromEPDSDump($post_facade));
+    $app->add(new SetStickyThread($post_facade));
 
     exit($app->run());
 }

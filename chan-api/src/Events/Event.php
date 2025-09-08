@@ -5,7 +5,6 @@ namespace PK\Events;
 use OpenApi\Attributes as OA;
 use PK\Events\Event\EventType;
 
-
 #[OA\Schema]
 class Event implements \JsonSerializable
 {

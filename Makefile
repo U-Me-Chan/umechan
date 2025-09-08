@@ -30,3 +30,6 @@ generate-env:
 
 restore-from-epds-dump:
 	docker exec umechan-api php index.php posts:restore-from-epds-dump $(timestamp)
+
+set-sticky-thread:
+	docker exec umechan-api php index.php posts:set-sticky-thread $(thread_id)

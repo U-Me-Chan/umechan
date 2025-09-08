@@ -2,6 +2,7 @@
 
 namespace PK\Posts\Services;
 
+use InvalidArgumentException;
 use OutOfBoundsException;
 use RuntimeException;
 use PK\Boards\BoardStorage;
@@ -165,5 +166,19 @@ EOT;
 
         $this->post_storage->save($post);
         $this->event_trigger->triggerPostDeleted($post->id);
+    }
+
+    public function setStickyFlagStateToThread(int $id, bool $is_sticky = false): void
+    {
+        $post = $this->post_storage->findById($id);
+
+        if (!$post->is_thread) {
+            throw new InvalidArgumentException('Не является нитью');
+        }
+
+        $post->is_sticky = $is_sticky;
+
+        $this->post_storage->save($post);
+        $this->event_trigger->triggerThreadUpdated($id);
     }
 }

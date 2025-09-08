@@ -154,6 +154,9 @@ class PostTest extends TestCase
                 case 'board_id':
                     $this->assertEquals(1, $value);
                     break;
+                case 'is_sticky':
+                    $this->assertEquals('no', $value);
+                    break;
                 default:
                     throw new Exception("Неизвестное имя колонки: {$column}");
             }

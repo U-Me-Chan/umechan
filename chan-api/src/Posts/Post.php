@@ -17,11 +17,15 @@ class Post implements \JsonSerializable
 {
     #[OA\Property(description: 'Превышен ли лимит ответов?')]
     public bool $bump_limit_reached {
-        get => $this->parent_id == null && $this->replies_count > 500 ? true : false;
+        get => $this->is_thread && $this->replies_count > 500 ? true : false;
     }
 
     public bool $is_draft {
         get => $this->id == 0 ? true : false;
+    }
+
+    public bool $is_thread {
+        get => $this->parent_id == null ? true : false;
     }
 
     #[OA\Property(description: 'Идентификатор доски')]
@@ -86,7 +90,8 @@ class Post implements \JsonSerializable
 
         unset(
             $data['password'],
-            $data['is_draft']
+            $data['is_draft'],
+            $data['is_thread']
         );
 
         return $data;
@@ -98,18 +103,19 @@ class Post implements \JsonSerializable
 
         $data['board_id']  = $this->board->id;
         $data['is_verify'] = $this->is_verify == true ? 'yes' : 'no';
+        $data['is_sticky'] = $this->is_sticky == true ? 'yes' : 'no';
         $data['password']  = $this->password->toString();
 
         unset(
             $data['board'],
             $data['replies'],
             $data['replies_count'],
-            $data['is_sticky'],
             $data['bump_limit_reached'],
             $data['is_draft'],
             $data['datetime'],
             $data['truncated_message'],
-            $data['media']
+            $data['media'],
+            $data['is_thread']
         );
 
         return $data;
