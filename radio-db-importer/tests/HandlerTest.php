@@ -1,4 +1,4 @@
-<?php
+g<?php
 
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -287,7 +287,7 @@ class HandlerTest extends TestCase
             ->willReturnCallback(function (array $filters) use ($tmp_file) {
                 $this->assertArrayHasKey('hash', $filters);
 
-                return new Track('Foo', 'Bar', 120, $this->path_cutter->cut($tmp_file), Hash::fromString('foo'), -240);
+                return new Track('Foo', 'Bar', 120, $this->path_cutter->cut($tmp_file), Hash::fromString('foo'), 0 - 1201, 0, 0, 10);
             });
 
         $this->logger->expects($this->exactly(2))->method('info');

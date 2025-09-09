@@ -118,7 +118,7 @@ class Track
             return false;
         }
 
-        if ($this->estimate < (0 - $this->estimate * 10)) {
+        if ($this->estimate < (0 - $this->duration * 10)) {
             return true;
         }
 
