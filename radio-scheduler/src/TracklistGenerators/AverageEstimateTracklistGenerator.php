@@ -31,14 +31,16 @@ class AverageEstimateTracklistGenerator implements ITracklistGenerator
 
         foreach ($genres as $genre) {
             /** @phpstan-ignore argument.type, arguments.count */
-            $tracks_list[] = $this->db->select('tracks', 'path', [
+            $paths = $this->db->select('tracks', 'path', [
                 'path[~]'         => $genres,
-                'estimate[>=]'    => Medoo::raw("(SELECT AVG(estimate) FROM tracks WHERE path LIKE '{$genre}/%')"), // TODO: у нового плейлиста средняя оценка всегда 0, значит треков не будет
+                'estimate[>=]'    => Medoo::raw("(SELECT AVG(estimate) FROM tracks WHERE path LIKE '{$genre}/%')"),
                 'ORDER'           => [
                     'last_playing' => 'ASC'
                 ],
                 'LIMIT'            => $tracks_count
             ]);
+
+            $tracks_list = array_merge($tracks_list, $paths);
         } // FIXME: переписать на CTE
 
         return array_map(fn(array $data) => $data['path'], $tracks_list);
