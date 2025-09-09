@@ -69,8 +69,8 @@
 
 <script>
 import { bus } from '../bus'
-import Thread from './Board/Thread.vue'
-import Form from './Form.vue'
+import Thread from '../components/Thread.vue'
+import Form from '../components/Form.vue'
 
 const axios = require('axios')
 const config = require('../../config')

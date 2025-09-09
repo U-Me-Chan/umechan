@@ -1,168 +1,84 @@
 <template>
-<div class="thread" ref="thread-top" id="thread-top">
-  <h3>{{opPost.boardName}}: {{opPost.subject ? opPost.subject : '...'}}</h3>
+<div class="post card" :id="id" :ref="id">
+  <Meta
+    :id="id"
+    :poster="poster"
+    :subject="subject"
+    :datetime="datetime"
+    :isVerify="isVerify"
+    :parentId="parentId"
+    :board="board"
+    :isSticky="isSticky"
+    :isBumpLimit="isBumpLimitReached"
+    :repliesCount="repliesCount"
+    />
 
-  <Post :id="opPost.id"
-        :poster="opPost.poster"
-        :subject="opPost.subject"
-        :message="opPost.message"
-        :parentId="opPost.parent_id"
-	:repliesCount="opPost.repliesCount"
-	:youtubes="opPost.youtubes"
-	:images="opPost.images"
-        :videos="opPost.videos"
-	:isVerify="opPost.isVerify"
-        :isThread="true"
-	:datetime="opPost.datetime"/>
+  <div class="post-body">
+    <Media :images="images" :youtubes="youtubes" :videos="videos"/>
+    <Message :message="message"/>
+  </div>
 
-  <Post class="post-reply"
-        v-for="post in replies" :key="post.id"
-        :id="post.id"
-        :poster="post.poster"
-        :subject="post.subject"
-        :message="post.truncated_message"
-        :images="post.media.images"
-        :youtubes="post.media.youtubes"
-        :videos="post.media.videos"
-	:isVerify="post.is_verify"
-        :parentId="post.parent_id"
-	:datetime="post.datetime"/>
+  <div class="replies" v-if="replies.lenght !== 0">
+    <div class="card" :key="post.id" :ref="post.id" v-for="post in replies">
+      <Meta :id="post.id" :poster="post.poster" :subject="post.subject" :datetime="post.datetime" :isVerify="post.is_verify" :parentId="post.parent_id"/>
+
+      <div class="post-body">
+        <Media :images="post.media.images" :youtubes="post.media.youtubes" :videos="post.media.videos"/>
+        <Message :message="post.truncated_message"/>
+      </div>
+    </div>
+  </div>
 </div>
 </template>
 
 <script>
-import Post from './Post.vue'
-import { bus } from '../bus'
-
-const config = require('../../config')
-const axios  = require('axios');
+import Meta from './Post/Meta.vue'
+import Message from './Post/Message.vue'
+import Media from './Post/Media.vue' 
 
 export default {
   name: 'Thread',
   components: {
-    Post
+    Message, Meta, Media
   },
-  methods: {
-    init: function () {
-      var self = this;
-      
-      bus.$emit('app.loader', [true]);
-      
-      axios.get(config.chan_url + '/v2/post/' + this.id + '/?no_board_list=true').then((response) => {
-        if (response.data.payload.thread_data.parent_id !== null) {
-          self.id = response.data.payload.thread_data.parent_id;
-          self.init();
-        }
-        
-        self.opPost = {
-          id: response.data.payload.thread_data.id,
-          poster: response.data.payload.thread_data.poster,
-          subject: response.data.payload.thread_data.subject,
-          message: response.data.payload.thread_data.truncated_message,
-          repliesCount: response.data.payload.thread_data.replies_count,
-          images: response.data.payload.thread_data.media.images,
-          youtubes: response.data.payload.thread_data.media.youtubes,
-          videos: response.data.payload.thread_data.media.videos,
-          isVerify: response.data.payload.thread_data.is_verify,
-          datetime: response.data.payload.thread_data.datetime,
-          boardName: response.data.payload.thread_data.board.name
-        };
-        
-        self.replies = response.data.payload.thread_data.replies;
-        
-        bus.$emit('boards.update', [response.data.payload.thread_data.board.tag]);
-        bus.$emit('app.loader', [false]);
-        
-        document.title = 'U III E : /' + response.data.payload.thread_data.board.tag + '/' + response.data.payload.thread_data.subject;
-      }).catch((error) => {
-        console.log(error);
-        self.$buefy.toast.open(`Произошла ошибка при запросе данных треда: ${error}`);
-        bus.$emit('app.loader', [false]);
-      });
+  props: {
+    id: Number,
+    poster: String,
+    isVerify: {
+      type: Boolean,
+      default: false
     },
-    scrollTo: function (section, type) {
-      var el = window.document.getElementById(section);
-      
-      this.$nextTick(() => el.scrollIntoView())
-      
-      if (type == 'post') {
-        el.classList.add('post-active');
-      }
-    }
-  },
-  created: function () {
-    this.id = this.$route.params.id;
-    this.init();
-  },
-  updated: function () {
-    var section = this.$router.currentRoute.hash.replace('#', '');
-    
-    if (section) {
-      this.scrollTo(section, 'post');
-    }
-
-    var self = this;
-
-    console.debug('updated');
-    
-    bus.$on('form:success', () => self.init());
-  },
-  watch:  {
-    '$route': function (to, from) {
-      if (to !== from) {
-        this.id = this.$route.params.id;
-        this.init();
-        
-        var section = this.$router.currentRoute.hash.replace('#', '');
-        
-        if (section) {
-          this.scrollTo(section, 'post');
-        }
-      }
-    }
-  },
-  data: function () {
-    return {
-      id: false,
-      opPost: false,
-      replies: [],
-      countReplies: 0,
-      isFormVisible: false
+    subject: {
+      type: String,
+      default: '...'
+    },
+    parentId: {
+      type: [Boolean, Number],
+      default: false
+    },
+    datetime: String,
+    message: String,
+    images: Array,
+    youtubes: Array,
+    videos: Array,
+    replies: Array,
+    board: Object,
+    repliesCount: Number,
+    isBumpLimitReached: {
+      type: Boolean,
+      default: false
+    },
+    isSticky: {
+      type: Boolean,
+      default: false
     }
   }
 }
 </script>
 
-<style scoped>
-.toggle-form {
-    cursor: pointer;
-    font-weight: bold;
-    padding: 5px;
-    background-color: #333;
-    text-align: center;
-    width: 95%;
-    border: 1px #444 solid;
-}
-
-.toggle-form:hover {
-    color: #aaa;
-}
-
-h3 {
-    font-size: 20px;
-    text-align: center;
-    margin-top: 10px;
-}
-
-.thread {
+<style>
+.post {
     background-color: #eee;
-    margin-top: 0;
-    overflow-wrap: anywhere;
-    max-width: 1280px;
-}
-
-.post-reply {
-    background-color: #fff;
 }
 
 .card {
@@ -170,7 +86,9 @@ h3 {
     padding: 10px;
 }
 
-.post-active {
-    border: 2px dotted blue;
-}
+.post-body {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+} 
 </style>

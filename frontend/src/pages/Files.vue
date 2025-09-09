@@ -22,10 +22,10 @@
 
 <script>
 import axios from 'axios'
-import { bus } from '../../bus'
-import File from './File.vue'
+import { bus } from '../bus'
+import File from '../components/Admin/File.vue'
 
-const config = require('../../../config')
+const config = require('../../config')
 
 export default {
   components: {

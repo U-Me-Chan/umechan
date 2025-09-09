@@ -37,11 +37,15 @@ pre {
     word-wrap: break-word;
 }
 
-blockquote {
+.blockquote {
     margin-left: 0px;
-    border-left: 5px solid #ddd;
-    padding-left: 2px;
+    padding-left: 5px;
     color: #083;
+}
+
+.hashtag {
+    padding-left: 5px;
+    color: red;
 }
 
 ol {

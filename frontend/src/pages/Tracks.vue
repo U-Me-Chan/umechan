@@ -46,10 +46,10 @@
 
 <script>
 import axios from 'axios'
-import { bus } from '../../bus'
-import { formatDuration } from '../../utils/duration_formatter'
+import { bus } from '../bus'
+import { formatDuration } from '../utils/duration_formatter'
 
-const config = require('../../../config')
+const config = require('../../config')
 const _      = require('lodash')
 
 export default {

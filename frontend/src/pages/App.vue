@@ -23,9 +23,6 @@
       <div class="radios-panel-wrap">
         <Radio class="radio-content"/>
       </div>
-      <div class="auth-panel-wrap">
-        <AuthPanel/>
-      </div>
     </div>
   </main>
 
@@ -42,15 +39,14 @@
 <script>
 import axios from 'axios'
 import { bus } from '../bus'
-import Radio from './Radio/Radio.vue'
-import AuthPanel from './Admin/AuthPanel.vue'
+import Radio from '../components/Radio/Radio.vue'
 
 const config = require('../../config')
 
 export default {
   name: 'App',
   components: {
-    Radio, AuthPanel
+    Radio
   },
   data: function () {
     return {

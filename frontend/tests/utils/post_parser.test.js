@@ -12,4 +12,13 @@ describe('post_parser', () => {
   it('test replier', () => {
     assert.strictEqual(parse('&gt;&gt;123'), "<p><a href='#123'>&gt;&gt;123</a></p>\n")
   })
+  it('test quote'), () => {
+    assert.strictEqual(parse('&gt;test'), `<span class="blockquote">test</span`)
+  }
+  it('test eblan'), () => {
+    assert.strictEqual(parse('/postcount'), 'Я еблан!')
+  }
+  it('test hashtag'), () => {
+    assert.strictEqual(parse('#test'), `<a class="hashtag">test</a>`)
+  }
 })

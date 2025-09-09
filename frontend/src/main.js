@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import App from './components/App.vue';
+import App from './pages/App.vue';
 import VueRouter from 'vue-router';
 import VueCookie from 'vue-cookie';
 
@@ -53,31 +53,31 @@ Vue.use(VueRouter);
 const routes = [
     {
       path: '/',
-      component: () => import('./components/TOS.vue')
+      component: () => import('./pages/TOS.vue')
     },
     {
       path: '/thread/:id',
-      component: () => import('./components/Thread.vue')
+      component: () => import('./pages/Thread.vue')
     },
     {
       path: '/board/:tag',
-      component: () => import('./components/Board.vue')
+      component: () => import('./pages/Board.vue')
     },
     {
       path: '/admin/files',
-      component: () => import('./components/Admin/Files.vue')
+      component: () => import('./pages/Files.vue')
     },
     {
       path: '/admin/files/:page',
-      component: () => import('./components/Admin/Files.vue')
+      component: () => import('./pages/Files.vue')
     },
     {
       path: '/tracks',
-      component: () => import('./components/Radio/Tracks.vue')
+      component: () => import('./pages/Tracks.vue')
     },
     {
       path: '/admin/delete-post/:id',
-      component: () => import('./components/Admin/DeletePost.vue')
+      component: () => import('./pages/DeletePost.vue')
     }
 ];
 

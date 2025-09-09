@@ -13,7 +13,6 @@
   <b-field label="Имя">
     <b-input  
       v-model="poster"
-      lazy
       custom-class="form__poster-input"
       placeholder="Anonymous"
       icon-right="close-circle"
@@ -25,7 +24,6 @@
   <b-field label="Тема">
     <b-input
       v-model="subject"
-      lazy
     />
   </b-field>
   <b-field label="Сообщение">
@@ -33,7 +31,6 @@
       v-model="message"
       type="textarea"
       ref="message"
-      lazy
     />
   </b-field>
   <b-field label="Медиафайлы">
