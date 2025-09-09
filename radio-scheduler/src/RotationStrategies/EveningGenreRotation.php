@@ -32,16 +32,14 @@ class EveningGenreRotation implements IRotation
     {
         $genre = Evening::getRandom();
 
-        $jingle_paths      = $this->random_tracklist_generator->build(['Jingles'], 1);
-        $commercials_paths = $this->random_tracklist_generator->build(['Commercials'], 3);
+        // $jingle_paths      = $this->random_tracklist_generator->build(['Jingles'], 1);
+        // $commercials_paths = $this->random_tracklist_generator->build(['Commercials'], 3);
         $new_track_paths   = $this->new_or_long_standing_tracklist_generator->build([$genre], 4, 8);
         $avg_track_paths   = $this->average_estimate_tracklist_generator->build([$genre], 4, 8);
 
         $track_paths = array_merge($new_track_paths, $avg_track_paths);
 
         shuffle($track_paths);
-
-        $track_paths = array_merge($jingle_paths, $commercials_paths, $track_paths);
 
         array_walk($track_paths, function (string $track_path) {
             $this->mpd->addToQueue($track_path);
