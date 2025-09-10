@@ -48,7 +48,8 @@ class Request
         return json_encode(
             [
                 'path'   => $this->getPath(),
-                'params' => $this->getParams()
+                'params' => $this->getParams(),
+                'headers' => $this->getHeaders(),
             ],
             JSON_UNESCAPED_UNICODE
         );
