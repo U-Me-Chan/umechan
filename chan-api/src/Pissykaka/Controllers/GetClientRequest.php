@@ -11,8 +11,7 @@ final class GetClientRequest
     {
         return new JsonResponse([
             'params' => $req->getParams(),
-            'headers' => $req->getHeaders(),
-            'server'  => $_SERVER
+            'headers' => $req->getHeaders()
         ]);
     }
 }
