@@ -29,6 +29,7 @@ use PK\Posts\Controllers\PostDeleter;
 use PK\Passports\Controllers\CreatePassport;
 use PK\Passports\Controllers\GetPassportList;
 use PK\Passports\PassportStorage;
+use PK\Pissykaka\Controllers\GetClientRequest;
 use PK\Posts\Console\RestorePostsFromEPDSDump;
 use PK\Posts\Console\SetStickyThread;
 use PK\Posts\Services\PostFacade;
@@ -103,6 +104,7 @@ $r->addRoute('GET', '/v2/event', new GetEventList($event_storage));
 
 $r->addRoute('GET', '/v2/_/openapi.json', new GetOpenApiSpecification(new Generator()));
 $r->addRoute('GET', '/v2/_/redoc.html', new GetRedocPage($_ENV['DOMAIN']));
+$r->addRoute('GET', '/pissykaka/request', new GetClientRequest());
 
 $request_sucessor = $_ENV['IS_DEV'] == 'yes' ? $r : new MemcachedRequestHandler(sucessor: $r);
 
