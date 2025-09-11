@@ -1,7 +1,14 @@
 import Vue from 'vue';
-import App from './pages/App.vue';
 import VueRouter from 'vue-router';
 import VueCookie from 'vue-cookie';
+
+import App from './pages/App.vue';
+import TosPage from './pages/TOS.vue';
+import ThreadPage from './pages/Thread.vue';
+import BoardPage from './pages/Board.vue';
+import FilesPage from './pages/Files.vue';
+import TracksPage from './pages/Tracks.vue';
+
 
 import {
   Toast,
@@ -51,34 +58,12 @@ Vue.use(Taginput);
 Vue.use(VueRouter);
 
 const routes = [
-    {
-      path: '/',
-      component: () => import('./pages/TOS.vue')
-    },
-    {
-      path: '/thread/:id',
-      component: () => import('./pages/Thread.vue')
-    },
-    {
-      path: '/board/:tag',
-      component: () => import('./pages/Board.vue')
-    },
-    {
-      path: '/admin/files',
-      component: () => import('./pages/Files.vue')
-    },
-    {
-      path: '/admin/files/:page',
-      component: () => import('./pages/Files.vue')
-    },
-    {
-      path: '/tracks',
-      component: () => import('./pages/Tracks.vue')
-    },
-    {
-      path: '/admin/delete-post/:id',
-      component: () => import('./pages/DeletePost.vue')
-    }
+  {path: '/',                      component: TosPage},
+  {path: '/thread/:id',            component: ThreadPage},
+  {path: '/board/:tag',            component: BoardPage},
+  {path: '/admin/files',           component: FilesPage},
+  {path: '/admin/files/:page',     component: FilesPage},
+  {path: '/tracks',                component: TracksPage},
 ];
 
 const router = new VueRouter({
