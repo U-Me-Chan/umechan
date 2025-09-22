@@ -15,7 +15,7 @@ use Ridouchire\RadioDbImporter\Utils\PathCutter;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "vendor/autoload.php";
 require_once __DIR__ . DIRECTORY_SEPARATOR . "vendor/james-heinrich/getid3/getid3/getid3.php";
 
-$logger = new Logger('log');
+$logger = new Logger('importer');
 $logger->pushHandler(new StreamHandler(__DIR__ . DIRECTORY_SEPARATOR . 'logs/radio-db-importer.log', Level::Info));
 $logger->info('Запуск');
 

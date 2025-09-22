@@ -31,7 +31,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 date_default_timezone_set('Europe/Ulyanovsk');
 
-$log = new Logger('log');
+$log = new Logger('scheduler');
 $log->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-scheduler.log', Level::Info));
 $log->info('Запуск');
 

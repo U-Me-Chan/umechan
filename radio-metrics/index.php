@@ -24,7 +24,7 @@ if (file_exists(__DIR__ . '/local.env.php')) {
 
 $env = new Environment($_ENV);
 
-$logger = new Logger('log');
+$logger = new Logger('metrics');
 $logger->pushHandler(new StreamHandler(__DIR__ . '/logs/radio-metrics.log', $env->radio_log_level));
 $logger->info('Запуск');
 
