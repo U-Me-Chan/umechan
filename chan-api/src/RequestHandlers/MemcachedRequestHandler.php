@@ -39,6 +39,10 @@ class MemcachedRequestHandler extends RequestHandler
         if (!isset($this->cache_map[$req->getHash()])) {
             $res = $this->sucessor->handle($req);
 
+            if ($res->getCode() !== 200) {
+                return $res;
+            }
+
             $this->cache_map[$req->getHash()] = $res;
 
             $this->memcached->set(self::CACHE_KEY, $this->cache_map);
