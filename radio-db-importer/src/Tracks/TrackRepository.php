@@ -54,15 +54,15 @@ class TrackRepository
     {
         $this->db->insert('tracks', $track->toArray());
 
-        return $this->db->id();
+        return (int) $this->db->id();
     }
 
-    public function update(Track $track)
+    public function update(Track $track): void
     {
         $this->db->update('tracks', $track->toArray(), ['id' => $track->getId()]);
     }
 
-    public function delete(Track $track)
+    public function delete(Track $track): void
     {
         $this->db->delete('tracks', ['hash' => $track->getHash()]);
     }

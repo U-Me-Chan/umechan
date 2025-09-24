@@ -1,4 +1,4 @@
-FROM library/php:8.1-cli
+FROM library/php:8.4-cli
 WORKDIR /db-importer
 
 RUN apt update -yyq && apt install -yyq zip libzip-dev

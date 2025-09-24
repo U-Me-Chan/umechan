@@ -54,8 +54,12 @@ class TrackRepository implements IRepository
             return [[], 0];
         }
 
-        /** @var array */
-        $track_datas = $this->db->select('tracks', '*', array_merge($conditions, $limiting)); // @phpstan-ignore arguments.count,argument.type
+        /**
+         * @var array
+         *
+         * @phpstan-ignore-next-line
+         */
+        $track_datas = $this->db->select('tracks', '*', array_merge($conditions, $limiting));
 
         $tracks = [];
 

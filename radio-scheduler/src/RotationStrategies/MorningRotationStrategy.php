@@ -19,7 +19,7 @@ class MorningRotationStrategy implements IRotation
     ) {
     }
 
-    public function isFired(): bool
+    public function isFired(int $hour = 0): bool
     {
         return true;
     }

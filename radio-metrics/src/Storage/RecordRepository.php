@@ -49,7 +49,8 @@ class RecordRepository implements IRepository
             return [[], 0];
         }
 
-        $record_datas = $this->db->select('records', '*', array_merge($conditions, $limiting)); // @phpstan-ignore arguments.count,argument.type
+        /** @phpstan-ignore-next-line */
+        $record_datas = $this->db->select('records', '*', array_merge($conditions, $limiting));
 
         $records = [];
 

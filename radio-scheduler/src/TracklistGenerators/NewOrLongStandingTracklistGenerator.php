@@ -20,7 +20,7 @@ class NewOrLongStandingTracklistGenerator implements ITracklistGenerator
         $tracks_count = $this->randomizer->getInt($min, $max);
         $genres       = array_map(fn(string $genre) => "{$genre}/%", $genres);
 
-        /** @phpstan-ignore argument.type, arguments.count */
+        /** @phpstan-ignore-next-line */
         $tracks_list = $this->db->select('tracks', 'path', [
             'path[~]'        => $genres,
             'ORDER'          => [
@@ -29,6 +29,7 @@ class NewOrLongStandingTracklistGenerator implements ITracklistGenerator
             'LIMIT' => $tracks_count
         ]);
 
-        return $tracks_list;
+        /** @phpstan-ignore nullCoalesce.variable */
+        return $tracks_list ?? [];
     }
 }

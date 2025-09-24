@@ -52,7 +52,6 @@ class TickHandlerTest extends TestCase
             $this->mpd_collector,
             $this->icecast_collector,
             $this->track_repo,
-            $this->record_repo,
             $this->md5hash,
             $this->cache
         );
@@ -133,8 +132,7 @@ class TickHandlerTest extends TestCase
         ]));
         $this->icecast_collector->expects($this->once())->method('getData')->willReturn(['listeners' => 2]);
         $this->cache->expects($this->once())->method('increment');
-        $this->record_repo->expects($this->once())->method('save');
-        $this->logger->expects($this->exactly(7))->method('debug');
+        $this->logger->expects($this->exactly(6))->method('debug');
 
         $this->handler->handle();
     }
@@ -175,7 +173,6 @@ class TickHandlerTest extends TestCase
         $this->icecast_collector->expects($this->exactly(1))->method('getData')->willReturn(['listeners' => 2]);
         $this->cache->expects($this->exactly(2))->method('set');
         $this->cache->expects($this->exactly(1))->method('increment');
-        $this->record_repo->expects($this->exactly(1))->method('save');
         $this->track_repo->expects($this->exactly(2))->method('save');
 
         $this->handler->handle();
@@ -202,8 +199,7 @@ class TickHandlerTest extends TestCase
         $this->cache->expects($this->once())->method('increment');
         $this->cache->expects($this->exactly(2))->method('set');
         $this->track_repo->expects($this->exactly(1))->method('save');
-        $this->record_repo->expects($this->exactly(1))->method('save');
-        $this->logger->expects($this->exactly(13))->method('debug');
+        $this->logger->expects($this->exactly(12))->method('debug');
 
         $this->handler->handle();
     }

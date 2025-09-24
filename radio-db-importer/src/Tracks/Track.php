@@ -17,7 +17,9 @@ class Track
         private string $path,
         private Hash $hash,
         private int $estimate = 0,
+        /** @phpstan-ignore property.onlyWritten */
         private int $first_playing = 0,
+        /** @phpstan-ignore property.onlyWritten */
         private int $last_playing = 0,
         private int $play_count = 0,
         private int $id = 0

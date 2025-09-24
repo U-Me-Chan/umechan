@@ -126,7 +126,8 @@ final class GetTrackList
         ];
 
         $count = $this->db->count('tracks', $conditions);
-        /** @phpstan-ignore arguments.count, argument.type */
+
+        /** @phpstan-ignore-next-line */
         $tracks = $this->db->select('tracks', '*', array_merge($conditions, $limit, $order));
 
         return Response::json(['tracks' => $tracks, 'count' => $count]);

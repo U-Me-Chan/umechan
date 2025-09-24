@@ -18,7 +18,7 @@ class RotationMaster
 
     public function execute(?int $timestamp = null): void
     {
-        $hour = date('G', $timestamp);
+        $hour = (int) date('G', $timestamp);
 
         if (!isset($this->strategies[$hour]) || empty($this->strategies[$hour])) {
             throw new RuntimeException('Нет стратегии ротации на данный час');

@@ -8,7 +8,6 @@ use Ridouchire\RadioScheduler\IRotation;
 use Ridouchire\RadioScheduler\Services\Mpd;
 use Ridouchire\RadioScheduler\TracklistGenerators\AverageEstimateTracklistGenerator;
 use Ridouchire\RadioScheduler\TracklistGenerators\NewOrLongStandingTracklistGenerator;
-use Ridouchire\RadioScheduler\TracklistGenerators\RandomTracklistGenerator;
 
 class NightGenreRotation implements IRotation
 {
@@ -17,13 +16,12 @@ class NightGenreRotation implements IRotation
     public function __construct(
         private Mpd $mpd,
         private Logger $logger,
-        private RandomTracklistGenerator $random_tracklist_generator,
         private NewOrLongStandingTracklistGenerator $new_or_long_standing_tracklist_generator,
         private AverageEstimateTracklistGenerator $average_estimate_tracklist_generator
     ) {
     }
 
-    public function isFired(): bool
+    public function isFired(int $hour = 0): bool
     {
         return true;
     }
@@ -32,8 +30,6 @@ class NightGenreRotation implements IRotation
     {
         $genre = Night::getRandom();
 
-        // $jingle_paths      = $this->random_tracklist_generator->build(['Jingles'], 1);
-        // $commercials_paths = $this->random_tracklist_generator->build(['Commercials'], 3);
         $new_track_paths = $this->new_or_long_standing_tracklist_generator->build([$genre], 4, 8);
         $avg_track_paths = $this->average_estimate_tracklist_generator->build([$genre], 4, 8);
 

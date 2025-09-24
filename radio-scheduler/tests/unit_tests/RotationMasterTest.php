@@ -14,7 +14,11 @@ class RotationMasterTest extends TestCase
 
     public function setUp(): void
     {
-        /** @var Logger|MockObject */
+        /**
+         * @var Logger|MockObject
+         *
+         * @phpstan-ignore varTag.noVariable
+        */
         $this->logger = $this->createMock(Logger::class);
 
         $this->rotation_master = new RotationMaster($this->logger);
@@ -32,7 +36,11 @@ class RotationMasterTest extends TestCase
     #[Test]
     public function attempExecuteWithStrategyIsNotFired(): void
     {
-        /** @var IRotation|MockObject */
+        /**
+         * @var IRotation|MockObject
+         *
+         * @phpstan-ignore varTag.nativeType
+         */
         $strategy = $this->createMock(IRotation::class);
         $strategy->method('isFired')->willReturn(false);
 
@@ -47,7 +55,11 @@ class RotationMasterTest extends TestCase
     #[Test]
     public function attemptExecuteWithStrategyIsFired(): void
     {
-        /** @var IRotation|MockObject */
+        /**
+         * @var IRotation|MockObject
+         *
+         * @phpstan-ignore varTag.nativeType
+         */
         $strategy = $this->createMock(IRotation::class);
         $strategy->method('isFired')->willReturn(true);
 
@@ -64,7 +76,11 @@ class RotationMasterTest extends TestCase
     #[Test]
     public function attempAddStrategyByPeriodWithInvalidArguments(): void
     {
-        /** @var IRotation|MockObject */
+        /**
+         * @var IRotation|MockObject
+         *
+         * @phpstan-ignore varTag.nativeType
+         */
         $strategy = $this->createMock(IRotation::class);
 
         $this->expectException(InvalidArgumentException::class);
@@ -77,7 +93,11 @@ class RotationMasterTest extends TestCase
     #[Test]
     public function attempAddStrategyByHourWithInvalidArgument(): void
     {
-        /** @var IRotation|MockObject */
+        /**
+         * @var IRotation|MockObject
+         *
+         * @phpstan-ignore varTag.nativeType
+         */
         $strategy = $this->createMock(IRotation::class);
 
         $this->expectException(InvalidArgumentException::class);
@@ -89,7 +109,11 @@ class RotationMasterTest extends TestCase
     #[Test]
     public function attemptExecuteBySpecificHour(): void
     {
-        /** @var IRotation|MockObject */
+        /**
+         * @var IRotation|MockObject
+         *
+         * @phpstan-ignore varTag.nativeType
+         */
         $strategy = $this->createMock(IRotation::class);
         $strategy->method('isFired')->willReturn(true);
 

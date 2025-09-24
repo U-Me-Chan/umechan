@@ -56,11 +56,11 @@ $best_estimate_tracklist_generator        = new BestEstimateTracklistGenerator($
 
 $strategy_master = new RotationMaster($log);
 
-$strategy_master->addStrategyByPeriod(0, 5, new NightGenreRotation($mpd, $log, $random_tracklist_generator, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
-$strategy_master->addStrategyByPeriod(6, 8, new MorningRotationStrategy($mpd, $log, $random_tracklist_generator, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
-$strategy_master->addStrategyByPeriod(9, 19, new DayGenreRotation($mpd, $log, $random_tracklist_generator, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
+$strategy_master->addStrategyByPeriod(0, 5, new NightGenreRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
+$strategy_master->addStrategyByPeriod(6, 8, new MorningRotationStrategy($mpd, $log, $random_tracklist_generator));
+$strategy_master->addStrategyByPeriod(9, 19, new DayGenreRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
 $strategy_master->addStrategyByPeriod(9, 19, new DayRandomPatternRotation($mpd, $log, $random_tracklist_generator));
-$strategy_master->addStrategyByPeriod(19, 23, new EveningGenreRotation($mpd, $log, $random_tracklist_generator, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
+$strategy_master->addStrategyByPeriod(19, 23, new EveningGenreRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
 
 $queue_cropper = new QueueCropper($mpd);
 

@@ -16,15 +16,24 @@ class BestEstimateTracklistGenerator implements ITracklistGenerator
     {
         $genres = array_map(fn(string $genre) => "{$genre}/%", $genres);
 
+        /**
+         * @phpstan-ignore-next-line
+         */
         $datas =  $this->db->select('tracks', 'path', [
             'path[~]' => $genres,
-            'ORDER' => [
+            'LIMIT'   => $count,
+            'ORDER'   => [
                 'estimate'     => 'DESC',
                 'last_playing' => 'ASC'
             ],
-            'LIMIT' => $count
         ]);
 
+        /** @phpstan-ignore equal.alwaysTrue */
+        if ($datas == null) { // Medoo::select может вернуть как пустой массив, так и null
+            return [];
+        }
+
+        /** @phpstan-ignore deadCode.unreachable */
         return array_map(fn(array $data) => $data['path'], $datas);
     }
 }

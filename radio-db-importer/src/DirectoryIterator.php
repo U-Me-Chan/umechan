@@ -9,6 +9,7 @@ use SplFileInfo;
 
 class DirectoryIterator
 {
+    /** @phpstan-ignore missingType.generics */
     private RecursiveIteratorIterator $iterator;
 
     public function __construct(
