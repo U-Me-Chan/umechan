@@ -11,16 +11,13 @@ use IH\DTO\UploadedFile as DTOUploadedFile;
 use IH\Exceptions\FileUnsupportedMimetype;
 use IH\Exceptions\FileNotUploaded;
 use IH\Services\FileUploader;
-use IH\Services\TelegramSender;
 use IH\Services\ThumbnailCreator;
-use Throwable;
 
 class UploadFile implements IController
 {
     public function __construct(
         private string $static_url,
-        private ThumbnailCreator $thumbnail_creator,
-        private TelegramSender $telegram_sender
+        private ThumbnailCreator $thumbnail_creator
     ) {
     }
 
@@ -44,11 +41,6 @@ class UploadFile implements IController
         list($filename, $thumbname) = $this->thumbnail_creator->execute($uploaded_file);
 
         $data = new DTOUploadedFile("{$this->static_url}/{$filename}", "{$this->static_url}/{$thumbname}");
-
-        // try {
-        //     $this->telegram_sender->send("Загружен новый файл: {$this->static_url}/{$filename}");
-        // } catch (Throwable) {
-        // }
 
         return new Response($data);
     }

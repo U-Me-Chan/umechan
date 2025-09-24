@@ -23,7 +23,7 @@ class GetFile implements IController
             return new Response(new DTOError('not found'), Response::HTTP_NOT_FOUND);
         }
 
-        /** @phpstan-ignore arguments.count,argument.type */
+        /** @phpstan-ignore-next-line */
         $post_ids = $this->db->select('posts', 'id', [
             'message[~]' => '%' . $vars['id'] . '%'
         ]);
