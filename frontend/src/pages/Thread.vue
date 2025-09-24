@@ -1,6 +1,6 @@
 <template>
 <div class="thread" ref="thread-top" id="thread-top">
-  <h3>{{opPost.boardName}}: {{opPost.subject ? opPost.subject : '...'}}</h3>
+  <h3>{{post.board.name}}(/{{post.board.tag}}/): {{post.subject ?? '...'}}</h3>
   
   <Thread
     :board="post.board"
@@ -100,11 +100,7 @@ export default {
   data: function () {
     return {
       id: false,
-      post: false,
-      opPost: false,
-      replies: [],
-      countReplies: 0,
-      isFormVisible: false
+      post: false
     }
   }
 }
