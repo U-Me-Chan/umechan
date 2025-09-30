@@ -22,6 +22,7 @@ use Ridouchire\RadioScheduler\RotationStrategies\EveningGenreRotation;
 use Ridouchire\RadioScheduler\RotationStrategies\MorningRotationStrategy;
 use Ridouchire\RadioScheduler\RotationStrategies\NightGenreRotation;
 use Ridouchire\RadioScheduler\Services\OrderTrackService;
+use Ridouchire\RadioScheduler\Services\RandomizerFromRandomPackageWrapper;
 use Ridouchire\RadioScheduler\TracklistGenerators\AverageEstimateTracklistGenerator;
 use Ridouchire\RadioScheduler\TracklistGenerators\BestEstimateTracklistGenerator;
 use Ridouchire\RadioScheduler\TracklistGenerators\NewOrLongStandingTracklistGenerator;
@@ -47,7 +48,7 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-$randomizer = new Random\Randomizer();
+$randomizer = new RandomizerFromRandomPackageWrapper();
 
 $random_tracklist_generator               = new RandomTracklistGenerator($db);
 $new_or_long_standing_tracklist_generator = new NewOrLongStandingTracklistGenerator($db, $randomizer);

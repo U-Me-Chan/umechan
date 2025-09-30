@@ -33,9 +33,11 @@ class MorningRotationStrategy implements IRotation
         $track_paths = array_merge($jingle_paths, $commercials_paths, $track_paths);
 
         array_walk($track_paths, function (string $track_path) {
-            $this->mpd->addToQueue($track_path);
-
             $this->logger->info(self::NAME . ": ставлю в очередь {$track_path}");
+
+            if (!$this->mpd->addToQueue($track_path)) {
+                $this->logger->error(self::NAME . ": ошибка постановки в очередь {$track_path}");
+            }
         });
     }
 }

@@ -43,7 +43,7 @@ class OrderTrackService
 
     public function putTrackListInQueue(string $genre): void
     {
-        if ($this->mpd->getQueueCount() >= 10) {
+        if ($this->mpd->getQueueCount() > 20) {
             throw new DomainException();
         }
 

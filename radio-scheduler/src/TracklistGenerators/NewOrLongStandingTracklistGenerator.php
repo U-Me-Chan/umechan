@@ -2,15 +2,15 @@
 
 namespace Ridouchire\RadioScheduler\TracklistGenerators;
 
-use Random\Randomizer;
 use Medoo\Medoo;
+use Ridouchire\RadioScheduler\IRandomizer;
 use Ridouchire\RadioScheduler\ITracklistGenerator;
 
 class NewOrLongStandingTracklistGenerator implements ITracklistGenerator
 {
     public function __construct(
         private Medoo $db,
-        private Randomizer $randomizer
+        private IRandomizer $randomizer
     ) {
     }
 
