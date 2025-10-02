@@ -37,7 +37,6 @@
     <div class="form__file-uploader-wrap">
       <b-upload
         v-model="files"
-        v-filesize="filesize"
         class="file-label"
         accept="image/png, image/jpeg, image/gif, video/webm, video/mp4, image/webp"
         drag-drop
@@ -66,6 +65,7 @@
 <script>
 import { bus } from '../bus';
 import { CLPBRD_ERR } from '../constants/common-error-texts.js';
+import { convertBytesToMegabytes } from '../utils/filesize_formatter.js'
 
 const config = require('../../config');
 const axios  = require('axios');
@@ -84,10 +84,6 @@ export default {
     message: {
       type: String,
       default: ''
-    },
-    filesize: {
-      type: String,
-      default: config.max_filesize
     }
   },
   methods: {
@@ -183,8 +179,8 @@ export default {
     sendFile: async function (file) {
       const self = this;
 
-      if (file.size > self.filesize) {
-        return Promise.reject('Превышен максимальный размер файла в 25 мегабайт');
+      if (file.size > config.max_filesize) {
+        return Promise.reject(`Превышен максимальный размер файла в ${convertBytesToMegabytes(config.max_filesize)} Мбайт`);
       }
       const uploadData = new formData();
 
@@ -273,11 +269,6 @@ export default {
       filesNames: [],
       isLoading: false
     }
-  },
-  directives: {
-    filesize: ((el, binding) => {
-      el.querySelector('input').size = binding.value;
-    })
   },
   watch: {
     'files': function () {
