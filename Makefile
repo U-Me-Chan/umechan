@@ -2,8 +2,10 @@ include .env
 
 production:
 	docker compose --profile $(TARGET) up --build -d
+	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} ${MYSQL_CHAN_DATABASE} < /tmp/dumps/${DTBS_DUMP_PATH}"
 	docker exec umechan-api vendor/bin/phinx migrate
 ifeq ($(TARGET),production)
+	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} ${MYSQL_RADIO_DATABASE} < /tmp/dumps/${DTBS_DUMP_PATH}"
 	docker exec umechan-radio-metrics ./vendor/bin/phinx migrate
 endif
 down:
@@ -18,7 +20,7 @@ development:
 	docker exec umechan-api ./vendor/bin/phinx migrate
 
 restore-from-dump:
-	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} < /tmp/dumps/$(DTBS_DUMP_PATH)"
+	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} ${MYSQL_CHAN_DATABASE} < /tmp/dumps/$(DTBS_DUMP_PATH)"
 
 generate-env:
 	echo "VUE_APP_API_URL=${API_URL}" > frontend/.env.dev
