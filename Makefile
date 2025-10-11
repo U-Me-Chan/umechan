@@ -2,10 +2,10 @@ include .env
 
 production:
 	docker compose --profile $(TARGET) up --build -d
-	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} ${MYSQL_CHAN_DATABASE} < /tmp/dumps/${DTBS_DUMP_PATH}"
+	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} -e 'CREATE DATABASE IF NOT EXISTS ${MYSQL_CHAN_DATABASE}'"
 	docker exec umechan-api vendor/bin/phinx migrate
 ifeq ($(TARGET),production)
-	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} ${MYSQL_RADIO_DATABASE} < /tmp/dumps/${DTBS_DUMP_PATH}"
+	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} -e 'CREATE DATABASE IF NOT EXISTS ${MYSQL_RADIO_DATABASE}'"
 	docker exec umechan-radio-metrics ./vendor/bin/phinx migrate
 endif
 down:
@@ -16,6 +16,7 @@ development:
 	docker exec umechan-api composer install
 	docker exec umechan-filestore composer install
 	$(MAKE) generate-env
+	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} -e 'CREATE DATABASE IF NOT EXISTS ${MYSQL_CHAN_DATABASE}'"
 	$(MAKE) restore-from-dump
 	docker exec umechan-api ./vendor/bin/phinx migrate
 
