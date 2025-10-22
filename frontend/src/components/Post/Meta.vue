@@ -4,7 +4,7 @@
   <Subject v-if="subject" :subject="subject"/>
   <b-tag>{{ datetime }}</b-tag>
   <b-tag v-if="board">/{{board.tag}}/</b-tag>
-  <b-tag>№{{ id }}</b-tag>
+  <b-tag>#{{ id }}</b-tag>
   <b-tag v-if="isSticky">📌</b-tag>
   <b-tag v-if="isBumpLimit">🌕</b-tag>
   <b-tag v-if="repliesCount">∑{{repliesCount}}</b-tag>

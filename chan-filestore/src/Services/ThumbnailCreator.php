@@ -2,8 +2,9 @@
 
 namespace IH\Services;
 
+use IH\Enums\Mimetype;
+use IH\Exceptions\ThumbnailerNotFoundByMimetype;
 use IH\Services\Thumbnailer;
-use IH\Services\FileUploader;
 
 class ThumbnailCreator
 {
@@ -16,24 +17,20 @@ class ThumbnailCreator
 
     /**
      * Запускает изготовить миниатюры согласно типу файла, возвращает имя файла и его миниатюры
-     *
-     * @param FileUploader $uploaded_file
-     *
-     * @return array
      */
-    public function execute(FileUploader $uploaded_file): array
+    public function execute(Mimetype $mimetype, string $filename): array
     {
-        if (!isset($this->map[$uploaded_file->getMimetype()->value])) {
-            throw new \Exception;
+        if (!isset($this->map[$mimetype->value])) {
+            throw new ThumbnailerNotFoundByMimetype();
         }
 
         /** @var Thumbnailer */
-        $thumbnailer = $this->map[$uploaded_file->getMimetype()->value];
+        $thumbnailer = $this->map[$mimetype->value];
 
-        $thumbnailer->readFromFile($uploaded_file->getFilepath());
+        $thumbnailer->readFromFile($filename);
         $thumbnailer->create(240, 320);
-        $thumbnail_name = $thumbnailer->save($uploaded_file->getFilename());
+        $thumbnail_name = $thumbnailer->save($filename);
 
-        return [$uploaded_file->getFilename(), $thumbnail_name];
+        return [$filename, $thumbnail_name];
     }
 }

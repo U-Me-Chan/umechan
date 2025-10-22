@@ -36,7 +36,7 @@ class VideoThumbnailer implements Thumbnailer
             ' -s ' . max($width, $height) .
             ' -c ' . self::THUMBNAIL_FILE_FORMAT .
             ' -q ' . self::THUMBNAIL_QUALITY .
-            ' -i ' . $this->filepath .
+            ' -i ' . $this->upload_dir_path .  $this->filepath .
             ' -o ' . $this->temp_thumb_filepath .
             ' 2>/dev/null';
         exec($shell);

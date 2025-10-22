@@ -22,7 +22,6 @@ class PostTest extends TestCase
             'test'
         );
 
-        $this->assertEquals(0, $thread->id);
         $this->assertEquals('Anonymous', $thread->poster);
         $this->assertEquals('', $thread->subject);
         $this->assertEquals('test', $thread->message);
@@ -46,7 +45,6 @@ class PostTest extends TestCase
             'foo bar'
         );
 
-        $this->assertEquals(0, $post->id);
         $this->assertEquals('Anonymous', $post->poster);
         $this->assertEquals('', $post->subject);
         $this->assertEquals('foo bar', $post->message);
@@ -80,7 +78,7 @@ class PostTest extends TestCase
             'replies_count' => 501
         ]);
 
-        $this->assertEquals(123, $thread->id);
+        $this->assertEquals(123, $thread->id->value);
         $this->assertEquals('x0ma74', $thread->poster);
         $this->assertEquals('foo', $thread->subject);
         $this->assertEquals('bar', $thread->message);

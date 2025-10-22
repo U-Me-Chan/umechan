@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class V20250728185745 extends AbstractMigration
+final class V20251013201153 extends AbstractMigration
 {
     /**
      * Change Method.
@@ -18,8 +18,13 @@ final class V20250728185745 extends AbstractMigration
      */
     public function change(): void
     {
-        $this->table('posts')
-            ->addIndex(['parent_id'], ['name' => 'parent_id_idx'])
-            ->update();
+        if (!$this->hasTable('boards')) {
+            $this->table('boards')
+                ->addColumn('tag', 'string', ['limit' => 100])
+                ->addColumn('name', 'string', ['limit' => 255])
+                ->addColumn('new_posts_count', 'integer', ['signed' => false, 'default' => 0])
+                ->addColumn('threads_count', 'integer', ['signed' => false, 'default' => 0])
+                ->create();
+        }
     }
 }

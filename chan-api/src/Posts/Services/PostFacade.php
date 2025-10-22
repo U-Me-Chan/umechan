@@ -6,7 +6,6 @@ use InvalidArgumentException;
 use OutOfBoundsException;
 use RuntimeException;
 use PK\Boards\BoardStorage;
-use PK\Events\Services\EventTrigger;
 use PK\Posts\Post;
 use PK\Posts\PostStorage;
 
@@ -17,7 +16,6 @@ class PostFacade
     public function __construct(
         private PostStorage $post_storage,
         private BoardStorage $board_storage,
-        private EventTrigger $event_trigger,
         private PostRestorator $post_restorator
     ) {
     }
@@ -90,11 +88,8 @@ class PostFacade
             $thread->updated_at = time();
 
             $this->post_storage->save($thread);
-
-            $this->event_trigger->triggerThreadUpdated($thread_id);
         }
 
-        $this->event_trigger->triggerPostCreated($id);
         $this->board_storage->updateCounters($thread->board->id);
 
         return ['post_id' => $id, 'password' => $post->password->clearPasswordToString()];
@@ -119,9 +114,6 @@ class PostFacade
 
         $id = $this->post_storage->save($post);
 
-        $this->event_trigger->triggerPostCreated($id);
-        $this->event_trigger->triggerBoardUpdated($board->id);
-
         $this->board_storage->updateCounters($board->id);
 
         return ['post_id' => $id, 'password' => $post->password->clearPasswordToString()];
@@ -142,7 +134,6 @@ EOT;
         $post->is_verify = false;
 
         $this->post_storage->save($post);
-        $this->event_trigger->triggerPostDeleted($id);
     }
 
     public function deletePostByAuthor(int $id, string $password): void
@@ -165,7 +156,6 @@ EOT;
         $post->is_verify = false;
 
         $this->post_storage->save($post);
-        $this->event_trigger->triggerPostDeleted($post->id);
     }
 
     public function setStickyFlagStateToThread(int $id, bool $is_sticky = false): void
@@ -179,6 +169,5 @@ EOT;
         $post->is_sticky = $is_sticky;
 
         $this->post_storage->save($post);
-        $this->event_trigger->triggerThreadUpdated($id);
     }
 }

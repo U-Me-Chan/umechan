@@ -7,6 +7,7 @@ use Medoo\Medoo;
 use OutOfBoundsException;
 use PDOStatement;
 use PK\Posts\Post;
+use PK\Posts\Post\Id;
 use PK\Boards\BoardStorage;
 use PK\Passports\PassportStorage;
 use PK\Posts\Post\PosterKeyHash;
@@ -71,7 +72,6 @@ class PostStorage
                 'posts.timestamp',
                 'posts.parent_id',
                 'posts.updated_at',
-                'posts.estimate',
                 'posts.is_verify',
                 'posts.is_sticky',
                 'posts.password',
@@ -112,7 +112,6 @@ class PostStorage
                         'posts.timestamp',
                         'posts.parent_id',
                         'posts.updated_at',
-                        'posts.estimate',
                         'posts.is_verify',
                         'posts.is_sticky',
                         'posts.password',
@@ -156,7 +155,6 @@ class PostStorage
                 'posts.timestamp',
                 'posts.parent_id',
                 'posts.updated_at',
-                'posts.estimate',
                 'posts.is_verify',
                 'posts.is_sticky',
                 'posts.password',
@@ -196,11 +194,9 @@ class PostStorage
         $this->db->insert('posts', $post->toArray());
     }
 
-    public function save(Post $post): int
+    public function save(Post $post): Id
     {
         $post_data = $post->toArray();
-
-        unset($post_data['id']);
 
         if ($post->is_draft) {
             try {
@@ -210,14 +206,14 @@ class PostStorage
                 $post_data['is_verify'] = VerifyFlag::yes->value;
             } catch (OutOfBoundsException) {
                 $post_data['is_verify'] = VerifyFlag::no->value;
-            }
+            } // FIXME: вынести верификацию в отдельный сервис
 
             $this->db->insert('posts', $post_data);
+        } else {
+            unset($post_data['id']);
 
-            return $this->db->id();
+            $this->db->update('posts', $post_data, ['id' => $post->id->value]);
         }
-
-        $this->db->update('posts', $post_data, ['id' => $post->id]);
 
         return $post->id;
     }

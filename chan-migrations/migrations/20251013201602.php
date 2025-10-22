@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class V20220306155936 extends AbstractMigration
+final class V20251013201602 extends AbstractMigration
 {
     /**
      * Change Method.
@@ -18,8 +18,8 @@ final class V20220306155936 extends AbstractMigration
      */
     public function change(): void
     {
-        $this->table('posts')
-             ->addColumn('is_verify', 'enum', ['values' => ['no', 'yes']])
-             ->update();
+        if ($this->hasTable('post') && $this->table('posts')->hasColumn('estimate')) {
+            $this->table('post')->removeColumn('estimate')->update();
+        }
     }
 }

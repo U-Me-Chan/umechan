@@ -1,0 +1,14 @@
+{
+    "name": "ridouchire/chan-migrations",
+    "type": "library",
+    "require": {
+        "robmorgan/phinx": "0.12.13"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ridouchire",
+            "email": "ridouchire@gmail.com"
+        }
+    ]
+}

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class AddColumnPasswordToPostTable extends AbstractMigration
+final class V20251021233303 extends AbstractMigration
 {
     /**
      * Change Method.
@@ -18,8 +18,11 @@ final class AddColumnPasswordToPostTable extends AbstractMigration
      */
     public function change(): void
     {
-        $this->table('posts')
-             ->addColumn('password', 'string', ['limit' => 255, 'null' => false])
-             ->update();
+        if ($this->hasTable('posts') && $this->table('posts')->hasColumn('id')) {
+            $this->table('posts')
+                ->changeColumn('id', 'biginteger', ['identity' => false, 'null' => false, 'signed' => false])
+                ->changeColumn('parent_id', 'biginteger', ['signed' => false, 'null' => true])
+                ->update();
+        }
     }
 }
