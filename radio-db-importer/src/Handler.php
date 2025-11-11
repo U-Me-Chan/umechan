@@ -61,7 +61,6 @@ final class Handler
             }
 
             $this->file_manager->moveToDirOfConvertibleFiles($file->getPathname(), $file->getFilename());
-
             $this->dir_iterator->next();
 
             return;
@@ -89,20 +88,6 @@ final class Handler
         try {
             $track = $this->track_repo->findOne(['hash' => Hash::fromPath($file->getPathname())->toString()]);
 
-            if ($track->getArtist() !== $this->tags_parser->getArtist()) {
-                /** @phpstan-ignore property.private */
-                $track->artist = $this->tags_parser->getArtist();
-
-                $this->logger->info('У трека обновлён исполнитель');
-            }
-
-            if ($track->getTitle() !== $this->tags_parser->getTitle()) {
-                /** @phpstan-ignore property.private */
-                $track->title = $this->tags_parser->getTitle();
-
-                $this->logger->info('У трека обновлено наименование');
-            }
-
             if ($track->getPath() !== $this->path_cutter->cut($file->getPathname())) {
                 /** @phpstan-ignore property.private */
                 $track->path = $this->path_cutter->cut($file->getPathname());
@@ -110,12 +95,12 @@ final class Handler
                 $this->logger->info('У трека обновлён путь');
             }
 
-            if ($track->isBad()) {
-                $this->logger->info('У трека отрицательная оценка, перемещаю его в директорию Duplicate');
+            // if ($track->isBad()) {
+            //     $this->logger->info('У трека отрицательная оценка, перемещаю его в директорию Duplicate');
 
-                /** @phpstan-ignore property.private */
-                $track->path = $this->path_cutter->cut($this->file_manager->moveToDirOfNegativeEstimate($file->getPathname(), $file->getFilename()));
-            }
+            //     /** @phpstan-ignore property.private */
+            //     $track->path = $this->path_cutter->cut($this->file_manager->moveToDirOfNegativeEstimate($file->getPathname(), $file->getFilename()));
+            // }
 
             if ($track->isUpdated()) {
                 $this->track_repo->update($track);
