@@ -16,8 +16,6 @@ services:
     restart: always
     depends_on:
       - api
-    env_file:
-      - '.env'
     volumes:
       - "./data/files:/var/www/html/files"
       - "./data/logs:/var/log/nginx"
@@ -32,8 +30,6 @@ services:
     container_name: umechan-db
     command: --default-authentication-plugin=mysql_native_password
     restart: always
-    env_file:
-      - '.env'
     environment:
       - MYSQL_DATABASE=${MYSQL_CHAN_DATABASE}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -58,8 +54,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    env_file:
-      - '.env'
     environment:
       - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
       - MYSQL_DATABASE=${MYSQL_CHAN_DATABASE}
@@ -90,8 +84,6 @@ services:
       target: production
     container_name: umechan-filestore
     restart: always
-    env_file:
-      - '.env'
     environment:
       - STATIC_URL=${STATIC_URL}
       - ADMINISTRATOR_KEY=${ADMINISTRATOR_KEY}
@@ -125,8 +117,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    env_file:
-      - '.env'
     environment:
       - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
       - MYSQL_DATABASE=${MYSQL_RADIO_DATABASE}
@@ -153,8 +143,6 @@ services:
         - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     container_name: umechan-radio-scheduler
     restart: always
-    env_file:
-      - '.env'
     volumes:
       - './data/logs/:/scheduler/logs'
     depends_on:
@@ -182,8 +170,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    env_file:
-      - '.env'
     environment:
       - PHINX_HOSTNAME=${MYSQL_HOSTNAME}
       - PHINX_DATABASE=${MYSQL_RADIO_DATABASE}
