@@ -40,7 +40,7 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-$path_cutter  = new PathCutter($music_dir_path);
+$path_cutter  = new PathCutter('/var/lib/music'); // должно быть всегда от корня директории
 $dir_iterator = new DirectoryIterator($music_dir_path);
 $tags_parser  = new Id3v2Parser(new getID3());
 $track_repo   = new TrackRepository($db);
