@@ -107,10 +107,20 @@ export default {
     },
     upvoteTrack: function (event) {
       event.preventDefault();
+
+      if (!this.isPlaying) {
+        return;
+      }
+
       this.estimateTrack(this.track_id, 'plus');
     },
     downvoteTrack: function (event) {
       event.preventDefault();
+
+      if (!this.isPlaying) {
+        return;
+      }
+
       this.estimateTrack(this.track_id, 'minus');
     },
     goToOrderTrack: function (event) {
