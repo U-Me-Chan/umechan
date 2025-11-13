@@ -21,6 +21,7 @@ use Ridouchire\RadioScheduler\RotationStrategies\DayRandomPatternRotation;
 use Ridouchire\RadioScheduler\RotationStrategies\EveningGenreRotation;
 use Ridouchire\RadioScheduler\RotationStrategies\MorningRotationStrategy;
 use Ridouchire\RadioScheduler\RotationStrategies\NightGenreRotation;
+use Ridouchire\RadioScheduler\RotationStrategies\OddFridayRotation;
 use Ridouchire\RadioScheduler\Services\OrderTrackService;
 use Ridouchire\RadioScheduler\Services\RandomizerFromRandomPackageWrapper;
 use Ridouchire\RadioScheduler\TracklistGenerators\AverageEstimateTracklistGenerator;
@@ -59,6 +60,7 @@ $strategy_master = new RotationMaster($log);
 
 $strategy_master->addStrategyByPeriod(0, 5, new NightGenreRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
 $strategy_master->addStrategyByPeriod(6, 8, new MorningRotationStrategy($mpd, $log, $random_tracklist_generator));
+$strategy_master->addStrategyByPeriod(13, 15, new OddFridayRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator, $random_tracklist_generator));
 $strategy_master->addStrategyByPeriod(9, 19, new DayGenreRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
 $strategy_master->addStrategyByPeriod(9, 19, new DayRandomPatternRotation($mpd, $log, $random_tracklist_generator));
 $strategy_master->addStrategyByPeriod(19, 23, new EveningGenreRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
