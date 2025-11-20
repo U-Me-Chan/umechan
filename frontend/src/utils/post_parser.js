@@ -14,7 +14,7 @@ export function parse(message) {
 
           if (match) {
             const text = src.replace(match[0], match => {
-              return `<a href='#${match.slice('&gt;&gt;'.length)}'>>>${match.slice('&gt;&gt;'.length)}</a>`;
+              return `<a class='reply-link' data-parent-id='${match.slice('&gt;&gt;'.length)}' href='/thread/${match.slice('&gt;&gt;'.length)}'>>>${match.slice('&gt;&gt;'.length)}</a>`;
             });
 
             const token = {
@@ -46,7 +46,6 @@ export function parse(message) {
           const match = rule.exec(src);
 
           if (match) {
-            console.debug(match)
             const text = `Я еблан!`;
 
             const token = {
@@ -70,7 +69,6 @@ export function parse(message) {
           const match = rule.exec(src);
 
           if (match) {
-            console.debug(match)
             const text = `<a class="hashtag">${match}</a>`;
 
             const token = {
@@ -94,7 +92,6 @@ export function parse(message) {
           const match = rule.exec(src);
 
           if (match) {
-            console.debug(match)
             const text = `<span class="blockquote">${match}</span>`;
 
             const token = {

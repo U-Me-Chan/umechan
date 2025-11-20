@@ -1,9 +1,14 @@
 <template>
-<div class="post-message" v-html="formattedMessage"></div>
+<div class="post-message" v-html="formattedMessage">
+</div>
 </template>
 
 <script>
-import { parse } from '../..//utils/post_parser'
+import { parse } from '../../utils/post_parser'
+import Post from '../Post.vue'
+
+const axios = require('axios');
+const config = require('../../../config');
 
 export default {
   name: 'Message',
@@ -16,6 +21,42 @@ export default {
   computed: {
     formattedMessage: function () {
       return parse(this.message)
+    }
+  },
+  created: function () {
+    const self = this;
+    window.onmouseover = function (event) {
+      if (event.target.className !== 'reply-link') {
+        return;
+      }
+      
+      axios.get(config.chan_url + '/v2/post/' + event.target.attributes[1].value + '/?no_board_list=true').then((response) => {
+        const post_data = response.data.payload.thread_data;
+        
+        self.$buefy.modal.open({
+          parent: self,
+          component: Post,
+          props: {
+            id: post_data.id,
+            poster: post_data.poster,
+            subject: post_data.subject,
+            youtubes: post_data.media.youtubes,
+            images: post_data.media.images,
+            videos: post_data.media.videos,
+            isVerfiy: post_data.is_verify,
+            parentId: post_data.parent_id,
+            datetime: post_data.datetime,
+            message: post_data.truncated_message,
+            repliesCount: post_data.replies_count,
+            isSticky: post_data.is_sticky
+            
+          },
+          trapFocus: true,
+          overlay: false,
+          customClass: 'no-overlay',
+        });
+
+      })
     }
   }
 }
@@ -58,6 +99,10 @@ table, tr, th, td {
 
 ul {
     list-style: inside;
+}
+
+.no-overlay .modal-background {
+    background-color: transparent !important;
 }
 </style>
   

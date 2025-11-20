@@ -88,8 +88,11 @@ class BoardsFetcher
             'AND' => [
                 'boards.tag[!]' => $exclude_tags
             ],
-            'LIMIT' => [$offset, $limit],
             'ORDER' => ['posts.timestamp' => 'DESC']
+        ];
+
+        $limiting = [
+            'LIMIT' => [$offset, $limit],
         ];
 
         if ($req->getParams('query')) {
@@ -100,6 +103,11 @@ class BoardsFetcher
         }
 
         $results['boards'] = $this->board_repo->find($exclude_tags);
+        $results['count']  = $this->db->count('posts', [
+            '[>]boards' => [
+                'board_id' => 'id'
+            ]
+        ], '*', $conditions);
 
         $results['posts'] = array_map(function ($post) {
             $post['is_verify'] = ($post['is_verify'] === 'yes' ? true : false);
@@ -122,7 +130,7 @@ class BoardsFetcher
                   'posts.is_verify',
                   'boards.tag'
               ],
-              $conditions
+              array_merge($conditions, $limiting)
           )
         );
 

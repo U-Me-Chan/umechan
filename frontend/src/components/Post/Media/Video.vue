@@ -14,7 +14,6 @@ export default {
 
 <style scoped>
 img {
-    border: 3px solid #ede7fb;
     max-width: 240px;
     max-height: 200px;
     widht: auto;
