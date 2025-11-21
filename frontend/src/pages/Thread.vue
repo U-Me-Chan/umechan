@@ -71,6 +71,8 @@ export default {
   created: function () {
     this.id = this.$route.params.id;
     this.init();
+
+    bus.$on('thread:updated', () => this.init())
   },
   updated: function () {
     var section = this.$router.currentRoute.hash.replace('#', '');

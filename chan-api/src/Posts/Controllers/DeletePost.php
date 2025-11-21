@@ -28,7 +28,7 @@ final class DeletePost
                 ->setException(new InvalidArgumentException("Неверный мастер-ключ"));
         }
 
-        $reason = $req->getHeaders('HTTP_REASON') ? $req->getHeaders('HTTP_REASON') : 'Не указано';
+        $reason = $req->getParams('reason', 'Не указан');
 
         $id = $vars['id'];
 
