@@ -54,6 +54,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      chan-migrations:
+        condition: service_completed_successfully
+    env_file:
+      - '.env'
     environment:
       - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
       - MYSQL_DATABASE=${MYSQL_CHAN_DATABASE}
@@ -98,6 +102,25 @@ services:
     volumes:
       - './data/files:/var/www/html/files'
       - './data/logs:/var/log'
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - production
+      - chan
+      - ${TARGET:-}
+  chan-migrations:
+    build:
+      dockerfile: images/chan-migrations/Dockerfile
+      context: .
+    container_name: umechan-migrations
+    env_file:
+      - '.env'
+    environment:
+      - PHINX_HOSTNAME=${MYSQL_HOSTNAME}
+      - PHINX_DATABASE=${MYSQL_CHAN_DATABASE}
+      - PHINX_USER=${MYSQL_USERNAME}
+      - PHINX_PASSWORD=${MYSQL_PASSWORD}
     depends_on:
       db:
         condition: service_healthy

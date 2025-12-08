@@ -142,7 +142,7 @@ p {
 }
 
 .footer-wrap {
-    background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%)
+    background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
 }
 
 .main-content,

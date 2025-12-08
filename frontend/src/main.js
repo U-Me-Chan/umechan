@@ -53,34 +53,34 @@ Vue.use(Dropdown);
 Vue.use(VueRouter);
 
 const routes = [
-    {
-      path: '/',
-      component: () => import('./pages/TOS.vue')
-    },
-    {
-      path: '/thread/:id',
-      component: () => import('./pages/Thread.vue')
-    },
-    {
-      path: '/board/:tag',
-      component: () => import('./pages/Board.vue')
-    },
-    {
-      path: '/admin/files',
-      component: () => import('./pages/Files.vue')
-    },
-    {
-      path: '/admin/files/:page',
-      component: () => import('./pages/Files.vue')
-    },
-    {
-      path: '/tracks',
-      component: () => import('./pages/Tracks.vue')
-    },
-    {
-      path: '/admin/login',
-      component: () => import('./pages/AdminCredentials.vue')
-    }
+  {
+    path: '/',
+    component: () => import('./pages/TOS.vue')
+  },
+  {
+    path: '/thread/:id',
+    component: () => import('./pages/Thread.vue')
+  },
+  {
+    path: '/board/:tag',
+    component: () => import('./pages/Board.vue')
+  },
+  {
+    path: '/admin/files',
+    component: () => import('./pages/Files.vue')
+  },
+  {
+    path: '/admin/files/:page',
+    component: () => import('./pages/Files.vue')
+  },
+  {
+    path: '/tracks',
+    component: () => import('./pages/Tracks.vue')
+  },
+  {
+    path: '/admin/login',
+    component: () => import('./pages/AdminCredentials.vue')
+  }
 ];
 
 const router = new VueRouter({

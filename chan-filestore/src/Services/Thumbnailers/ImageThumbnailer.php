@@ -20,9 +20,9 @@ class ImageThumbnailer implements Thumbnailer
         $this->image = new \Imagick();
     }
 
-    public function readFromFile(string $filepath): void
+    public function readFromFile(string $filename): void
     {
-        $fh = fopen($filepath, 'r');
+        $fh = fopen($this->upload_dir_path . $filename, 'r');
 
         $this->image->readImageFile($fh);
 

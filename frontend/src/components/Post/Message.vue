@@ -1,9 +1,10 @@
 <template>
-<div class="post-message" v-html="formattedMessage"></div>
+<div class="post-message" v-html="formattedMessage">
+</div>
 </template>
 
 <script>
-import { parse } from '../..//utils/post_parser'
+import { parse } from '../../utils/post_parser'
 
 export default {
   name: 'Message',
@@ -58,6 +59,10 @@ table, tr, th, td {
 
 ul {
     list-style: inside;
+}
+
+.no-overlay .modal-background {
+    background-color: transparent !important;
 }
 </style>
   

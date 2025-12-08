@@ -79,7 +79,7 @@ class PostRestorator
             ]);
 
             try {
-                $this->post_storage->findById($post->id);
+                $this->post_storage->findById($post->id->value);
             } catch (OutOfBoundsException) {
                 $this->post_storage->saveAsIs($post);
             }

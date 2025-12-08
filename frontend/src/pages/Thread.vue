@@ -1,6 +1,6 @@
 <template>
 <div class="thread" ref="thread-top" id="thread-top">
-  <h3>{{post.board.name}}(/{{post.board.tag}}/): {{post.subject ?? '...'}}</h3>
+  <h3>/{{post.board.tag}}/:{{post.subject ?? '...'}}</h3>
   
   <Thread
     :board="post.board"
@@ -26,7 +26,7 @@
 import { bus } from '../bus'
 import Thread from '../components/Thread.vue'
 
-const config = require('../../config')
+const config = require('../../config');
 const axios  = require('axios');
 
 export default {
@@ -37,53 +37,53 @@ export default {
   methods: {
     init: function () {
       var self = this;
-
+      
       bus.$emit('app.loader', [true]);
-
+      
       axios.get(config.chan_url + '/v2/post/' + this.id + '/?no_board_list=true').then((response) => {
         if (response.data.payload.thread_data.parent_id !== null) {
-          self.id = response.data.payload.thread_data.parent_id;
-          self.init();
+          self.$router.push('/thread/' + response.data.payload.thread_data.parent_id + '/#' + self.id);
+          
+          return;
         }
-
+        
         self.post = response.data.payload.thread_data;
-
-        bus.$emit('boards.update', [response.data.payload.thread_data.board.tag]);
+        
+        bus.$emit('boards.update', [self.post.board.tag]);
         bus.$emit('app.loader', [false]);
-
-        document.title = 'U III E : /' + response.data.payload.thread_data.board.tag + '/' + response.data.payload.thread_data.subject;
+        
+        document.title = '/'
+          + response.data.payload.thread_data.board.tag
+          + '/'
+          + response.data.payload.thread_data.subject
+          + ':'
+          + response.data.payload.thread_data.id;
       }).catch((error) => {
-        console.log(error);
+        console.error(error);
         self.$buefy.toast.open(`Произошла ошибка при запросе данных треда: ${error}`);
         bus.$emit('app.loader', [false]);
       });
     },
-    scrollTo: function (section, type) {
+    scrollTo: function (section) {
       var el = window.document.getElementById(section);
-
+      
       this.$nextTick(() => el.scrollIntoView())
-
-      if (type == 'post') {
-        el.classList.add('post-active');
-      }
+      
+      el.classList.add('post-active');
     }
   },
   created: function () {
     this.id = this.$route.params.id;
     this.init();
-
-    bus.$on('thread:updated', () => this.init())
+    
+    var self = this;
+    bus.$on('form:success', () => self.init());
+    bus.$on('thread:updated', () => this.init());
   },
   updated: function () {
     var section = this.$router.currentRoute.hash.replace('#', '');
 
-    if (section) {
-      this.scrollTo(section, 'post');
-    }
-
-    var self = this;
-
-    bus.$on('form:success', () => self.init());
+    this.scrollTo(section, 'post');
   },
   watch:  {
     '$route': function (to, from) {
@@ -92,10 +92,7 @@ export default {
         this.init();
 
         var section = this.$router.currentRoute.hash.replace('#', '');
-
-        if (section) {
-          this.scrollTo(section, 'post');
-        }
+        this.scrollTo(section, 'post');
       }
     }
   },
@@ -108,7 +105,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .toggle-form {
     cursor: pointer;
     font-weight: bold;
@@ -146,6 +143,6 @@ h3 {
 }
 
 .post-active {
-    border: 2px dotted blue;
+    border: 3px dotted blue;
 }
 </style>

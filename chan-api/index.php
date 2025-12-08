@@ -12,6 +12,7 @@ use PK\Http\Request;
 use PK\Feed\Controllers\BoardsFetcher;
 
 use PK\Boards\BoardStorage;
+use PK\Boards\Console\CreateBoard;
 use PK\Boards\Controllers\GetBoardList;
 
 use PK\Events\Controllers\GetEventList;
@@ -66,18 +67,19 @@ $db = new Medoo([
 $event_storage    = new EventStorage($db);
 $passport_storage = new PassportStorage($db);
 $board_storage    = new BoardStorage($db);
-$post_storage     = new PostStorage($db, $board_storage, $passport_storage);
+$post_storage     = new PostStorage($db, $passport_storage);
 
 $event_trigger = new EventTrigger($event_storage);
 
 $post_restorator = new PostRestorator('/tmp/dumps/' . $_ENV['EPDS_DUMP_PATH'], $board_storage, $post_storage);
-$post_facade     = new PostFacade($post_storage, $board_storage, $event_trigger, $post_restorator);
+$post_facade     = new PostFacade($post_storage, $board_storage, $post_restorator);
 
 if (PHP_SAPI == 'cli') {
     $app = new ConsoleApplication('ChanApi');
 
     $app->add(new RestorePostsFromEPDSDump($post_facade));
     $app->add(new SetStickyThread($post_facade));
+    $app->add(new CreateBoard($board_storage));
 
     exit($app->run());
 }
