@@ -8,6 +8,17 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(schema: 'Board')]
 class Board implements \JsonSerializable
 {
+    public static function draft(string $tag, string $name): self
+    {
+        return new self(
+            0,
+            $tag,
+            $name,
+            0,
+            0
+        );
+    }
+
     public static function fromArray(array $state): self
     {
         $id = match(true) {

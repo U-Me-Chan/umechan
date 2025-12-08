@@ -10,6 +10,7 @@ use PK\Posts\Post\StickyFlag;
 use PK\Posts\Post\VerifyFlag;
 use PK\Posts\Post\VideoParser;
 use PK\Posts\Post\YoutubeParser;
+use PK\Posts\Post\Id;
 use PK\Posts\OpenApi\Schemas\MediaList;
 
 #[OA\Schema]
@@ -18,10 +19,6 @@ class Post implements \JsonSerializable
     #[OA\Property(description: 'Превышен ли лимит ответов?')]
     public bool $bump_limit_reached {
         get => $this->is_thread && $this->replies_count > 500 ? true : false;
-    }
-
-    public bool $is_draft {
-        get => $this->id == 0 ? true : false;
     }
 
     public bool $is_thread {
@@ -46,7 +43,7 @@ class Post implements \JsonSerializable
         string $subject = ''
     ): self {
         return new self(
-            0,
+            Id::generate(),
             $poster,
             $subject,
             $message,
@@ -54,15 +51,15 @@ class Post implements \JsonSerializable
             $board,
             $parent_id,
             time(),
-            0,
-            PasswordHash::generate()
+            PasswordHash::generate(),
+            is_draft: true
         );
     }
 
     public static function fromArray(array $state): self
     {
         return new self(
-            $state['id'],
+            Id::fromInt($state['id']),
             $state['poster'],
             $state['subject'],
             $state['message'],
@@ -70,12 +67,12 @@ class Post implements \JsonSerializable
             Board::fromArray($state['board_data']),
             $state['parent_id'],
             $state['updated_at'],
-            $state['estimate'],
             PasswordHash::fromString($state['password']),
             isset($state['replies']) && !empty($state['replies']) ? $state['replies'] : [],
             isset($state['replies_count']) ? $state['replies_count'] : 0,
             VerifyFlag::from($state['is_verify']) == VerifyFlag::yes ? true : false,
-            StickyFlag::from($state['is_sticky']) == StickyFlag::yes ? true: false
+            StickyFlag::from($state['is_sticky']) == StickyFlag::yes ? true: false,
+            is_draft: false
         );
     }
 
@@ -87,6 +84,7 @@ class Post implements \JsonSerializable
 
         $data['media']             = $media;
         $data['truncated_message'] = $truncated_message;
+        $data['id']                = $this->id->value;
 
         unset(
             $data['password'],
@@ -105,6 +103,7 @@ class Post implements \JsonSerializable
         $data['is_verify'] = $this->is_verify == true ? 'yes' : 'no';
         $data['is_sticky'] = $this->is_sticky == true ? 'yes' : 'no';
         $data['password']  = $this->password->toString();
+        $data['id']        = $this->id->value;
 
         unset(
             $data['board'],
@@ -123,7 +122,7 @@ class Post implements \JsonSerializable
 
     private function __construct(
         #[OA\Property(description: 'Идентификатор')]
-        public int $id,
+        public Id $id,
         #[OA\Property(description: 'Автор')]
         public string $poster,
         #[OA\Property(description: 'Тема')]
@@ -138,8 +137,6 @@ class Post implements \JsonSerializable
         public ?int $parent_id,
         #[OA\Property(description: 'Метка времени в unixtime последнего обновления поста')]
         public int $updated_at,
-        #[OA\Property(deprecated: true)]
-        public int $estimate,
         public PasswordHash $password,
         #[OA\Property(items: new OA\Items(ref: Post::class), description: 'Список ответов на нить')]
         public array $replies = [],
@@ -152,7 +149,8 @@ class Post implements \JsonSerializable
         #[OA\Property(description: 'Очищенное от медиа сообщение')]
         private string $truncated_message = '',
         #[OA\Property(description: 'Список медиа', ref: MediaList::class, nullable: false)]
-        private ?object $media = null
+        private ?object $media = null,
+        public bool $is_draft = true
     ) {
     }
 
