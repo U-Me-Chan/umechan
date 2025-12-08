@@ -5,7 +5,7 @@ data/dumps/*
 data/music
 data/tagme
 data/convert
-!data/dumps/dump.sql
+data/dumps/dump.sql
 data/logs/*
 .env
 .projectile

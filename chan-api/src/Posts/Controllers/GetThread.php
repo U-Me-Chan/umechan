@@ -74,8 +74,12 @@ final class GetThread
         $exclude_tags  = $req->getParams('exclude_tags', $this->exclude_tags);
         $no_board_list = $req->getParams('no_board_list') ? true : false;
 
-        list($thread, $boards) = $this->post_facade->getThread($id, $exclude_tags, $no_board_list);
+        try {
+            list($thread, $boards) = $this->post_facade->getThread($id, $exclude_tags, $no_board_list);
 
-        return new JsonResponse(['thread_data' => $thread, 'boards' => $boards]);
+            return new JsonResponse(['thread_data' => $thread, 'boards' => $boards]);
+        } catch (OutOfBoundsException $e) {
+            return new JsonResponse([], 404)->setException($e);
+        }
     }
 }

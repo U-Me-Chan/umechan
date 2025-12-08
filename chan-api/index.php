@@ -66,7 +66,7 @@ $db = new Medoo([
 $event_storage    = new EventStorage($db);
 $passport_storage = new PassportStorage($db);
 $board_storage    = new BoardStorage($db);
-$post_storage     = new PostStorage($db, $board_storage, $passport_storage);
+$post_storage     = new PostStorage($db, $passport_storage);
 
 $event_trigger = new EventTrigger($event_storage);
 

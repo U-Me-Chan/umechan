@@ -17,7 +17,6 @@ class PostStorage
 {
     public function __construct(
         private Medoo $db,
-        private BoardStorage $board_storage,
         private PassportStorage $passport_storage
     ) {
     }

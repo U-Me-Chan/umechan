@@ -6,7 +6,7 @@ class Id
 {
     public static function generate(): self
     {
-        return new self(microtime(true) * 1000000);
+        return new self(intval(microtime(true) * 1000000));
     }
 
     public static function fromInt(int $id): self
