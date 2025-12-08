@@ -15,7 +15,14 @@
   </b-pagination>
 
   <div class="files">
-    <File :name="file.name" :original="file.original" :thumbnail="file.thumbnail" v-for="file in files" :key="file.name"/>
+    <File
+      :name="file.name"
+      :original="file.original"
+      :thumbnail="file.thumbnail"
+      :postIds="file.post_ids"
+      v-for="file in files"
+      :key="file.name"
+      />
   </div>
 </div>
 </template>

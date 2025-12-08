@@ -6,6 +6,29 @@ export function parse(message) {
     breaks: true,
     extensions: [
       {
+        name: 'quote',
+        level: 'inline',
+        tokenizer(src) {
+          const rule = /&gt;{1,}[\w\s\S]+/gmi;
+          const match = rule.exec(src);
+
+          if (match) {
+            const text = `<span class="blockquote">${match}</span>`;
+
+            const token = {
+              type: 'quote',
+              raw: src,
+              text: text
+            }
+
+            return token;
+          }
+        },
+        renderer (token) {
+          return `${token.text}`
+        }
+      },
+      {
         name: 'replier',
         level: 'block',
         tokenizer(src) {
@@ -14,7 +37,7 @@ export function parse(message) {
 
           if (match) {
             const text = src.replace(match[0], match => {
-              return `<a href='#${match.slice('&gt;&gt;'.length)}'>>>${match.slice('&gt;&gt;'.length)}</a>`;
+              return `<a class='reply-link' data-parent-id='${match.slice('&gt;&gt;'.length)}' href='/thread/${match.slice('&gt;&gt;'.length)}'>>>${match.slice('&gt;&gt;'.length)}</a>`;
             });
 
             const token = {
@@ -39,30 +62,6 @@ export function parse(message) {
         }
       },
       {
-        name: 'eblan',
-        level: 'inline',
-        tokenizer(src) {
-          const rule = /^\/postcount$/;
-          const match = rule.exec(src);
-
-          if (match) {
-            console.debug(match)
-            const text = `Я еблан!`;
-
-            const token = {
-              type: 'quote',
-              raw: src,
-              text: text
-            }
-
-            return token;
-          }
-        },
-        renderer (token) {
-          return `${token.text}`
-        }
-      },
-      {
         name: 'hashtag',
         level: 'inline',
         tokenizer(src) {
@@ -70,32 +69,7 @@ export function parse(message) {
           const match = rule.exec(src);
 
           if (match) {
-            console.debug(match)
             const text = `<a class="hashtag">${match}</a>`;
-
-            const token = {
-              type: 'quote',
-              raw: src,
-              text: text
-            }
-
-            return token;
-          }
-        },
-        renderer (token) {
-          return `${token.text}`
-        }
-      },
-      {
-        name: 'quote',
-        level: 'inline',
-        tokenizer(src) {
-          const rule = /^&gt;{1,}[\w\s\S]+$/;
-          const match = rule.exec(src);
-
-          if (match) {
-            console.debug(match)
-            const text = `<span class="blockquote">${match}</span>`;
 
             const token = {
               type: 'quote',
