@@ -38,7 +38,7 @@
       <b-upload
         v-model="files"
         class="file-label"
-        accept="image/png, image/jpeg, image/gif, video/webm, video/mp4, image/webp"
+        accept="image/png, image/jpeg, image/gif, video/webm, video/mp4, image/webp, video/quicktime"
         drag-drop
         multiple
       >
