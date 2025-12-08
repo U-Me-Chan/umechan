@@ -4,7 +4,9 @@ use Medoo\Medoo;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use OpenApi\Generator;
 use PK\RequestHandlers\Router;
+use PK\RequestHandlers\MemcachedRequestHandler;
 use PK\Application;
+use PK\Base\Controllers\GetDebugRequestData;
 use PK\Http\Request;
 
 use PK\Feed\Controllers\BoardsFetcher;
@@ -34,7 +36,6 @@ use PK\Posts\Console\RestorePostsFromEPDSDump;
 use PK\Posts\Console\SetStickyThread;
 use PK\Posts\Services\PostFacade;
 use PK\Posts\Services\PostRestorator;
-use PK\RequestHandlers\MemcachedRequestHandler;
 
 require_once __DIR__ . "/vendor/autoload.php";
 
@@ -86,6 +87,12 @@ if (PHP_SAPI == 'cli') {
 /** @var Router */
 $r = new Router();
 
+$r->addRoute('GET', '/test', new GetDebugRequestData());
+$r->addRoute('POST', '/test', new GetDebugRequestData());
+$r->addRoute('PUT', '/test', new GetDebugRequestData());
+$r->addRoute('PATCH', '/test', new GetDebugRequestData());
+$r->addRoute('DELETE', '/test', new GetDebugRequestData());
+
 $r->addRoute('GET', '/board/all', new BoardsFetcher($board_storage, $db, $exclude_tags));
 
 $r->addRoute('GET', '/v2/board', new GetBoardList($board_storage, $exclude_tags));
@@ -96,7 +103,7 @@ $r->addRoute('POST', '/v2/post', new CreateThread($post_facade));
 $r->addRoute('PUT', '/v2/post/{id:[0-9]+}', new CreateReply($post_facade));
 $r->addRoute('PATCH', '/v2/post/{id:[0-9]+}', new UpdatePost($maintenance_key));
 $r->addRoute('DELETE', '/v2/post/{id:[0-9]+}', new PostDeleter($post_facade));
-$r->addRoute('DELETE', '/_/v2/post/{id:[0-9]+}', new DeletePost($post_facade, $maintenance_key));
+$r->addRoute('POST', '/_/v2/post/{id:[0-9]+}', new DeletePost($post_facade, $maintenance_key));
 
 $r->addRoute('GET', '/v2/passport', new GetPassportList($passport_storage));
 $r->addRoute('POST', '/v2/passport', new CreatePassport($passport_storage, $default_name));

@@ -4,6 +4,7 @@ namespace PK\Passports;
 
 use Medoo\Medoo;
 use OutOfBoundsException;
+use PK\Passports\Exceptions\NameOrKeyIsForbiddenException;
 use PK\Passports\Passport;
 
 class PassportStorage
@@ -57,7 +58,7 @@ class PassportStorage
             $this->db->insert('passports', $passport->toArray());
         } catch (\PDOException $e) {
             if ($e->getCode() == 23000) {
-                throw new \RuntimeException("Нельзя использовать такое имя или пароль");
+                throw new NameOrKeyIsForbiddenException("Нельзя использовать такое имя или пароль");
             }
 
             throw new \RuntimeException("Произошла ошибка, обратитесь к администратору");

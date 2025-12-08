@@ -104,6 +104,8 @@ export default {
   created: function () {
     this.tag = this.$route.params.tag;
     this.init();
+
+    bus.$on('board:updated', () => this.init())
   },
   computed: {
     title: function () {

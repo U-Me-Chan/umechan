@@ -7,6 +7,7 @@ use PK\Http\Request;
 use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Error;
 use PK\OpenApi\Schemas\Response;
+use PK\Passports\Exceptions\NameOrKeyIsForbiddenException;
 use PK\Passports\Passport;
 use PK\Passports\PassportStorage;
 
@@ -47,7 +48,7 @@ use PK\Passports\PassportStorage;
     response: 409,
     description: 'При попытке использовать недопустимые значения',
     type: 'InvalidArgumentException',
-    message: 'Нельзя использовать имя автора по умолчанию для любого из параметров: Anon'
+    message: 'Нельзя использовать такое имя или пароль'
 )]
 final class CreatePassport
 {
@@ -82,13 +83,17 @@ final class CreatePassport
         if ($req->getParams('name') == $this->default_name || $req->getParams('key') == $this->default_name) {
             return (new JsonResponse([], 409))
                 ->setException(
-                    new \InvalidArgumentException("Нельзя использовать имя автора по умолчанию для любого из параметров: {$this->default_name}")
+                    new NameOrKeyIsForbiddenException("Нельзя использовать имя автора по умолчанию для любого из параметров: {$this->default_name}")
                 );
         }
 
         $passport = Passport::draft($req->getParams('name'), $req->getParams('key'));
 
-        $this->passport_repo->save($passport);
+        try {
+            $this->passport_repo->save($passport);
+        } catch (NameOrKeyIsForbiddenException $e) {
+            return new JsonResponse([], 409)->setException($e);
+        }
 
         return new JsonResponse([], 201);
     }

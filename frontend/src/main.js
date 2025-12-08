@@ -21,7 +21,8 @@ import {
   Icon,
   Tooltip,
   Loading,
-  Taginput
+  Taginput,
+  Dropdown
 } from 'buefy';
 
 import 'buefy/dist/buefy.css';
@@ -47,6 +48,7 @@ Vue.use(Icon);
 Vue.use(Tooltip);
 Vue.use(Loading);
 Vue.use(Taginput);
+Vue.use(Dropdown);
 
 Vue.use(VueRouter);
 
@@ -76,8 +78,8 @@ const routes = [
     component: () => import('./pages/Tracks.vue')
   },
   {
-    path: '/admin/delete-post/:id',
-    component: () => import('./pages/DeletePost.vue')
+    path: '/admin/login',
+    component: () => import('./pages/AdminCredentials.vue')
   }
 ];
 

@@ -19,7 +19,13 @@ $logger = new Logger('importer');
 $logger->pushHandler(new StreamHandler(__DIR__ . DIRECTORY_SEPARATOR . 'logs/radio-db-importer.log', Level::Info));
 $logger->info('Запуск');
 
-$music_dir_path                  = '/var/lib/music';
+$subpath = isset($_ENV['RADIO_DB_IMPORTER_SUBDIR_PATH']) ? $_ENV['RADIO_DB_IMPORTER_SUBDIR_PATH'] : '';
+
+if ($subpath == '/') {
+    $subpath = '';
+}
+
+$music_dir_path                  = '/var/lib/music' . $subpath;
 $music_dir_of_convertible_files  = '/var/lib/convert';
 $music_dir_of_files_without_tags = '/var/lib/tagme';
 $music_dir_of_negative_estimates = '/var/lib/music/Duplicate';
@@ -34,7 +40,7 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-$path_cutter  = new PathCutter($music_dir_path);
+$path_cutter  = new PathCutter('/var/lib/music'); // должно быть всегда от корня директории
 $dir_iterator = new DirectoryIterator($music_dir_path);
 $tags_parser  = new Id3v2Parser(new getID3());
 $track_repo   = new TrackRepository($db);

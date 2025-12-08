@@ -4,7 +4,7 @@ namespace Ridouchire\RadioScheduler\Services;
 
 use RuntimeException;
 use FloFaber\MphpD\MphpD;
-use FloFaber\MPDException;
+use FloFaber\MphpD\MPDException;
 use FloFaber\MphpD\Filter;
 use Monolog\Logger;
 
@@ -172,8 +172,8 @@ class Mpd
 
             try {
                 $this->mphpd->connect();
-            } catch (MPDException $e) { // @phpstan-ignore class.notFound
-                $this->log->error('MPD: произошла ошибка при подключении к серверу: ' . $e->getMessage(), ['error' => $this->mphpd->get_last_error()]); // @phpstan-ignore class.notFound
+            } catch (MPDException $e) {
+                $this->log->error('MPD: произошла ошибка при подключении к серверу: ' . $e->getMessage(), ['error' => $this->mphpd->get_last_error()]);
             }
         }
 
