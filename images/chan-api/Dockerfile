@@ -3,8 +3,7 @@ FROM library/php:8.4-fpm AS base
 RUN apt update -yyq && apt install -yyq zip libzip-dev libmemcached-dev libssl-dev
 RUN pecl install memcached
 RUN docker-php-ext-enable memcached
-RUN docker-php-ext-install pdo_mysql
-RUN docker-php-ext-install zip
+RUN docker-php-ext-install -j$(nproc) pdo_mysql zip
 RUN docker-php-source delete
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
