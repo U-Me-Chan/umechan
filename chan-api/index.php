@@ -34,6 +34,7 @@ use PK\Passports\Controllers\GetPassportList;
 use PK\Passports\PassportStorage;
 use PK\Posts\Console\RestorePostsFromEPDSDump;
 use PK\Posts\Console\SetStickyThread;
+use PK\Posts\Controllers\GetThreadFileList;
 use PK\Posts\Services\PostFacade;
 use PK\Posts\Services\PostRestorator;
 
@@ -104,6 +105,7 @@ $r->addRoute('PUT', '/v2/post/{id:[0-9]+}', new CreateReply($post_facade));
 $r->addRoute('PATCH', '/v2/post/{id:[0-9]+}', new UpdatePost($maintenance_key));
 $r->addRoute('DELETE', '/v2/post/{id:[0-9]+}', new PostDeleter($post_facade));
 $r->addRoute('POST', '/_/v2/post/{id:[0-9]+}', new DeletePost($post_facade, $maintenance_key));
+$r->addRoute('GET', '/v2/post/{id:[0-9]+}/files', new GetThreadFileList($post_facade));
 
 $r->addRoute('GET', '/v2/passport', new GetPassportList($passport_storage));
 $r->addRoute('POST', '/v2/passport', new CreatePassport($passport_storage, $default_name));

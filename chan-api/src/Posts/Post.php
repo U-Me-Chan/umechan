@@ -154,6 +154,15 @@ class Post implements \JsonSerializable
     ) {
     }
 
+    public function getMedia(): array
+    {
+        list($media) = $this->getMediaAndTruncatedMessage();
+
+        $result = array_merge($media['videos'], $media['images']);
+
+        return $result;
+    }
+
     public function getMediaAndTruncatedMessage(): array
     {
         $message = $this->message;
