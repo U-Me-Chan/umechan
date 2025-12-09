@@ -6,7 +6,7 @@ production:
 	docker exec umechan-migrations vendor/bin/phinx migrate
 ifeq ($(TARGET),production)
 	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} -e 'CREATE DATABASE IF NOT EXISTS ${MYSQL_RADIO_DATABASE}'"
-	docker exec umechan-radio-metrics ./vendor/bin/phinx migrate
+	docker restart umechan-migrations
 endif
 down:
 	docker compose --profile $(TARGET) down
