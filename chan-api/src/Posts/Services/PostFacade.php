@@ -170,4 +170,19 @@ EOT;
 
         $this->post_storage->save($post);
     }
+
+    public function getThreadFiles(int $thread_id): array
+    {
+        /** @var Post */
+        list($thread) = $this->getThread($thread_id, no_board_list: true);
+
+        $result = $thread->getMedia();
+
+        /** @var Post $post */
+        foreach ($thread->replies as $post) {
+            $result = array_merge($result, array_values($post->getMedia()));
+        }
+
+        return $result;
+    }
 }
