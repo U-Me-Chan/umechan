@@ -13,7 +13,6 @@ class Day implements IGenreSchema
             'Alternative High/20',
             'Alternative Rock',
             'Alternative Rock/20',
-            'Ru Angst',
             'Pop',
             'Pop/20',
             'Pop Ru',
@@ -41,7 +40,6 @@ class Day implements IGenreSchema
             [
                 'Alternative High/20',
                 'Alternative Rock/20',
-                'Ru Angst',
             ],
             [
                 'Pop/20',
