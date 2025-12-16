@@ -6,7 +6,7 @@ RUN docker-php-ext-enable memcached
 RUN docker-php-ext-install -j$(nproc) pdo_mysql zip
 RUN docker-php-source delete
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 ADD images/chan-api/api-php.ini /usr/local/etc/php/conf.d
 

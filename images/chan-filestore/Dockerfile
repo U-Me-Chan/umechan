@@ -6,7 +6,7 @@ RUN pecl install imagick
 RUN docker-php-source delete
 RUN apk del --purge autoconf g++ make linux-headers
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 ARG MAX_FILESIZE
 COPY images/chan-filestore/filestore-php.ini /usr/local/etc/php/conf.d

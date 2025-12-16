@@ -4,7 +4,7 @@ RUN apk add zip libzip-dev
 RUN docker-php-ext-install -j$(nproc) pdo_mysql zip
 RUN docker-php-source delete
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 ADD chan-migrations .
 RUN composer install
