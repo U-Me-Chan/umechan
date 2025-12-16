@@ -10,6 +10,7 @@
     :isSticky="isSticky"
     :board="board"
     :repliesCount="repliesCount"
+    :isBumpLimit="isBumpLimit"
     />
   <div class="post-body">
     <Media :images="images" :youtubes="youtubes" :videos="videos"/>
