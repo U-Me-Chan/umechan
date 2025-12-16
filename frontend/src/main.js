@@ -80,6 +80,14 @@ const routes = [
   {
     path: '/admin/login',
     component: () => import('./pages/AdminCredentials.vue')
+  },
+  {
+    path: '/thread/:id/player',
+    component: () => import('./pages/MediaPlayer.vue')
+  },
+  {
+    path: '*',
+    component: () => import('./pages/404.vue')
   }
 ];
 

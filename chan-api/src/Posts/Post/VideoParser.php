@@ -24,7 +24,8 @@ final class VideoParser extends PostMessageParser
             foreach ($matches['link'] as $k => $link) {
                 $videos[$link] = [
                     'link'    => $link,
-                    'preview' => $matches['preview'][$k]
+                    'preview' => $matches['preview'][$k],
+                    'type'    => 'video'
                 ];
             }
         }

@@ -24,7 +24,8 @@ final class ImageParser extends PostMessageParser
             foreach ($matches['link'] as $k => $link) {
                 $images[$link] = [
                     'link'    => $link,
-                    'preview' => $matches['preview'][$k]
+                    'preview' => $matches['preview'][$k],
+                    'type'    => 'image'
                 ];
             }
         }
