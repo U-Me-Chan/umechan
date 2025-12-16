@@ -1,9 +1,10 @@
 FROM library/php:8.4.12-alpine
 WORKDIR /scheduler
 
-RUN apk add zip libzip-dev
+RUN apk add zip libzip-dev linux-headers
 RUN docker-php-ext-install -j$(nproc) pdo_mysql zip sockets
 RUN docker-php-source delete
+RUN apk del --purge linux-headers
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
