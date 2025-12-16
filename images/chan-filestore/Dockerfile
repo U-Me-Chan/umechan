@@ -1,12 +1,12 @@
-FROM library/php:8.4-fpm AS base
+FROM library/php:8.4.12-fpm-alpine AS base
 
-RUN apt update -yyq && apt install -yyq zip libzip-dev libmagickwand-dev ffmpegthumbnailer
+RUN apk add zip libzip-dev autoconf g++ make linux-headers imagemagick-dev ffmpegthumbnailer
 RUN docker-php-ext-install -j$(nproc) pdo_mysql zip
 RUN pecl install imagick
 RUN docker-php-source delete
+RUN apk del --purge autoconf g++ make linux-headers
 
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-RUN php composer-setup.php --install-dir=/usr/local/bin/ --filename composer; rm composer-setup.php
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 ARG MAX_FILESIZE
 COPY images/chan-filestore/filestore-php.ini /usr/local/etc/php/conf.d

@@ -1,12 +1,11 @@
-FROM library/php:8.4-cli
+FROM library/php:8.4.12-alpine
 WORKDIR /scheduler
 
-RUN apt update -yyq && apt install -yyq zip libzip-dev
+RUN apk add zip libzip-dev
 RUN docker-php-ext-install -j$(nproc) pdo_mysql zip sockets
 RUN docker-php-source delete
 
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-RUN php composer-setup.php --install-dir=/usr/local/bin/ --filename composer; rm composer-setup.php
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 COPY radio-scheduler .
 RUN composer install --no-dev

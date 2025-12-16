@@ -1,22 +1,23 @@
-FROM library/php:8.4-fpm AS base
+FROM library/php:8.4.12-fpm-alpine AS base
 
-RUN apt update -yyq && apt install -yyq zip libzip-dev libmemcached-dev libssl-dev
+RUN apk add zip libzip-dev libmemcached-dev libressl-dev autoconf g++ make linux-headers
 RUN pecl install memcached
 RUN docker-php-ext-enable memcached
 RUN docker-php-ext-install -j$(nproc) pdo_mysql zip
 RUN docker-php-source delete
 
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-RUN php composer-setup.php --install-dir=/usr/local/bin/ --filename composer; rm composer-setup.php
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 ADD images/chan-api/api-php.ini /usr/local/etc/php/conf.d
 
 FROM base AS development
 RUN pecl install xdebug
 RUN docker-php-ext-enable xdebug
+RUN apk del --purge autoconf g++ make linux-headers
 ADD images/chan-api/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 FROM base AS production
+RUN apk del --purge autoconf g++ make linux-headers
 ADD images/chan-api/php-logging.conf /usr/local/etc/php-fmp.d/logging.conf
 WORKDIR /var/www/html
 ADD chan-api .
