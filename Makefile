@@ -3,7 +3,6 @@ include .env
 production:
 	docker compose --profile $(TARGET) up --build -d
 	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} -e 'CREATE DATABASE IF NOT EXISTS ${MYSQL_CHAN_DATABASE}'"
-	docker exec umechan-migrations vendor/bin/phinx migrate
 ifeq ($(TARGET),production)
 	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} -e 'CREATE DATABASE IF NOT EXISTS ${MYSQL_RADIO_DATABASE}'"
 	docker restart umechan-migrations
