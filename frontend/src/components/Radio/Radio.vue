@@ -69,7 +69,7 @@ export default {
     return {
       title: 'Включите воспроизведение для обновление информации',
       listeners: 0,
-      streamUrl: `${config.icecast_url}/stream`,
+      streamUrl: `${config.icecast_url}/stream?bypass_cache_hack=${Date.now()}`,
       m3uUrl: `${config.icecast_url}/stream.m3u`,
       isPlaying: false,
       metadataInterval: null,
