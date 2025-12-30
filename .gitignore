@@ -1,12 +1,4 @@
-data/db/*
-data/files/*
-data/grafana/*
-data/dumps/*
-data/music
-data/tagme
-data/convert
-data/dumps/dump.sql
-data/logs/*
+data/*
 .env
 .projectile
 docker-compose.override.yml

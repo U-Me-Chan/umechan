@@ -57,8 +57,12 @@
       ></div>
   </div>
 
-  <div v-if="files.lenght === 0">
+  <div v-if="isEmptyFilesList">
     Пусто!
+  </div>
+
+  <div v-if="!isEmptyFilesList">
+    <button @click="shuffleFilesList">Shuffle</button>
   </div>
 </div>
 </template>
@@ -82,6 +86,9 @@ export default {
   computed: {
     currentFile() {
       return this.files[this.currentIndex] || null;
+    },
+    isEmptyFilesList() {
+      return this.files.length === 0;
     }
   },
   created: function () {
@@ -170,6 +177,9 @@ export default {
     },
     onNavigateToNumber(number) {
       console.debug(this.currentIndex, number);
+    },
+    shuffleFilesList() {
+      this.files.sort(() => Math.random() - 0.5);
     }
   }
 }
