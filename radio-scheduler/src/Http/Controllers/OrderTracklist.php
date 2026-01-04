@@ -16,12 +16,21 @@ use RuntimeException;
     summary: 'Добавляет список случайных композиций в очередь',
     parameters: [
         new OA\Parameter(
-            name: 'id',
+            name: 'genre',
             in: 'query',
             description: 'genre',
             required: true,
             schema: new OA\Schema(
                 type: 'string',
+            )
+        ),
+        new OA\Parameter(
+            name: 'rotation',
+            in: 'query',
+            description: 'genre',
+            required: false,
+            schema: new OA\Schema(
+                type: 'string'
             )
         )
     ]
@@ -132,8 +141,10 @@ final class OrderTracklist
             return $res;
         }
 
+        $rotation = isset($params['rotation']) ? $params['rotation'] : 'random';
+
         try {
-            $this->order_track_service->putTrackListInQueue($params['genre']);
+            $this->order_track_service->putTrackListInQueue($params['genre'], $rotation);
         } catch (RuntimeException) {
             $res = Response::json(['status' => 'failed', 'reason' => 'genre is empty']);
             $res = $res->withStatus(Response::STATUS_INTERNAL_SERVER_ERROR);

@@ -88,7 +88,15 @@ Loop::addPeriodicTimer(1, function () use ($log, $mpd, $queue_cropper, $strategy
     }
 });
 
-$order_track_service = new OrderTrackService($mpd, $db, $log, $random_tracklist_generator);
+$order_track_service = new OrderTrackService(
+    $mpd,
+    $db,
+    $log,
+    $random_tracklist_generator,
+    $new_or_long_standing_tracklist_generator,
+    $average_estimate_tracklist_generator,
+    $best_estimate_tracklist_generator
+);
 
 $r = new Router();
 

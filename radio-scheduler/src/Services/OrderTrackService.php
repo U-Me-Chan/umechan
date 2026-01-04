@@ -7,6 +7,9 @@ use Medoo\Medoo;
 use Monolog\Logger;
 use OutOfBoundsException;
 use Ridouchire\RadioScheduler\Services\Mpd;
+use Ridouchire\RadioScheduler\TracklistGenerators\AverageEstimateTracklistGenerator;
+use Ridouchire\RadioScheduler\TracklistGenerators\BestEstimateTracklistGenerator;
+use Ridouchire\RadioScheduler\TracklistGenerators\NewOrLongStandingTracklistGenerator;
 use Ridouchire\RadioScheduler\TracklistGenerators\RandomTracklistGenerator;
 use RuntimeException;
 
@@ -16,7 +19,10 @@ class OrderTrackService
         private Mpd $mpd,
         private Medoo $db,
         private Logger $logger,
-        private RandomTracklistGenerator $random_tracklist_generator
+        private RandomTracklistGenerator $random_tracklist_generator,
+        private NewOrLongStandingTracklistGenerator $new_or_long_standing_tracklist_generator,
+        private AverageEstimateTracklistGenerator $average_estimate_tracklist_generator,
+        private BestEstimateTracklistGenerator $best_estimate_tracklist_generator
     ) {
     }
 
@@ -41,13 +47,25 @@ class OrderTrackService
         $this->logger->info("OrderTrack: ставлю в очередь файл {$track_path}");
     }
 
-    public function putTrackListInQueue(string $genre): void
+    public function putTrackListInQueue(string $genre, string $rotation = 'random'): void
     {
         if ($this->mpd->getQueueCount() > 20) {
             throw new DomainException();
         }
 
-        $track_paths = $this->random_tracklist_generator->build([$genre], 10);
+        switch($rotation) {
+            case 'smart':
+                $new_track_paths = $this->new_or_long_standing_tracklist_generator->build([$genre], 4, 8);
+                $avg_track_paths = $this->average_estimate_tracklist_generator->build([$genre], 4, 8);
+                $bst_track_paths = $this->best_estimate_tracklist_generator->build([$genre], 4);
+                $track_paths     = array_merge($new_track_paths, $avg_track_paths, $bst_track_paths);
+
+                shuffle($track_paths);
+            case 'random':
+            default:
+                $track_paths = $this->random_tracklist_generator->build([$genre], 10);
+                break;
+        }
 
         if (empty($track_paths)) {
             throw new RuntimeException();
