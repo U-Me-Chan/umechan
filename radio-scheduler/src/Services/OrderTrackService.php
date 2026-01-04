@@ -61,9 +61,12 @@ class OrderTrackService
                 $track_paths     = array_merge($new_track_paths, $avg_track_paths, $bst_track_paths);
 
                 shuffle($track_paths);
+
+                break;
             case 'random':
             default:
                 $track_paths = $this->random_tracklist_generator->build([$genre], 10);
+
                 break;
         }
 
