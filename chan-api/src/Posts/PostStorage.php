@@ -8,7 +8,6 @@ use OutOfBoundsException;
 use PDOStatement;
 use PK\Posts\Post;
 use PK\Posts\Post\Id;
-use PK\Boards\BoardStorage;
 use PK\Passports\PassportStorage;
 use PK\Posts\Post\PosterKeyHash;
 use PK\Posts\Post\VerifyFlag;
@@ -169,6 +168,9 @@ class PostStorage
                 'OR' => [
                     'posts.id' => $id,
                     'posts.parent_id' => $id
+                ],
+                'ORDER' => [
+                    'posts.parent_id' => 'ASC' // костыль для тредов, куда перенесли старые посты
                 ]
             ]
         );
