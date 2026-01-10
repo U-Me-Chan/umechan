@@ -191,7 +191,6 @@ export default {
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    max-width: 800px;
     margin: 0 auto;
 }
 
