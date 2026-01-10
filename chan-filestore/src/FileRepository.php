@@ -31,7 +31,12 @@ class FileRepository
         $files = array_map(function (SplFileInfo $spl_file) {
             $file_name = $spl_file->getBasename();
 
-            if (substr($file_name, -3) == 'mp4' || substr($file_name, -4) == 'webm' || substr($file_name, -3) == 'mov') {
+            if (
+                substr($file_name, -3) == 'mp4' ||
+                substr($file_name, -4) == 'webm' ||
+                substr($file_name, -3) == 'mov' ||
+                substr($file_name, -3) == 'gif'
+            ) {
                 $thumbnail = $this->static_url . '/thumb.' . $file_name . '.' . 'jpeg';
             } else {
                 $thumbnail = $this->static_url . '/thumb.' . $file_name;
