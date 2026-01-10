@@ -170,7 +170,8 @@ class PostStorage
                     'posts.parent_id' => $id
                 ],
                 'ORDER' => [
-                    'posts.parent_id' => 'ASC' // костыль для тредов, куда перенесли старые посты
+                    'posts.parent_id' => 'ASC', // костыль для тредов, куда перенесли старые посты
+                    'posts.timestamp' => 'ASC'
                 ]
             ]
         );
