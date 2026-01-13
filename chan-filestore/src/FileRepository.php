@@ -63,4 +63,18 @@ class FileRepository
 
         return new FileCollection($files, $count, $filters);
     }
+
+    public function deleteFile(string $filename): void
+    {
+        $filepath  = $filename;
+        $thumbpath = 'thumb.' . $filename;
+
+        if (is_file($filepath)) {
+            unlink($filepath);
+        }
+
+        if (is_file($thumbpath)) {
+            unlink($thumbpath);
+        }
+    }
 }

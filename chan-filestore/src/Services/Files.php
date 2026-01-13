@@ -59,14 +59,7 @@ class Files
     public function deleteFile(string $filename): void
     {
         $filepath  = $this->files_dir . $filename;
-        $thumbpath = $this->files_dir . 'thumb.' . $filename;
 
-        if (is_file($filepath)) {
-            unlink($filepath);
-        }
-
-        if (is_file($thumbpath)) {
-            unlink($thumbpath);
-        }
+        $this->file_repository->deleteFile($filepath);
     }
 }
