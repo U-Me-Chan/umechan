@@ -44,7 +44,7 @@
       >
         <span class="file-cta">
           <b-icon class="file-icon" icon="upload"/>
-          <span class="file-label">PNG JPEG WEBP GIF WEBM MP4</span>
+          <span class="file-label">PNG JPEG WEBP GIF WEBM MP4 MOV</span>
         </span>
       </b-upload>
       <span v-if="filesNames.length > 0">
