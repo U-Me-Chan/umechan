@@ -1,7 +1,6 @@
 {
     "name": "ridouchire/radio-db-importer",
     "require": {
-        "react/event-loop": "^1.5",
         "catfan/medoo": "^2.1",
         "monolog/monolog": "^3.5",
         "james-heinrich/getid3": "^1.9"

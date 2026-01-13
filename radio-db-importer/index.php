@@ -4,7 +4,6 @@ use Medoo\Medoo;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
-use React\EventLoop\Loop;
 use Ridouchire\RadioDbImporter\DirectoryIterator;
 use Ridouchire\RadioDbImporter\FileManager;
 use Ridouchire\RadioDbImporter\Handler;
@@ -47,4 +46,6 @@ $track_repo   = new TrackRepository($db);
 $file_manager = new FileManager($music_dir_of_convertible_files, $music_dir_of_files_without_tags, $music_dir_of_negative_estimates);
 $handler      = new Handler($dir_iterator, $tags_parser, $logger, $track_repo, $file_manager, $path_cutter);
 
-Loop::addPeriodicTimer(0.01, $handler);
+while (true) {
+    $handler();
+}
