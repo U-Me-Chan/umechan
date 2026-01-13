@@ -2,10 +2,13 @@
 
 namespace PK\Posts\Services;
 
-use InvalidArgumentException;
 use OutOfBoundsException;
 use RuntimeException;
 use PK\Boards\BoardStorage;
+use PK\Posts\Exceptions\InvalidPostPasswordException;
+use PK\Posts\Exceptions\NotIsThreadException;
+use PK\Posts\Exceptions\ThreadBlockedException;
+use PK\Posts\Exceptions\ThreadNotFoundException;
 use PK\Posts\Post;
 use PK\Posts\PostStorage;
 
@@ -29,7 +32,7 @@ class PostFacade
     }
 
     /**
-     * @throws OutOfBoundsException
+     * @throws ThreadNotFoundException
      */
     public function getThread(int $id, array $exclude_tags = [], bool $no_board_list = false): array
     {
@@ -66,11 +69,15 @@ class PostFacade
     }
 
     /**
-     * @throws OutOfBoundsException
+     * @throws ThreadNotFoundException
      */
     public function createReplyOnThread(int $thread_id, string $message, array $params = []): array
     {
         $thread = $this->post_storage->findById($thread_id);
+
+        if ($thread->is_blocked) {
+            throw new ThreadBlockedException('Ответ на нить запрещён');
+        }
 
         $post = Post::draft($thread->board, $thread_id, $message);
 
@@ -141,7 +148,13 @@ EOT;
         $post = $this->post_storage->findById($id);
 
         if (!$post->password->isEqualTo($password)) {
-            throw new \RuntimeException('Неверный пароль поста');
+            throw new InvalidPostPasswordException('Неверный пароль поста');
+        }
+
+        if ($post->is_thread) {
+            $this->post_storage->delete($id);
+
+            return;
         }
 
         $post->subject = self::LACUNA_STRING;
@@ -163,7 +176,7 @@ EOT;
         $post = $this->post_storage->findById($id);
 
         if (!$post->is_thread) {
-            throw new InvalidArgumentException('Не является нитью');
+            throw new NotIsThreadException('Не является нитью');
         }
 
         $post->is_sticky = $is_sticky;
@@ -184,5 +197,18 @@ EOT;
         }
 
         return $result;
+    }
+
+    public function setBlockedFlagStateToThread(int $id, bool $is_blocked = false): void
+    {
+        $thread = $this->post_storage->findById($id);
+
+        if (!$thread->is_thread) {
+            throw new NotIsThreadException();
+        }
+
+        $thread->is_blocked = $is_blocked;
+
+        $this->post_storage->save($thread);
     }
 }

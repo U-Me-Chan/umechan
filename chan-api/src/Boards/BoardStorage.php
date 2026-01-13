@@ -2,10 +2,10 @@
 
 namespace PK\Boards;
 
-use OutOfBoundsException;
 use Medoo\Medoo;
 use PK\Base\Timestamp;
 use PK\Boards\Board;
+use PK\Boards\Exceptions\BoardNotFoundException;
 
 class BoardStorage
 {
@@ -37,15 +37,12 @@ class BoardStorage
         return array_map(fn(array $board_data) => Board::fromArray($board_data), $board_datas);
     }
 
-    /**
-     * @throws OutOfBoundsException Если доска не найдена
-     */
     public function findByTag(string $tag): Board
     {
         $board_data = $this->db->get('boards', '*', ['tag' => $tag]);
 
         if ($board_data == null) {
-            throw new \OutOfBoundsException();
+            throw new BoardNotFoundException();
         }
 
         return Board::fromArray($board_data);
@@ -56,7 +53,7 @@ class BoardStorage
         $board_data = $this->db->get('boards', '*', ['id' => $id]);
 
         if ($board_data == null) {
-            throw new \OutOfBoundsException();
+            throw new BoardNotFoundException();
         }
 
         return Board::fromArray($board_data);

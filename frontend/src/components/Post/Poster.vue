@@ -1,9 +1,9 @@
 <template>
 <span class="poster">
   <b-tag v-if="isVerify" size="is-small" type="is-success">
-    <b-tooltip label="Личность этого автора удостоверена"><b>{{ poster }}</b></b-tooltip>
+    <b-tooltip label="Личность этого автора удостоверена">{{ poster }}</b-tooltip>
   </b-tag>
-  <b-tag v-if="!isVerify" size="is-small" type="is-light"><b>{{ poster }}</b></b-tag>
+  <b-tag v-if="!isVerify" size="is-small" type="is-light">{{ poster }}</b-tag>
 </span>
 </template>
 

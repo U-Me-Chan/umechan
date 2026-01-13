@@ -43,6 +43,7 @@
         :repliesCount="post.replies_count"
         :isBumpLimitReached="post.bump_limit_reached"
         :isSticky="post.is_sticky"
+        :isBlocked="post.is_blocked"
       />
     </section>
   </div>

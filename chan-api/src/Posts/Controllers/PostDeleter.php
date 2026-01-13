@@ -9,6 +9,8 @@ use PK\Http\Request;
 use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Error;
 use PK\OpenApi\Schemas\Response;
+use PK\Posts\Exceptions\InvalidPostPasswordException;
+use PK\Posts\Exceptions\ThreadNotFoundException;
 use PK\Posts\Services\PostFacade;
 use RuntimeException;
 
@@ -56,13 +58,13 @@ use RuntimeException;
 #[Error(
     404,
     'Пост не найден',
-    OutOfBoundsException::class,
+    ThreadNotFoundException::class,
     'Пост не найден'
 )]
 #[Error(
     401,
     'Неверный пароль',
-    RuntimeException::class
+    InvalidPostPasswordException::class
 )]
 class PostDeleter
 {
@@ -80,10 +82,10 @@ class PostDeleter
 
         try {
             $this->post_facade->deletePostByAuthor($vars['id'], $req->getParams('password'));
-        } catch (OutOfBoundsException $e) {
+        } catch (ThreadNotFoundException $e) {
             return (new JsonResponse([], 404))->setException($e);
-        } catch (RuntimeException $e) {
-            return (new JsonResponse([], 401))->setException($e);
+        } catch (InvalidPostPasswordException $e) {
+            return (new JsonResponse([], 403))->setException($e);
         }
 
         return new JsonResponse([], 204);

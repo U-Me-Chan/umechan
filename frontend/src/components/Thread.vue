@@ -13,6 +13,7 @@
     :videos="videos"
     :repliesCount="repliesCount"
     :isSticky="isSticky"
+    :isBlocked="isBlocked"
     :isBumpLimit="isBumpLimitReached"
     :board="board"
     />
@@ -30,6 +31,7 @@
       :images="post.media.images"
       :youtubes="post.media.youtubes"
       :videos="post.media.videos"
+      :isBlocked="isBlocked"
       />
   </div>
 </div>
@@ -71,6 +73,10 @@ export default {
       default: false
     },
     isSticky: {
+      type: Boolean,
+      default: false
+    },
+    isBlocked: {
       type: Boolean,
       default: false
     }

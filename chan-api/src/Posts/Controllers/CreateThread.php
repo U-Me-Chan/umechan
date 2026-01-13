@@ -6,6 +6,7 @@ use Exception;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use OpenApi\Attributes as OA;
+use PK\Boards\Exceptions\BoardNotFoundException;
 use PK\Http\Request;
 use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Error;
@@ -97,9 +98,8 @@ final class CreateThread
                 $req->getParams('message'),
                 $params
             );
-        } catch (OutOfBoundsException) {
-            return (new JsonResponse([], 404))
-                ->setException(new Exception('Нет доски с таким тегом'));
+        } catch (BoardNotFoundException $e) {
+            return new JsonResponse([], 404)->setException($e);
         }
 
         return new JsonResponse($data, 201);

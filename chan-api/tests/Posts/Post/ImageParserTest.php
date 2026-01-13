@@ -32,7 +32,8 @@ class ImageParserTest extends TestCase
                 [
                     [
                         'preview' => 'https://scheoble.xyz/files/thumb.test.jpeg',
-                        'link'    => 'https://scheoble.xyz/files/test.jpeg'
+                        'link'    => 'https://scheoble.xyz/files/test.jpeg',
+                        'type'    => 'image'
                     ]
                 ]
             ],
@@ -42,7 +43,8 @@ class ImageParserTest extends TestCase
                 [
                     [
                         'preview' => 'https://scheoble.xyz/files/thumb.test.jpe',
-                        'link'    => 'https://scheoble.xyz/files/test.jpe'
+                        'link'    => 'https://scheoble.xyz/files/test.jpe',
+                        'type'    => 'image'
                     ]
                 ]
             ],
@@ -52,7 +54,8 @@ class ImageParserTest extends TestCase
                 [
                     [
                         'preview' => 'https://scheoble.xyz/files/thumb.test.jpg',
-                        'link'    => 'https://scheoble.xyz/files/test.jpg'
+                        'link'    => 'https://scheoble.xyz/files/test.jpg',
+                        'type'    => 'image'
                     ]
                 ]
             ],
@@ -62,7 +65,8 @@ class ImageParserTest extends TestCase
                 [
                     [
                         'preview' => 'https://scheoble.xyz/files/thumb.test.png',
-                        'link'    => 'https://scheoble.xyz/files/test.png'
+                        'link'    => 'https://scheoble.xyz/files/test.png',
+                        'type'    => 'image'
                     ]
                 ]
             ],
@@ -72,7 +76,8 @@ class ImageParserTest extends TestCase
                 [
                     [
                         'preview' => 'https://scheoble.xyz/files/thumb.test.jfif',
-                        'link'    => 'https://scheoble.xyz/files/test.jfif'
+                        'link'    => 'https://scheoble.xyz/files/test.jfif',
+                        'type'    => 'image'
                     ]
                 ]
             ],
@@ -82,7 +87,8 @@ class ImageParserTest extends TestCase
                 [
                     [
                         'preview' => 'https://scheoble.xyz/files/thumb.test.jfif',
-                        'link'    => 'https://scheoble.xyz/files/test.jfif'
+                        'link'    => 'https://scheoble.xyz/files/test.jfif',
+                        'type'    => 'image'
                     ]
                 ]
             ]

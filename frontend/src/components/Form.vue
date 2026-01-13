@@ -97,6 +97,9 @@ export default {
 
       return (poster === 'undefined' || poster === null) ? config.default_poster : poster;
     },
+    savePostPassword: function (id, password) {
+      localStorage.setItem(id, password);
+    },
     setPoster: function (value) {
       localStorage.setItem('poster', value);
     },
@@ -247,13 +250,14 @@ export default {
 
       appropriatePromise(outputData)
         .then(({ data }) => {
+          self.savePostPassword(data.payload.post_id.value, data.payload.password);
           self.init();
           bus.$emit('form:success', [data]);
           self.setPoster(outputData['poster']);
           self.$buefy.toast.open('Отправлено!');
         })
         .catch((error) => {
-          self.$buefy.toast.open(`Ошибка: ${error}`);
+          self.$buefy.toast.open(`Ошибка: ${error.response.data.error.message}`);
         })
         .finally(() => {
           self.isLoading = false;

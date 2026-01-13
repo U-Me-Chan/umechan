@@ -3,12 +3,13 @@
 namespace PK\Posts\Controllers;
 
 use InvalidArgumentException;
-use OutOfBoundsException;
 use OpenApi\Attributes as OA;
 use PK\Http\Request;
 use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Error;
 use PK\OpenApi\Schemas\Response;
+use PK\Posts\Exceptions\ThreadBlockedException;
+use PK\Posts\Exceptions\ThreadNotFoundException;
 use PK\Posts\OpenApi\Schemas\PostCreated;
 use PK\Posts\Services\PostFacade;
 
@@ -66,6 +67,11 @@ use PK\Posts\Services\PostFacade;
     InvalidArgumentException::class,
     'Необходимо передать message'
 )]
+#[Error(
+    404,
+    'Нет такой нити',
+    ThreadNotFoundException::class
+)]
 final class CreateReply
 {
     public function __construct(
@@ -102,8 +108,10 @@ final class CreateReply
                 $req->getParams('message'),
                 $params
             );
-        } catch (OutOfBoundsException) {
-            return new JsonResponse([], 404);
+        } catch (ThreadNotFoundException $e) {
+            return new JsonResponse([], 404)->setException($e);
+        } catch (ThreadBlockedException $e) {
+            return new JsonResponse([], 403)->setException($e);
         }
 
         return new JsonResponse($data, 201);

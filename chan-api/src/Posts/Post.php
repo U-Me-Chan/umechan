@@ -12,6 +12,7 @@ use PK\Posts\Post\VideoParser;
 use PK\Posts\Post\YoutubeParser;
 use PK\Posts\Post\Id;
 use PK\Posts\OpenApi\Schemas\MediaList;
+use PK\Posts\Post\BlockedFlag;
 
 #[OA\Schema]
 class Post implements \JsonSerializable
@@ -72,6 +73,7 @@ class Post implements \JsonSerializable
             isset($state['replies_count']) ? $state['replies_count'] : 0,
             VerifyFlag::from($state['is_verify']) == VerifyFlag::yes ? true : false,
             StickyFlag::from($state['is_sticky']) == StickyFlag::yes ? true: false,
+            BlockedFlag::from($state['is_blocked']) == BlockedFlag::yes ? true : false,
             is_draft: false
         );
     }
@@ -99,11 +101,12 @@ class Post implements \JsonSerializable
     {
         $data = get_object_vars($this);
 
-        $data['board_id']  = $this->board->id;
-        $data['is_verify'] = $this->is_verify == true ? 'yes' : 'no';
-        $data['is_sticky'] = $this->is_sticky == true ? 'yes' : 'no';
-        $data['password']  = $this->password->toString();
-        $data['id']        = $this->id->value;
+        $data['board_id']   = $this->board->id;
+        $data['is_verify']  = $this->is_verify == true ? 'yes' : 'no';
+        $data['is_sticky']  = $this->is_sticky == true ? 'yes' : 'no';
+        $data['is_blocked'] = $this->is_blocked == true ? 'yes' : 'no';
+        $data['password']   = $this->password->toString();
+        $data['id']         = $this->id->value;
 
         unset(
             $data['board'],
@@ -146,6 +149,8 @@ class Post implements \JsonSerializable
         public bool $is_verify = false,
         #[OA\Property(description: 'Является ли нить прилипчивой?')]
         public bool $is_sticky = false,
+        #[OA\Property(description: 'Является ли нить заблокированной к ответам?')]
+        public bool $is_blocked = false,
         #[OA\Property(description: 'Очищенное от медиа сообщение')]
         private string $truncated_message = '',
         #[OA\Property(description: 'Список медиа', ref: MediaList::class, nullable: false)]

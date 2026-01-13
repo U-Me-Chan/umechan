@@ -2,34 +2,37 @@
 <div class="post-meta">
   <Poster :poster="poster" :isVerify="isVerify"/>
   <Subject v-if="subject" :subject="subject"/>
-  <b-tag>{{ datetime }}</b-tag>
+  <b-tag >{{ datetime }}</b-tag>
   <b-tag v-if="board">/{{board.tag}}/</b-tag>
   <b-tag>#{{ id }}</b-tag>
-  <b-tag v-if="isSticky">📌</b-tag>
-  <b-tag v-if="isBumpLimit">🌕</b-tag>
-  <b-tag v-if="repliesCount">∑{{repliesCount}}</b-tag>
-  
-  <a v-if="isShowButtons && !parentId" :href="'/thread/' + id">
-    <b-button type="is-text" size="is-small" @click="selectThread(id, $event)">➜</b-button>
-  </a>
-  
-  <b-button v-if="isShowButtons" type="is-text" size="is-small" @click="isFormVisible = !isFormVisible">✍</b-button>
-  <b-modal v-model="isFormVisible">
-    <Form v-if="isFormVisible"
-          :parent_id="!parentId ? id : parentId"
-          :message="`>>${id}\n`"/>
-  </b-modal>
-
+  <b-tag class="infotag" v-if="isSticky">📌</b-tag>
+  <b-tag class="infotag" v-if="isBumpLimit">🌕</b-tag>
+  <b-tag class="infotag" v-if="repliesCount">∑{{repliesCount}}</b-tag>
+  <b-tag class="infotag" v-if="isBlocked">🔒</b-tag>
+    
   <b-dropdown v-if="isShowAdminButtons && parentId">
     <template #trigger>
       <b-button type="is-text" size="is-small" icon-right="menu-down">
         🚔
       </b-button>
     </template>
-    <b-dropdown-item @click="deletePost(id, 'Неприлично! 😡')">Неприлично! 😡</b-dropdown-item>
-    <b-dropdown-item @click="deletePost(id, 'Незаконно! 🚔🔒')">Незаконно! 🚔🔒</b-dropdown-item>
-    <b-dropdown-item @click="deletePost(id, 'Оффтопик! 🙅')">Оффтопик! 🙅</b-dropdown-item>
+    <b-dropdown-item @click="erasePost(id, 'Неприлично! 😡')">Неприлично! 😡</b-dropdown-item>
+    <b-dropdown-item @click="erasePost(id, 'Незаконно! 🚔')">Незаконно! 🚔</b-dropdown-item>
+    <b-dropdown-item @click="erasePost(id, 'Оффтопик! 🙅')">Оффтопик! 🙅</b-dropdown-item>
   </b-dropdown>
+  
+  <a v-if="isShowButtons && !parentId" :href="'/thread/' + id">
+    <b-button type="is-text" size="is-small" @click="selectThread(id, $event)">➜</b-button>
+  </a>
+
+  <b-button v-if="isSavedPostPassword" type="is-text" size="is-small" @click="deletePost(id)">🗑</b-button>
+  
+  <b-button v-if="isShowButtons && !isBlocked" type="is-text" size="is-small" @click="isFormVisible = !isFormVisible">✍</b-button>
+  <b-modal v-model="isFormVisible">
+    <Form v-if="isFormVisible"
+          :parent_id="!parentId ? id : parentId"
+          :message="`>>${id}\n`"/>
+  </b-modal>
 </div>
 </template>
 
@@ -70,6 +73,10 @@ export default {
     isShowButtons: {
       type: Boolean,
       default: true
+    },
+    isBlocked: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
@@ -78,7 +85,28 @@ export default {
 
       this.$router.push('/thread/' + id);
     },
-    deletePost: function (id, reason) {
+    deletePost: function (id) {
+      if (!confirm('Точно удалить?')) {
+        return
+      }
+      
+      const password = localStorage.getItem(id)
+
+      var self = this
+
+      axios.delete(config.chan_url + '/v2/post/' + id, {
+        params: {
+          password: password
+        }
+      }).then(() => {
+        bus.$emit('thread:updated')
+        bus.$emit('board:updated')
+      }).catch((error) => {
+        self.$buefy.toast.open('Ошибка при удалении')
+        console.error(error)
+      })
+    },
+    erasePost: function (id, reason) {
       var key = ''
 
       if (this.$cookie.get('admin_key') !== null) {
@@ -106,13 +134,16 @@ export default {
         bus.$emit('board:updated')
       }).catch((error) => {
         self.$buefy.toast.open('Ошибка при удалении')
-        console.debug(error)
+        console.error(error)
       })
     }
   },
   computed: {
     isShowAdminButtons: function () {
       return this.$cookie.get('admin_key') !== null ? true : false;
+    },
+    isSavedPostPassword: function () {
+      return localStorage.getItem(this.id) !== null ? true : false;
     }
   },
   data: function () {
@@ -125,3 +156,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.infotag {
+    font-size: 12px;
+}
+</style>

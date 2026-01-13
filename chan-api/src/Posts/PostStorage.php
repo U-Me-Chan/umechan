@@ -9,6 +9,7 @@ use PDOStatement;
 use PK\Posts\Post;
 use PK\Posts\Post\Id;
 use PK\Passports\PassportStorage;
+use PK\Posts\Exceptions\ThreadNotFoundException;
 use PK\Posts\Post\PosterKeyHash;
 use PK\Posts\Post\VerifyFlag;
 
@@ -72,6 +73,7 @@ class PostStorage
                 'posts.updated_at',
                 'posts.is_verify',
                 'posts.is_sticky',
+                'posts.is_blocked',
                 'posts.password',
                 'posts.board_id',
                 'boards.tag',
@@ -112,6 +114,7 @@ class PostStorage
                         'posts.updated_at',
                         'posts.is_verify',
                         'posts.is_sticky',
+                        'posts.is_blocked',
                         'posts.password',
                         'board_data' => [
                             'boards.id(board_id)',
@@ -135,9 +138,6 @@ class PostStorage
         return [$threads, $count];
     }
 
-    /**
-     * @throws OutOfBoundsException
-     */
     public function findById(int $id): Post
     {
         $thread_and_replies_datas = $this->db->select(
@@ -155,6 +155,7 @@ class PostStorage
                 'posts.updated_at',
                 'posts.is_verify',
                 'posts.is_sticky',
+                'posts.is_blocked',
                 'posts.password',
                 'board_data' => [
                     'boards.id(board_id)',
@@ -177,7 +178,7 @@ class PostStorage
         );
 
         if (empty($thread_and_replies_datas)) {
-            throw new OutOfBoundsException('Нет такой нити');
+            throw new ThreadNotFoundException('Нет такой нити');
         }
 
         $thread_data = array_shift($thread_and_replies_datas);
@@ -223,12 +224,17 @@ class PostStorage
     public function delete(int $id): bool
     {
         /** @var PDOStatement */
-        $pdo = $this->db->delete('posts', ['id' => $id]);
+        $pdo = $this->db->delete('posts', [
+            'OR' => [
+                'id'        => $id,
+                'parent_id' => $id
+            ]
+        ]);
 
-        if ($pdo->rowCount() == 1) {
+        if ($pdo->rowCount() > 0) {
             return true;
         }
 
-        throw new \OutOfBoundsException();
+        throw new ThreadNotFoundException();
     }
 }

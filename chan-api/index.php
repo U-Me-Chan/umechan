@@ -15,9 +15,6 @@ use PK\Boards\BoardStorage;
 use PK\Boards\Console\CreateBoard;
 use PK\Boards\Controllers\GetBoardList;
 
-use PK\Events\Controllers\GetEventList;
-use PK\Events\EventStorage;
-use PK\Events\Services\EventTrigger;
 use PK\OpenApi\Controllers\GetOpenApiSpecification;
 use PK\OpenApi\Controllers\GetRedocPage;
 use PK\Posts\PostStorage;
@@ -25,7 +22,6 @@ use PK\Posts\Controllers\GetThread;
 use PK\Posts\Controllers\GetThreadList;
 use PK\Posts\Controllers\CreateThread;
 use PK\Posts\Controllers\CreateReply;
-use PK\Posts\Controllers\UpdatePost;
 use PK\Posts\Controllers\DeletePost;
 use PK\Posts\Controllers\PostDeleter;
 
@@ -33,7 +29,10 @@ use PK\Passports\Controllers\CreatePassport;
 use PK\Passports\Controllers\GetPassportList;
 use PK\Passports\PassportStorage;
 use PK\Posts\Console\RestorePostsFromEPDSDump;
+use PK\Posts\Console\SetBlockedThread;
 use PK\Posts\Console\SetStickyThread;
+use PK\Posts\Console\UnsetBlockedThread;
+use PK\Posts\Console\UnsetStickyThread;
 use PK\Posts\Controllers\GetThreadFileList;
 use PK\Posts\Services\PostFacade;
 use PK\Posts\Services\PostRestorator;
@@ -65,12 +64,9 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-$event_storage    = new EventStorage($db);
 $passport_storage = new PassportStorage($db);
 $board_storage    = new BoardStorage($db);
 $post_storage     = new PostStorage($db, $passport_storage);
-
-$event_trigger = new EventTrigger($event_storage);
 
 $post_restorator = new PostRestorator('/tmp/dumps/' . $_ENV['EPDS_DUMP_PATH'], $board_storage, $post_storage);
 $post_facade     = new PostFacade($post_storage, $board_storage, $post_restorator);
@@ -80,7 +76,10 @@ if (PHP_SAPI == 'cli') {
 
     $app->add(new RestorePostsFromEPDSDump($post_facade));
     $app->add(new SetStickyThread($post_facade));
+    $app->add(new UnsetStickyThread($post_facade));
     $app->add(new CreateBoard($board_storage));
+    $app->add(new SetBlockedThread($post_facade));
+    $app->add(new UnsetBlockedThread($post_facade));
 
     exit($app->run());
 }
@@ -102,15 +101,12 @@ $r->addRoute('GET', '/v2/board/{tags:[a-z\+]+}', new GetThreadList($post_facade,
 $r->addRoute('GET', '/v2/post/{id:[0-9]+}', new GetThread($post_facade, $exclude_tags));
 $r->addRoute('POST', '/v2/post', new CreateThread($post_facade));
 $r->addRoute('PUT', '/v2/post/{id:[0-9]+}', new CreateReply($post_facade));
-$r->addRoute('PATCH', '/v2/post/{id:[0-9]+}', new UpdatePost($maintenance_key));
 $r->addRoute('DELETE', '/v2/post/{id:[0-9]+}', new PostDeleter($post_facade));
 $r->addRoute('POST', '/_/v2/post/{id:[0-9]+}', new DeletePost($post_facade, $maintenance_key));
 $r->addRoute('GET', '/v2/post/{id:[0-9]+}/files', new GetThreadFileList($post_facade));
 
 $r->addRoute('GET', '/v2/passport', new GetPassportList($passport_storage));
 $r->addRoute('POST', '/v2/passport', new CreatePassport($passport_storage, $default_name));
-
-$r->addRoute('GET', '/v2/event', new GetEventList($event_storage));
 
 $r->addRoute('GET', '/v2/_/openapi.json', new GetOpenApiSpecification(new Generator()));
 $r->addRoute('GET', '/v2/_/redoc.html', new GetRedocPage($_ENV['DOMAIN']));

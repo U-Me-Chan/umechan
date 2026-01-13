@@ -2,9 +2,9 @@
 
 namespace PK\Posts\Controllers;
 
-use OutOfBoundsException;
 use PK\Http\Request;
 use PK\Http\Responses\JsonResponse;
+use PK\Posts\Exceptions\ThreadNotFoundException;
 use PK\Posts\Services\PostFacade;
 
 final class GetThreadFileList
@@ -20,7 +20,7 @@ final class GetThreadFileList
             $result = $this->post_facade->getThreadFiles($vars['id']);
 
             return new JsonResponse(['files' => $result], 200);
-        } catch (OutOfBoundsException $e) {
+        } catch (ThreadNotFoundException $e) {
             return new JsonResponse([], 404)->setException($e);
         }
     }

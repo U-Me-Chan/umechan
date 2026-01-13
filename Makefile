@@ -42,6 +42,13 @@ restore-chan-database-from-epds-dump:
 
 chan-set-sticky-thread:
 	docker exec umechan-api php index.php posts:set-sticky-thread $(thread_id)
+chan-unset-sticky-thread:
+	docker exec umechan-api php index.php posts:unset-sticky-thread $(thread_id)
+
+chan-set-blocked-thread:
+	docker exec umechan-api php index.php posts:set-blocked-thread $(thread_id)
+chan-unset-blocked-thread:
+	docker exec umechan-api php index.php posts:unset-blocked-thread $(thread_id)
 
 chan-create-board:
 	docker exec umechan-api php index.php boards:create $(tag) $(name)

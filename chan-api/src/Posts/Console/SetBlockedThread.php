@@ -10,7 +10,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use PK\Posts\Exceptions\NotIsThreadException;
 use PK\Posts\Services\PostFacade;
 
-final class SetStickyThread extends Command
+final class SetBlockedThread extends Command
 {
     public function __construct(
         private PostFacade $post_facade
@@ -21,8 +21,8 @@ final class SetStickyThread extends Command
     public function configure()
     {
         $this
-            ->setName('posts:set-sticky-thread')
-            ->setDescription('Устанавливает флаг прилипчивой нити')
+            ->setName('posts:set-blocked-thread')
+            ->setDescription('Устанавливает флаг заблокированного к ответу треда')
             ->addArgument('thread_id', InputArgument::REQUIRED, 'Идентификатор треда');
     }
 
@@ -31,7 +31,7 @@ final class SetStickyThread extends Command
         $io = new SymfonyStyle($input_interface, $output_interface);
 
         try {
-            $this->post_facade->setStickyFlagStateToThread($input_interface->getArgument('thread_id'), true);
+            $this->post_facade->setBlockedFlagStateToThread($input_interface->getArgument('thread_id'), true);
 
             $io->success('Установлен!');
 

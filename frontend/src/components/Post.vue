@@ -11,6 +11,7 @@
     :board="board"
     :repliesCount="repliesCount"
     :isBumpLimit="isBumpLimit"
+    :isBlocked="isBlocked"
     />
   <div class="post-body">
     <Media :images="images" :youtubes="youtubes" :videos="videos"/>
@@ -43,6 +44,10 @@ export default {
       default: false
     },
     isSticky: {
+      type: Boolean,
+      default: false
+    },
+    isBlocked: {
       type: Boolean,
       default: false
     },

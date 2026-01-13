@@ -25,19 +25,16 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 
 FROM base AS development
-COPY images/web-server/nginx-api.conf \
-  images/web-server/nginx-filestore.conf \
-  images/web-server/nginx-metrics-dev.conf \
-  images/web-server/nginx-scheduler-dev.conf \
-  /etc/nginx/locations
+COPY images/web-server/nginx-api.conf /etc/nginx/locations
+COPY images/web-server/nginx-filestore.conf /etc/nginx/locations
+COPY images/web-server/nginx-metrics-dev.conf /etc/nginx/locations
+COPY images/web-server/nginx-scheduler-dev.conf /etc/nginx/locations
 
 FROM base AS chan
-COPY images/web-server/nginx-api.conf \
-  images/web-server/nginx-filestore.conf \
-  /etc/nginx/locations
+COPY images/web-server/nginx-api.conf /etc/nginx/locations
+COPY images/web-server/nginx-filestore.conf /etc/nginx/locations
 COPY --from=frontend-builder /app/dist /var/www/html
 
 FROM chan AS production
-COPY images/web-server/nginx-metrics.conf \
-  images/web-server/nginx-scheduler.conf \
-  /etc/nginx/locations
+COPY images/web-server/nginx-metrics.conf /etc/nginx/locations
+COPY images/web-server/nginx-scheduler.conf /etc/nginx/locations

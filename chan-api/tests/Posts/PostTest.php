@@ -75,6 +75,7 @@ class PostTest extends TestCase
             'password' => 'test',
             'is_verify' => 'yes',
             'is_sticky' => 'no',
+            'is_blocked' => 'no',
             'replies_count' => 501
         ]);
 
@@ -93,6 +94,7 @@ class PostTest extends TestCase
         $this->assertEquals('test', $thread->password->toString());
         $this->assertTrue($thread->is_verify);
         $this->assertFalse($thread->is_sticky);
+        $this->assertFalse($thread->is_blocked);
         $this->assertTrue($thread->bump_limit_reached);
     }
 
@@ -117,7 +119,8 @@ class PostTest extends TestCase
             'estimate' => 0,
             'password' => 'test',
             'is_verify' => 'yes',
-            'is_sticky' => 'no'
+            'is_sticky' => 'no',
+            'is_blocked' => 'yes'
         ]);
 
         $state = $post->toArray();
@@ -155,6 +158,9 @@ class PostTest extends TestCase
                 case 'is_sticky':
                     $this->assertEquals('no', $value);
                     break;
+                case 'is_blocked':
+                    $this->assertEquals('yes', $value);
+                    break;
                 default:
                     throw new Exception("Неизвестное имя колонки: {$column}");
             }
@@ -182,7 +188,8 @@ class PostTest extends TestCase
             'estimate' => 0,
             'password' => 'test',
             'is_verify' => 'yes',
-            'is_sticky' => 'no'
+            'is_sticky' => 'no',
+            'is_blocked' => 'no'
         ]);
 
         $state = $post->jsonSerialize();
@@ -236,6 +243,9 @@ class PostTest extends TestCase
                     $this->assertFalse($value);
                     break;
                 case 'bump_limit_reached':
+                    $this->assertFalse($value);
+                    break;
+                case 'is_blocked':
                     $this->assertFalse($value);
                     break;
                 default:
