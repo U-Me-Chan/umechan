@@ -13,7 +13,9 @@ export function parse(message) {
           const match = rule.exec(src);
 
           if (match) {
-            const text = `<span class="blockquote">${match}</span>`;
+            const text = src.replace(match[0], match => {
+              return `<span class="blockquote">${match}</span>`;
+            });
 
             const token = {
               type: 'quote',
