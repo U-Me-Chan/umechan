@@ -115,9 +115,9 @@ $r->addRoute('GET', '/v2/event', new GetEventList($event_storage));
 $r->addRoute('GET', '/v2/_/openapi.json', new GetOpenApiSpecification(new Generator()));
 $r->addRoute('GET', '/v2/_/redoc.html', new GetRedocPage($_ENV['DOMAIN']));
 
-$request_sucessor = $_ENV['IS_DEV'] == 'yes' ? $r : new MemcachedRequestHandler(sucessor: $r);
+// $request_sucessor = $_ENV['IS_DEV'] == 'yes' ? $r : new MemcachedRequestHandler(sucessor: $r);
 
-$app = new Application($request_sucessor, $config);
+$app = new Application($r, $config);
 
 $request = new Request($_SERVER, $_POST);
 
