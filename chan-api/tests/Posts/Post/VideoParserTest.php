@@ -1,5 +1,6 @@
 <?php
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use PK\Posts\Post\VideoParser;
@@ -7,30 +8,55 @@ use PK\Posts\Post\VideoParser;
 class VideoParserTest extends TestCase
 {
     #[Test]
-    public function test(): void
+    #[DataProvider('dataProvider')]
+    public function test(
+        string $orig_message,
+        string $exp_message,
+        array $exp_videos
+    ): void
     {
-        $orig_message = '[![test](https://scheoble.xyz/files/thumb.test.mp4.jpeg)](https://scheoble.xyz/files/test.mp4)\n';
-        $orig_message .= '\n[![kek?](https://scheoble.xyz/files/thumb.test.webm.jpeg)](https://scheoble.xyz/files/test.webm)\n';
-
         list($videos, $message) = VideoParser::parse($orig_message);
 
-        $this->assertEquals('\n\n\n', $message);
-        $this->assertCount(2, $videos);
+        $this->assertEquals($exp_message, $message);
+        $this->assertEquals($exp_videos, $videos);
+    }
 
-        $video_data = $videos[0];
-
-        $this->assertArrayHasKey('link', $video_data);
-        $this->assertEquals('https://scheoble.xyz/files/test.mp4', $video_data['link']);
-
-        $this->assertArrayHasKey('preview', $video_data);
-        $this->assertEquals('https://scheoble.xyz/files/thumb.test.mp4.jpeg', $video_data['preview']);
-
-        $video_data = $videos[1];
-
-        $this->assertArrayHasKey('link', $video_data);
-        $this->assertEquals('https://scheoble.xyz/files/test.webm', $video_data['link']);
-
-        $this->assertArrayHasKey('preview', $video_data);
-        $this->assertEquals('https://scheoble.xyz/files/thumb.test.webm.jpeg', $video_data['preview']);
+    public static function dataProvider(): array
+    {
+        return [
+            [
+                '[![](https://scheoble.xyz/files/thumb.test.webm.jpeg)](https://scheoble.xyz/files/test.webm)',
+                '',
+                [
+                    [
+                        'preview' => 'https://scheoble.xyz/files/thumb.test.webm.jpeg',
+                        'link'    => 'https://scheoble.xyz/files/test.webm',
+                        'type'    => 'video'
+                    ]
+                ]
+            ],
+            [
+                '[![](https://scheoble.xyz/files/thumb.test.mov.jpeg)](https://scheoble.xyz/files/test.mov)',
+                '',
+                [
+                    [
+                        'preview' => 'https://scheoble.xyz/files/thumb.test.mov.jpeg',
+                        'link'    => 'https://scheoble.xyz/files/test.mov',
+                        'type'    => 'video'
+                    ]
+                ]
+            ],
+            [
+                '[![](https://scheoble.xyz/files/thumb.test.mp4.jpeg)](https://scheoble.xyz/files/test.mp4)',
+                '',
+                [
+                    [
+                        'preview' => 'https://scheoble.xyz/files/thumb.test.mp4.jpeg',
+                        'link'    => 'https://scheoble.xyz/files/test.mp4',
+                        'type'    => 'video'
+                    ]
+                ]
+            ]
+        ];
     }
 }

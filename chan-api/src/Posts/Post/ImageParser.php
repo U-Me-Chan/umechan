@@ -11,9 +11,9 @@ final class ImageParser extends PostMessageParser
         '|' .
         '\[\!\[([a-z\W]+)?\]\((?<preview>' .
         self::BASE_URL .
-        '\/files\/thumb\.\w+\.(jpe?g?|png|webp|jfif))\)\]\((?<link>' .
+        '\/files\/thumb\.\w+\.(jpe?g?|png|webp|jfif|gif\.jpeg))\)\]\((?<link>' .
         self::BASE_URL .
-        '\/files\/\w+\.(jpe?g?|png|webp|jfif))\)' .
+        '\/files\/\w+\.(jpe?g?|png|webp|jfif|gif))\)' .
         '/mi';
 
     public static function parse(string $message): array

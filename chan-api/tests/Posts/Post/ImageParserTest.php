@@ -91,6 +91,17 @@ class ImageParserTest extends TestCase
                         'type'    => 'image'
                     ]
                 ]
+            ],
+            [
+                '[![](https://scheoble.xyz/files/thumb.test.gif.jpeg)](https://scheoble.xyz/files/test.gif)',
+                '',
+                [
+                    [
+                        'preview' => 'https://scheoble.xyz/files/thumb.test.gif.jpeg',
+                        'link'    => 'https://scheoble.xyz/files/test.gif',
+                        'type'    => 'image'
+                    ]
+                ]
             ]
         ];
     }

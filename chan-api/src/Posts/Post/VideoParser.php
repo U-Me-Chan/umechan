@@ -11,9 +11,9 @@ final class VideoParser extends PostMessageParser
         '|' .
         '\[\!\[([a-z\W]+)?\]\((?<preview>' .
         self::BASE_URL .
-        '\/files\/thumb\.\w+\.(webm|mp4|gif|mov)\.jpeg)\)\]\((?<link>' .
+        '\/files\/thumb\.\w+\.(webm|mp4|mov)\.jpeg)\)\]\((?<link>' .
         self::BASE_URL .
-        '\/files\/\w+\.(webm|mp4|gif|mov))\)' .
+        '\/files\/\w+\.(webm|mp4|mov))\)' .
         '/mi';
 
     public static function parse(string $message): array
