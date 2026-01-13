@@ -67,11 +67,13 @@ export function parse(message) {
         name: 'hashtag',
         level: 'inline',
         tokenizer(src) {
-          const rule = /^#{1}[\w\s\S]+$/;
+          const rule = /^#{1}[\w\S]+/;
           const match = rule.exec(src);
 
           if (match) {
-            const text = `<a class="hashtag">${match}</a>`;
+            const text = src.replace(match[0], match => {
+              return `<a class="hashtag">${match}</a>`;
+            })
 
             const token = {
               type: 'quote',
