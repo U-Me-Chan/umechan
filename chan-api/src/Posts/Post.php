@@ -124,7 +124,7 @@ class Post implements \JsonSerializable
     }
 
     private function __construct(
-        #[OA\Property(description: 'Идентификатор')]
+        #[OA\Property(description: 'Идентификатор', type: 'integer')]
         public Id $id,
         #[OA\Property(description: 'Автор')]
         public string $poster,
