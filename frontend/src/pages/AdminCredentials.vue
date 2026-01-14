@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import { getAdminKey, setAdminKey } from '../utils/storage'
+
 export default {
   name: 'AdminCredentials',
   data: function () {
@@ -13,10 +15,10 @@ export default {
     }
   },
   updated: function () {
-    this.$cookie.set('admin_key', this.key)
+    setAdminKey(this.key);
   },
   created: function  () {
-    this.key = this.$cookie.get('admin_key')
+    this.key = getAdminKey();
   }
 }
 </script>

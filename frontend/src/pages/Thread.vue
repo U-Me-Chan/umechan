@@ -24,10 +24,8 @@
 
 <script>
 import { bus } from '../bus'
+import { getThreadData } from '../api/posts'
 import Thread from '../components/Thread.vue'
-
-const config = require('../../config');
-const axios  = require('axios');
 
 export default {
   name: 'ThreadPage',
@@ -40,7 +38,7 @@ export default {
       
       bus.$emit('app.loader', [true]);
       
-      axios.get(config.chan_url + '/v2/post/' + this.id + '/?no_board_list=true').then((response) => {
+      getThreadData(this.id).then((response) => {
         if (response.data.payload.thread_data.parent_id !== null) {
           self.$router.push('/thread/' + response.data.payload.thread_data.parent_id + '/#' + self.id);
           

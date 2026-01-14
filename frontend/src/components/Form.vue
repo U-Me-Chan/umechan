@@ -63,13 +63,15 @@
 </template>
 
 <script>
-import { bus } from '../bus';
-import { CLPBRD_ERR } from '../constants/common-error-texts.js';
-import { convertBytesToMegabytes } from '../utils/filesize_formatter.js'
-
-const config = require('../../config');
-const axios  = require('axios');
 const formData = require('form-data');
+const config   = require('../../config')
+
+import { bus } from '../bus';
+import { createReply, createThread } from '../api/posts'
+import { uploadFile } from '../api/files'
+import { CLPBRD_ERR } from '../constants/common-error-texts';
+import { convertBytesToMegabytes } from '../utils/filesize_formatter'
+import { getPosterName, setPosterName, setPostPassword } from '../utils/storage'
 
 export default {
   name: 'Form',
@@ -93,15 +95,13 @@ export default {
       this.isSage = false;
     },
     getPoster: function() {
-      const poster = localStorage.getItem('poster');
-
-      return (poster === 'undefined' || poster === null) ? config.default_poster : poster;
+      return getPosterName();
     },
     savePostPassword: function (id, password) {
-      localStorage.setItem(id, password);
+      setPostPassword(id, password);
     },
     setPoster: function (value) {
-      localStorage.setItem('poster', value);
+      setPosterName(value);
     },
     onPosterReset: function() {
       this.poster = '';
@@ -189,8 +189,7 @@ export default {
 
       uploadData.append('image', file);
 
-      return axios
-        .post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data' }})
+      return uploadFile(uploadData)
         .then((response) => {
           const orig = response.data.original_file;
           const thumb = response.data.thumbnail_file;
@@ -222,10 +221,10 @@ export default {
       return Promise.reject(CLPBRD_ERR.empty);
     },
     createReply: function (outputData) {
-      return axios.put(`${config.chan_url}/v2/post/${this.parent_id}`, outputData);
+      return createReply(outputData, this.parent_id);
     },
     createThread: function (outputData) {
-      return axios.post(`${config.chan_url}/v2/post`, outputData);
+      return createThread(outputData);
     },
     defineOutputData: function (type) {
       if (this.message.length < 1) {

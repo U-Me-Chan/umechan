@@ -8,9 +8,7 @@
 </template>
 
 <script>
-const axios = require('axios')
-const config = require('../../../config')
-
+import { deleteFile } from '../../api/files'
 import { bus } from '../../bus'
 
 export default {
@@ -36,7 +34,7 @@ export default {
 
       var self = this
 
-      axios.delete(config.filestore_url + '/files/' + this.name, {
+      deleteFile(this.name, {
         data: {},
         headers: {
           'Key': key

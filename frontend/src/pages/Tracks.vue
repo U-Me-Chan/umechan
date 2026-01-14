@@ -45,12 +45,11 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { bus } from '../bus'
-import { formatDuration } from '../utils/duration_formatter'
+const _ = require('lodash')
 
-const config = require('../../config')
-const _      = require('lodash')
+import { bus } from '../bus'
+import { putTrackToQueue, getQueue, getTrackList } from '../api/radio'
+import { formatDuration } from '../utils/duration_formatter'
 
 export default {
   name: 'Tracks',
@@ -89,9 +88,7 @@ export default {
       var self = this
       bus.$emit('app.loader', [true])
 
-      axios.put(config.base_url + '/radio/queue', {
-        track_id: track_id
-      }).then(() => {
+      putTrackToQueue(track_id).then(() => {
         self.$buefy.toast.open('Отправлено')
         self.getQueue()
         bus.$emit('app.loader', [false])
@@ -104,7 +101,7 @@ export default {
     getQueue: function () {
       var self = this
 
-      axios.get(config.base_url + '/radio/queue').then((response) => {
+      getQueue().then((response) => {
         self.queue = response.data.queue
       }).catch((error) => {
         console.error(error)
@@ -115,14 +112,7 @@ export default {
       var offset = page - 1
       offset = offset * this.perPage
 
-      axios.get(config.base_url + '/radio/tracks', {
-        params: {
-          offset: offset,
-          limit: this.perPage,
-          artist_substr: this.artist,
-          title_substr: this.title
-        }
-      }).then((response) => {
+      getTrackList(offset, this.perPage, this.artist, this.title).then((response) => {
         self.tracks = response.data.tracks
         self.count  = response.data.count
       }).catch((error) => {

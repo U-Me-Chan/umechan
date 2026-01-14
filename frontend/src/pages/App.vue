@@ -37,11 +37,9 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { bus } from '../bus'
 import Radio from '../components/Radio/Radio.vue'
-
-const config = require('../../config')
+import { getBoardList } from '../api/boards'
 
 export default {
   name: 'App',
@@ -59,16 +57,16 @@ export default {
   created: function () {
     this.updateData();
     document.title = this.title;
-
+    
     setInterval(() => this.updateData(), 30000);
   },
   mounted: function () {
     var self = this
-
+    
     bus.$on('boards.update', function (params) {
       self.tag = params[0]
     })
-
+    
     bus.$on('app.loader', function (args) {
       self.isLoading = args[0]
     })
@@ -81,12 +79,12 @@ export default {
     },
     updateData: function () {
       var self = this;
-
-      axios.get(config.chan_url + '/v2/board').then((response) => {
+      
+      getBoardList().then((response) => {
         self.boards = response.data.payload.boards;
       }).catch((error) => {
         self.$buefy.toast.open('Произошла ошибка при запросе данных с сервера')
-        console.log(error);
+        console.error(error);
       })
     }
   }

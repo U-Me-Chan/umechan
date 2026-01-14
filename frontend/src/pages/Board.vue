@@ -72,9 +72,7 @@
 import { bus } from '../bus'
 import Thread from '../components/Thread.vue'
 import Form from '../components/Form.vue'
-
-const axios = require('axios')
-const config = require('../../config')
+import { getBoardData } from '../api/boards'
 
 export default {
   name: 'Board',
@@ -147,9 +145,7 @@ export default {
         params.no_cache = true
       }
 
-      axios.get(config.chan_url + '/v2/board/' + this.tag, {
-        params: params
-      }).then((response) => {
+      getBoardData(this.tag, params).then((response) => {
         self.count = response.data.payload.count;
         self.threads = response.data.payload.posts;
         self.tag = self.$route.params.tag;

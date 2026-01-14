@@ -67,10 +67,16 @@ const routes = [
   },
   {
     path: '/admin/files',
-    component: () => import('./pages/Files.vue')
+    component: () => import('./pages/Files.vue'),
+    name: 'FilesPage',
+    beforeEnter: (to, from, next) => {
+      console.log(to);
+      next()
+    }
   },
   {
     path: '/admin/files/:page',
+    name: 'FilesConcretePage',
     component: () => import('./pages/Files.vue')
   },
   {
@@ -78,8 +84,9 @@ const routes = [
     component: () => import('./pages/Tracks.vue')
   },
   {
-    path: '/admin/login',
-    component: () => import('./pages/AdminCredentials.vue')
+    path: '/login',
+    component: () => import('./pages/AdminCredentials.vue'),
+    name: 'LoginPage'
   },
   {
     path: '/thread/:id/player',

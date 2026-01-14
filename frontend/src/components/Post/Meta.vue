@@ -10,7 +10,7 @@
   <b-tag class="infotag" v-if="repliesCount">∑{{repliesCount}}</b-tag>
   <b-tag class="infotag" v-if="isBlocked">🔒</b-tag>
     
-  <b-dropdown v-if="isShowAdminButtons && parentId">
+  <b-dropdown v-if="isAdminKeyExist && parentId">
     <template #trigger>
       <b-button type="is-text" size="is-small" icon-right="menu-down">
         🚔
@@ -25,7 +25,7 @@
     <b-button type="is-text" size="is-small" @click="selectThread(id, $event)">➜</b-button>
   </a>
 
-  <b-button v-if="isSavedPostPassword" type="is-text" size="is-small" @click="deletePost(id)">🗑</b-button>
+  <b-button v-if="isPostPasswordExist" type="is-text" size="is-small" @click="deletePost(id)">🗑</b-button>
   
   <b-button v-if="isShowButtons && !isBlocked" type="is-text" size="is-small" @click="isFormVisible = !isFormVisible">✍</b-button>
   <b-modal v-model="isFormVisible">
@@ -37,13 +37,13 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { deletePost } from '../../api/posts'
 import { bus } from '../../bus'
 import Poster from './Poster.vue'
 import Subject from './Subject.vue'
 import Form from '../Form.vue'
-
-const config = require('../../../config')
+import { erasePost } from '../../api/posts'
+import { getPostPassword, getAdminKey } from '../../utils/storage'
 
 export default {
   name: 'Meta',
@@ -94,11 +94,7 @@ export default {
 
       var self = this
 
-      axios.delete(config.chan_url + '/v2/post/' + id, {
-        params: {
-          password: password
-        }
-      }).then(() => {
+      deletePost(id, password).then(() => {
         bus.$emit('thread:updated')
         bus.$emit('board:updated')
       }).catch((error) => {
@@ -109,27 +105,15 @@ export default {
     erasePost: function (id, reason) {
       var key = ''
 
-      if (this.$cookie.get('admin_key') !== null) {
-        key = this.$cookie.get('admin_key')
-      } else {
+      if (!this.isAdminKeyExist) {
         key = prompt('Admin key', [''])
+      } else {
+        key = getAdminKey();
       }
 
       var self = this
 
-      axios.post(
-        config.chan_url + '/_/v2/post/' + id,
-        {
-          reason: reason
-        },
-        {
-          headers: {
-            'Key': key,
-            'Content-type': 'application/json;charset=utf-8',
-            'Accept': 'application/json;charset=utf-8'
-          }
-        }
-      ).then(() => {
+      erasePost(id, reason, key).then(() => {
         bus.$emit('thread:updated')
         bus.$emit('board:updated')
       }).catch((error) => {
@@ -139,11 +123,11 @@ export default {
     }
   },
   computed: {
-    isShowAdminButtons: function () {
-      return this.$cookie.get('admin_key') !== null ? true : false;
+    isAdminKeyExist: function () {
+      return getAdminKey() !== null ? true : false;
     },
-    isSavedPostPassword: function () {
-      return localStorage.getItem(this.id) !== null ? true : false;
+    isPostPasswordExist: function () {
+      return getPostPassword(this.id) !== null ? true : false;
     }
   },
   data: function () {

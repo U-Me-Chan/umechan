@@ -28,11 +28,9 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { bus } from '../bus'
 import File from '../components/Admin/File.vue'
-
-const config = require('../../config')
+import { getFiles } from '../api/files'
 
 export default {
   components: {
@@ -69,11 +67,9 @@ export default {
       var offset = page - 1
       offset = offset * this.perPage
 
-      axios.get(config.filestore_url + '/files', {
-        params: {
-          offset: offset,
-          limit: this.perPage
-        }
+      getFiles({
+        offset: offset,
+        limit: this.perPage
       }).then((response) => {
         self.files = response.data.files
         self.count = response.data.count
