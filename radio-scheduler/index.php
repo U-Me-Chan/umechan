@@ -21,7 +21,6 @@ use Ridouchire\RadioScheduler\RotationStrategies\DayRandomPatternRotation;
 use Ridouchire\RadioScheduler\RotationStrategies\EveningGenreRotation;
 use Ridouchire\RadioScheduler\RotationStrategies\MorningRotationStrategy;
 use Ridouchire\RadioScheduler\RotationStrategies\NightGenreRotation;
-use Ridouchire\RadioScheduler\RotationStrategies\OddFridayRotation;
 use Ridouchire\RadioScheduler\RotationStrategies\OddMiddayFridayRotation;
 use Ridouchire\RadioScheduler\RotationStrategies\SimpleMiddayFridayRotation;
 use Ridouchire\RadioScheduler\Services\OrderTrackService;

@@ -1,7 +1,6 @@
 import axios from 'axios'
 
-const config = '../../config'
-
+const config = require('../../config')
 
 export const putTrackToQueue = (track_id) => {
   return axios.put(config.base_url + '/radio/queue', { track_id: track_id });
