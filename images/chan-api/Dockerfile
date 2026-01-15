@@ -9,6 +9,7 @@ RUN docker-php-source delete
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 ADD images/chan-api/api-php.ini /usr/local/etc/php/conf.d
+ADD images/chan-api/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 FROM base AS development
 RUN pecl install xdebug
