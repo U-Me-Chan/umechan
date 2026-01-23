@@ -9,11 +9,17 @@ services:
     environment:
       PHP_IDE_CONFIG: serverName=PHPSTORM
       IS_DEV: yes
+    depends_on:
+      composer-chan-api-runner:
+        condition: service_completed_successfully
   filestore:
     build:
-      target: base
+      target: development
     volumes:
       - './chan-filestore:/var/www/html'
+    depends_on:
+      composer-chan-filestore-runner:
+        condition: service_completed_successfully
   nginx:
     build:
       target: development
@@ -21,3 +27,15 @@ services:
       - './data/dev-stubs:/var/www/html/dev-stubs'
     ports:
       - '80:80'
+  composer-chan-api-runner:
+    image: composer:latest
+    container_name: composer-chan-api-runner
+    command: composer install --dev --ignore-platform-reqs
+    volumes:
+      - './chan-api:/app'
+  composer-chan-filestore-runner:
+    image: composer:latest
+    container_name: composer-chan-filestore-runner
+    command: composer install --dev --ignore-platform-reqs
+    volumes:
+      - './chan-filestore:/app'
