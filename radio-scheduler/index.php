@@ -93,8 +93,7 @@ $order_track_service = new OrderTrackService(
     $log,
     $random_tracklist_generator,
     $new_or_long_standing_tracklist_generator,
-    $average_estimate_tracklist_generator,
-    $best_estimate_tracklist_generator
+    $average_estimate_tracklist_generator
 );
 
 $r = new Router();

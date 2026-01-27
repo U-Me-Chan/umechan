@@ -7,7 +7,6 @@ use Ridouchire\RadioScheduler\IRotation;
 use Ridouchire\RadioScheduler\Services\Mpd;
 use Ridouchire\RadioScheduler\TracklistGenerators\AverageEstimateTracklistGenerator;
 use Ridouchire\RadioScheduler\TracklistGenerators\NewOrLongStandingTracklistGenerator;
-use Ridouchire\RadioScheduler\TracklistGenerators\RandomTracklistGenerator;
 
 class SimpleMiddayFridayRotation implements IRotation
 {
@@ -36,7 +35,7 @@ class SimpleMiddayFridayRotation implements IRotation
     public function execute(): void
     {
         $a = $this->average_estimate_tracklist_generator->build(['DnB Pop'], 2, 2);
-        $b = $this->new_or_long_standing_tracklist_generator->build(['DnB Pop'], 3, 3);
+        $b = $this->new_or_long_standing_tracklist_generator->build(['DnB Pop'], 3, 3, $a);
 
         $track_paths = array_merge($a, $b);
 

@@ -14,20 +14,26 @@ class NewOrLongStandingTracklistGenerator implements ITracklistGenerator
     ) {
     }
 
-    public function build(array $genres = [], int $min = 4, int $max = 8): array
+    public function build(array $genres = [], int $min = 4, int $max = 8, array $exclude_paths = []): array
     {
         $tracks_list  = [];
         $tracks_count = $this->randomizer->getInt($min, $max);
         $genres       = array_map(fn(string $genre) => "{$genre}/%", $genres);
 
-        /** @phpstan-ignore-next-line */
-        $tracks_list = $this->db->select('tracks', 'path', [
-            'path[~]'        => $genres,
-            'ORDER'          => [
-                'last_playing' => 'ASC',
+        $conditions = [
+            'path[~]' => $genres,
+            'ORDER'   => [
+                'last_playing' => 'ASC'
             ],
             'LIMIT' => $tracks_count
-        ]);
+        ];
+
+        if (!empty($exclude_paths)) {
+            $conditions['path[!]'] = $exclude_paths;
+        }
+
+        /** @phpstan-ignore-next-line */
+        $tracks_list = $this->db->select('tracks', 'path', $conditions);
 
         /** @phpstan-ignore nullCoalesce.variable */
         return $tracks_list ?? [];

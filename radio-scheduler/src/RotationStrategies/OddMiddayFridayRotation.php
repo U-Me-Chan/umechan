@@ -36,11 +36,11 @@ class OddMiddayFridayRotation implements IRotation
 
     public function execute(): void
     {
-        $a = $this->average_estimate_tracklist_generator->build(['Dancecore'], 2, 2);
-        $b = $this->new_or_long_standing_tracklist_generator->build(['Dancecore'], 3, 3);
-        $c = $this->random_tracklist_generator->build(['Dancecore Breaker'], 1);
+        $average_track_paths = $this->average_estimate_tracklist_generator->build(['Dancecore'], 2, 2);
+        $new_track_paths     = $this->new_or_long_standing_tracklist_generator->build(['Dancecore'], 3, 3, $average_track_paths);
+        $breaker_track_path  = $this->random_tracklist_generator->build(['Dancecore Breaker'], 1);
 
-        $track_paths = array_merge($a, $b, $c);
+        $track_paths = array_merge($average_track_paths, $new_track_paths, $breaker_track_path);
 
         array_walk($track_paths, function (string $track_path) {
             $this->logger->info(self::NAME . ": ставлю в очередь {$track_path}");

@@ -21,8 +21,7 @@ class OrderTrackService
         private Logger $logger,
         private RandomTracklistGenerator $random_tracklist_generator,
         private NewOrLongStandingTracklistGenerator $new_or_long_standing_tracklist_generator,
-        private AverageEstimateTracklistGenerator $average_estimate_tracklist_generator,
-        private BestEstimateTracklistGenerator $best_estimate_tracklist_generator
+        private AverageEstimateTracklistGenerator $average_estimate_tracklist_generator
     ) {
     }
 
@@ -56,7 +55,7 @@ class OrderTrackService
         switch($rotation) {
             case 'smart':
                 $new_track_paths = $this->new_or_long_standing_tracklist_generator->build([$genre], 4, 8);
-                $avg_track_paths = $this->average_estimate_tracklist_generator->build([$genre], 4, 8);
+                $avg_track_paths = $this->average_estimate_tracklist_generator->build([$genre], 4, 8, $new_track_paths);
                 $track_paths     = array_merge($new_track_paths, $avg_track_paths);
 
                 shuffle($track_paths);

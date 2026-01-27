@@ -15,7 +15,7 @@ class AverageEstimateTracklistGenerator implements ITracklistGenerator
     ) {
     }
 
-    public function build(array $genres = [], int $min = 4, int $max = 8): array
+    public function build(array $genres = [], int $min = 4, int $max = 8, array $exclude_paths = []): array
     {
         if (sizeof($genres) == 0) {
             throw new InvalidArgumentException('Список жанров не может быть пустым');
@@ -25,16 +25,26 @@ class AverageEstimateTracklistGenerator implements ITracklistGenerator
         $tracks_count = $this->randomizer->getInt($min, $max);
         $genres       = array_map(fn(string $genre) => "{$genre}/%", $genres);
 
+        $conditions = [
+            'LIMIT' => $tracks_count,
+            'ORDER' => [
+                'last_playing' => 'ASC'
+            ]
+        ];
+
+        if (!empty($exclude_paths)) {
+            $conditions['path[!]'] = $exclude_paths;
+        }
+
         foreach ($genres as $genre) {
             /** @phpstan-ignore-next-line */
-            $paths = $this->db->select('tracks', 'path', [
-                'path[~]'         => $genre,
-                'estimate[>=]'    => Medoo::raw("(SELECT AVG(estimate) FROM tracks WHERE path LIKE '{$genre}')"),
-                'ORDER'           => [
-                    'last_playing' => 'ASC'
+            $paths = $this->db->select('tracks', 'path', array_merge(
+                [
+                    'path[~]'         => $genre,
+                    'estimate[>=]'    => Medoo::raw("(SELECT AVG(estimate) FROM tracks WHERE path LIKE '{$genre}')"),
                 ],
-                'LIMIT'            => $tracks_count
-            ]);
+                $conditions
+            ));
 
             /** @phpstan-ignore booleanNot.alwaysTrue */
             if (!$paths) { // Medoo::select может вернуть как array, так и null
