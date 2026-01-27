@@ -57,8 +57,7 @@ class OrderTrackService
             case 'smart':
                 $new_track_paths = $this->new_or_long_standing_tracklist_generator->build([$genre], 4, 8);
                 $avg_track_paths = $this->average_estimate_tracklist_generator->build([$genre], 4, 8);
-                $bst_track_paths = $this->best_estimate_tracklist_generator->build([$genre], 4);
-                $track_paths     = array_merge($new_track_paths, $avg_track_paths, $bst_track_paths);
+                $track_paths     = array_merge($new_track_paths, $avg_track_paths);
 
                 shuffle($track_paths);
 
