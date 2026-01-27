@@ -95,12 +95,12 @@ final class Handler
                 $this->logger->info('У трека обновлён путь');
             }
 
-            // if ($track->isBad()) {
-            //     $this->logger->info('У трека отрицательная оценка, перемещаю его в директорию Duplicate');
+            if ($track->isBad()) {
+                $this->logger->info('У трека отрицательная оценка, перемещаю его в директорию Duplicate');
 
-            //     /** @phpstan-ignore property.private */
-            //     $track->path = $this->path_cutter->cut($this->file_manager->moveToDirOfNegativeEstimate($file->getPathname(), $file->getFilename()));
-            // }
+                /** @phpstan-ignore property.private */
+                $track->path = $this->path_cutter->cut($this->file_manager->moveToDirOfNegativeEstimate($file->getPathname(), $file->getFilename()));
+            }
 
             if ($track->isUpdated()) {
                 $this->track_repo->update($track);

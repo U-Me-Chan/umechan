@@ -116,11 +116,11 @@ class Track
 
     public function isBad(): bool
     {
-        if ($this->play_count < 10) {
+        if ($this->play_count < 1) {
             return false;
         }
 
-        if ($this->estimate < (0 - $this->duration * 10)) {
+        if ($this->estimate < (0 - $this->duration * 3)) {
             return true;
         }
 
