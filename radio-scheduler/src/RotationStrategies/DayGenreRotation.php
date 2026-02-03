@@ -28,10 +28,10 @@ class DayGenreRotation implements IRotation
 
     public function execute(): void
     {
-        $genre = Day::getRandom();
+        $genres = Day::getRandomPattern();
 
-        $new_track_paths   = $this->new_or_long_standing_tracklist_generator->build([$genre], 4, 8);
-        $avg_track_paths   = $this->average_estimate_tracklist_generator->build([$genre], 4, 8, $new_track_paths);
+        $new_track_paths   = $this->new_or_long_standing_tracklist_generator->build($genres, 4, 8);
+        $avg_track_paths   = $this->average_estimate_tracklist_generator->build($genres, 4, 8, $new_track_paths);
 
         $track_paths = array_merge($new_track_paths, $avg_track_paths);
 

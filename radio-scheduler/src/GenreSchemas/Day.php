@@ -39,15 +39,17 @@ class Day implements IGenreSchema
         return [
             [
                 'Alternative High/20',
+                'Alternative Ru High/20',
                 'Alternative Rock/20',
+                'Alternative Ru Rock/20'
             ],
             [
                 'Pop/20',
-                'Pop Ru',
+                'Pop Ru/20',
             ],
             [
                 'Pop Dance/20',
-                'Pop Ru Dance'
+                'Pop Ru Dance/20'
             ],
         ];
     }
