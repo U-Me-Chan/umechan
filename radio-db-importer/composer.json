@@ -3,7 +3,8 @@
     "require": {
         "catfan/medoo": "^2.1",
         "monolog/monolog": "^3.5",
-        "james-heinrich/getid3": "^1.9"
+        "james-heinrich/getid3": "^1.9",
+        "react/event-loop": "^1.6.0"
     },
     "license": "MIT",
     "autoload": {

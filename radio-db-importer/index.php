@@ -4,10 +4,12 @@ use Medoo\Medoo;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
+use React\EventLoop\Loop;
 use Ridouchire\RadioDbImporter\DirectoryIterator;
 use Ridouchire\RadioDbImporter\FileManager;
 use Ridouchire\RadioDbImporter\Handler;
 use Ridouchire\RadioDbImporter\Id3v2Parser;
+use Ridouchire\RadioDbImporter\Tracks\Services\TrackEstimateValidator;
 use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
 use Ridouchire\RadioDbImporter\Utils\PathCutter;
 
@@ -18,16 +20,11 @@ $logger = new Logger('importer');
 $logger->pushHandler(new StreamHandler(__DIR__ . DIRECTORY_SEPARATOR . 'logs/radio-db-importer.log', Level::Info));
 $logger->info('Запуск');
 
-$subpath = isset($_ENV['RADIO_DB_IMPORTER_SUBDIR_PATH']) ? $_ENV['RADIO_DB_IMPORTER_SUBDIR_PATH'] : '';
-
-if ($subpath == '/') {
-    $subpath = '';
-}
-
-$music_dir_path                  = '/var/lib/music' . $subpath;
+$music_dir_path                  = '/var/lib/music';
 $music_dir_of_convertible_files  = '/var/lib/convert';
 $music_dir_of_files_without_tags = '/var/lib/tagme';
-$music_dir_of_negative_estimates = '/var/lib/music/Duplicate';
+$music_dir_of_negative_estimates = '/var/lib/music/BadEstimate';
+$bad_estimate_value              = $_ENV['RADIO_DB_IMPORTER_BAD_ESTIMATE_VALUE'];
 
 $db = new Medoo([
     'database_type' => 'mysql',
@@ -39,13 +36,23 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-$path_cutter  = new PathCutter('/var/lib/music'); // должно быть всегда от корня директории
+$path_cutter  = new PathCutter($music_dir_path);
 $dir_iterator = new DirectoryIterator($music_dir_path);
 $tags_parser  = new Id3v2Parser(new getID3());
 $track_repo   = new TrackRepository($db);
-$file_manager = new FileManager($music_dir_of_convertible_files, $music_dir_of_files_without_tags, $music_dir_of_negative_estimates);
-$handler      = new Handler($dir_iterator, $tags_parser, $logger, $track_repo, $file_manager, $path_cutter);
+$file_manager = new FileManager(
+    $music_dir_of_convertible_files,
+    $music_dir_of_files_without_tags,
+    $music_dir_of_negative_estimates
+);
+$handler = new Handler(
+    $dir_iterator,
+    $tags_parser,
+    $logger,
+    $track_repo,
+    $file_manager,
+    $path_cutter,
+    new TrackEstimateValidator($bad_estimate_value)
+);
 
-while (true) {
-    $handler();
-}
+Loop::addPeriodicTimer(0, $handler);

@@ -114,16 +114,13 @@ class Track
         return $this->estimate;
     }
 
-    public function isBad(): bool
+    public function getPlayCount(): int
     {
-        if ($this->play_count < 1) {
-            return false;
-        }
+        return $this->play_count;
+    }
 
-        if ($this->estimate < (0 - $this->duration * 5)) {
-            return true;
-        }
-
-        return false;
+    public function getDuration(): int
+    {
+        return $this->duration;
     }
 }

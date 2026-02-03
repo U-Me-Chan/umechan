@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use OutOfBoundsException;
 use SplFileInfo;
 use Monolog\Logger;
+use Ridouchire\RadioDbImporter\Tracks\Services\TrackEstimateValidator;
 use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
 use Ridouchire\RadioDbImporter\Tracks\Track;
 use Ridouchire\RadioDbImporter\Tracks\Track\Hash;
@@ -21,7 +22,8 @@ final class Handler
         private Logger $logger,
         private TrackRepository $track_repo,
         private FileManager $file_manager,
-        private PathCutter $path_cutter
+        private PathCutter $path_cutter,
+        private TrackEstimateValidator $track_estimate_validator
     ) {
     }
 
@@ -95,7 +97,7 @@ final class Handler
                 $this->logger->info('У трека обновлён путь');
             }
 
-            if ($track->isBad()) {
+            if ($this->track_estimate_validator->isBadEstimate($track)) {
                 $this->logger->info('У трека отрицательная оценка, перемещаю его в директорию Duplicate');
 
                 /** @phpstan-ignore property.private */
