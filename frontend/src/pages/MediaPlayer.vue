@@ -41,6 +41,8 @@
       autoplay
       @ended="onVideoEnd"
       @error="onFileError"
+      @volumechange="onVolumeChange"
+      ref="videoPlayer"
       >
       Ваш браузер не поддерживает видео тег
     </video>
@@ -80,7 +82,8 @@ export default {
       progress: 0,
       timer: null,
       videoTimer: null,
-      files: []
+      files: [],
+      currentVideoVolume: 0.2
     }
   },
   computed: {
@@ -101,6 +104,7 @@ export default {
   mounted: function () {
     if (this.files.length > 0) {
       this.startTimer();
+      this.restoreVolume();
     }
   },
   beforeDestroy() {
@@ -113,9 +117,17 @@ export default {
         this.clearTimers();
         if (this.files.length > 0) {
           this.startTimer();
+          this.restoreVolume();
         }
       },
       deep: true
+    },
+    currentIndex: {
+      handler() {
+        this.$nextTick(() => {
+          this.restoreVolume();
+        });
+      }
     }
   },
   methods: {
@@ -180,6 +192,31 @@ export default {
     },
     shuffleFilesList() {
       this.files.sort(() => Math.random() - 0.5);
+    },
+    onVolumeChange() {
+      if (this.$refs.videoPlayer && this.currentFile?.type === 'video') {
+        const volume = this.$refs.videoPlayer.volume;
+        const key = `video_volume`;
+        localStorage.setItem(key, volume.toString());
+        this.currentVideoVolume = volume;
+      }
+    },
+    restoreVolume() {
+      if (this.currentFile && this.currentFile.type === 'video' && this.$refs.videoPlayer) {
+        const key = `video_volume`;
+        const savedVolume = localStorage.getItem(key);
+
+        if (savedVolume !== null) {
+          const volume = parseFloat(savedVolume);
+          if (volume >= 0 && volume <= 1) {
+            this.$refs.videoPlayer.volume = volume;
+            this.currentVideoVolume = volume;
+          }
+        } else {
+          this.$refs.videoPlayer.volume = 0.2;
+          this.currentVideoVolume = 0.2;
+        }
+      }
     }
   }
 }
