@@ -3,21 +3,16 @@
 namespace PK\Posts;
 
 use InvalidArgumentException;
-use Medoo\Medoo;
-use OutOfBoundsException;
 use PDOStatement;
+use Medoo\Medoo;
 use PK\Posts\Post;
 use PK\Posts\Post\Id;
-use PK\Passports\PassportStorage;
 use PK\Posts\Exceptions\ThreadNotFoundException;
-use PK\Posts\Post\PosterKeyHash;
-use PK\Posts\Post\VerifyFlag;
 
 class PostStorage
 {
     public function __construct(
-        private Medoo $db,
-        private PassportStorage $passport_storage
+        private Medoo $db
     ) {
     }
 
@@ -202,15 +197,6 @@ class PostStorage
         $post_data = $post->toArray();
 
         if ($post->is_draft) {
-            try {
-                $passport = $this->passport_storage->findOne(['hash' => PosterKeyHash::fromString($post_data['poster'])->toString()]);
-
-                $post_data['poster'] = $passport->name->toString();
-                $post_data['is_verify'] = VerifyFlag::yes->value;
-            } catch (OutOfBoundsException) {
-                $post_data['is_verify'] = VerifyFlag::no->value;
-            } // FIXME: вынести верификацию в отдельный сервис
-
             $this->db->insert('posts', $post_data);
         } else {
             unset($post_data['id']);

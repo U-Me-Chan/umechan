@@ -10,4 +10,5 @@ return [
     'maintenance_key'      => $_ENV['ADMINISTRATOR_KEY'],
     'default_name'         => $_ENV['DEFAULT_NAME'],
     'exclude_tags'         => $_ENV['EXCLUDE_TAGS'],
+    'node_sign'            => $_ENV['NODE_ID']
 ];

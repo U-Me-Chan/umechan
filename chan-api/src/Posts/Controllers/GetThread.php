@@ -10,7 +10,7 @@ use PK\OpenApi\Schemas\Error;
 use PK\OpenApi\Schemas\Response;
 use PK\Posts\Exceptions\ThreadNotFoundException;
 use PK\Posts\OpenApi\Schemas\ThreadData;
-use PK\Posts\Services\PostFacade;
+use PK\Posts\Services\PostService;
 
 #[OA\Get(
     path: '/api/v2/post/{id}',
@@ -62,7 +62,7 @@ use PK\Posts\Services\PostFacade;
 final class GetThread
 {
     public function __construct(
-        private PostFacade $post_facade,
+        private PostService $post_service,
         private array $exclude_tags
     ) {
     }
@@ -76,7 +76,7 @@ final class GetThread
         $no_board_list = $req->getParams('no_board_list') ? true : false;
 
         try {
-            list($thread, $boards) = $this->post_facade->getThread($id, $exclude_tags, $no_board_list);
+            list($thread, $boards) = $this->post_service->getThread($id, $exclude_tags, $no_board_list);
 
             return new JsonResponse(['thread_data' => $thread, 'boards' => $boards]);
         } catch (ThreadNotFoundException $e) {

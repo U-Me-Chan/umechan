@@ -11,7 +11,7 @@ use PK\OpenApi\Schemas\Response;
 use PK\Posts\Exceptions\ThreadBlockedException;
 use PK\Posts\Exceptions\ThreadNotFoundException;
 use PK\Posts\OpenApi\Schemas\PostCreated;
-use PK\Posts\Services\PostFacade;
+use PK\Posts\Services\PostService;
 
 #[OA\Put(
     path: '/api/v2/post/{id}',
@@ -75,7 +75,7 @@ use PK\Posts\Services\PostFacade;
 final class CreateReply
 {
     public function __construct(
-        private PostFacade $post_facade
+        private PostService $post_service
     ) {
     }
 
@@ -103,7 +103,7 @@ final class CreateReply
         }
 
         try {
-            $data = $this->post_facade->createReplyOnThread(
+            $data = $this->post_service->createReplyOnThread(
                 $thread_id,
                 $req->getParams('message'),
                 $params

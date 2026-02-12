@@ -6,6 +6,7 @@ use OpenApi\Attributes as OA;
 use Medoo\Medoo;
 use PK\Http\Request;
 use PK\Boards\BoardStorage;
+use PK\Boards\Services\BoardService;
 use PK\Feed\OpenApi\Schemas\Feed;
 use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Response;
@@ -67,7 +68,7 @@ use PK\OpenApi\Schemas\Response;
 class BoardsFetcher
 {
     public function __construct(
-        private BoardStorage $board_repo,
+        private BoardService $board_service,
         private Medoo $db,
         private array $exclude_tags
     ) {
@@ -102,7 +103,7 @@ class BoardsFetcher
             ];
         }
 
-        $results['boards'] = $this->board_repo->find($exclude_tags);
+        $results['boards'] = $this->board_service->getBoardList($exclude_tags);
         $results['count']  = $this->db->count('posts', [
             '[>]boards' => [
                 'board_id' => 'id'

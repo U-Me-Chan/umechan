@@ -3,11 +3,14 @@ RUN apk add --no-cache --virtual \
   zip \
   libzip-dev \
   libmemcached-dev \
-  libressl-dev autoconf \
+  autoconf \
   g++ \
   make \
+  librdkafka \
+  librdkafka-dev \
   linux-headers && \
   pecl install memcached && \
+  pecl install rdkafka && \
   docker-php-ext-enable memcached && \
   docker-php-ext-install -j$(nproc) pdo_mysql zip && \
   docker-php-source delete

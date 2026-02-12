@@ -3,7 +3,6 @@
 namespace PK\Posts\Controllers;
 
 use InvalidArgumentException;
-use OutOfBoundsException;
 use OpenApi\Attributes as OA;
 use PK\Http\Request;
 use PK\Http\Responses\JsonResponse;
@@ -11,8 +10,7 @@ use PK\OpenApi\Schemas\Error;
 use PK\OpenApi\Schemas\Response;
 use PK\Posts\Exceptions\InvalidPostPasswordException;
 use PK\Posts\Exceptions\ThreadNotFoundException;
-use PK\Posts\Services\PostFacade;
-use RuntimeException;
+use PK\Posts\Services\PostService;
 
 #[OA\Delete(
     path: '/api/v2/post/{id}',
@@ -66,10 +64,10 @@ use RuntimeException;
     'Неверный пароль',
     InvalidPostPasswordException::class
 )]
-class PostDeleter
+class DeletePostByAuthor
 {
     public function __construct(
-        private PostFacade $post_facade
+        private PostService $post_service
     ) {
     }
 
@@ -81,7 +79,7 @@ class PostDeleter
         }
 
         try {
-            $this->post_facade->deletePostByAuthor($vars['id'], $req->getParams('password'));
+            $this->post_service->deletePostByAuthor($vars['id'], $req->getParams('password'));
         } catch (ThreadNotFoundException $e) {
             return (new JsonResponse([], 404))->setException($e);
         } catch (InvalidPostPasswordException $e) {

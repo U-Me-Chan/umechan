@@ -12,7 +12,7 @@ use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Error;
 use PK\OpenApi\Schemas\Response;
 use PK\Posts\OpenApi\Schemas\PostCreated;
-use PK\Posts\Services\PostFacade;
+use PK\Posts\Services\PostService;
 
 #[OA\Post(
     path: '/api/v2/post',
@@ -66,7 +66,7 @@ use PK\Posts\Services\PostFacade;
 final class CreateThread
 {
     public function __construct(
-        private PostFacade $post_facade
+        private PostService $post_service
     ) {
     }
 
@@ -93,7 +93,7 @@ final class CreateThread
         }
 
         try {
-            $data = $this->post_facade->createThread(
+            $data = $this->post_service->createThread(
                 $req->getParams('tag'),
                 $req->getParams('message'),
                 $params

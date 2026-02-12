@@ -8,8 +8,7 @@ use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Error;
 use PK\OpenApi\Schemas\Response;
 use PK\Passports\Exceptions\NameOrKeyIsForbiddenException;
-use PK\Passports\Passport;
-use PK\Passports\PassportStorage;
+use PK\Passports\Services\PassportService;
 
 #[OA\Post(
     path: '/api/v2/passport',
@@ -53,8 +52,7 @@ use PK\Passports\PassportStorage;
 final class CreatePassport
 {
     public function __construct(
-        private PassportStorage $passport_repo,
-        private string $default_name
+        private PassportService $passport_service
     ) {
     }
 
@@ -80,17 +78,8 @@ final class CreatePassport
                 ->setException(new \InvalidArgumentException("Параметр key не может быть пустым"));
         }
 
-        if ($req->getParams('name') == $this->default_name || $req->getParams('key') == $this->default_name) {
-            return (new JsonResponse([], 409))
-                ->setException(
-                    new NameOrKeyIsForbiddenException("Нельзя использовать имя автора по умолчанию для любого из параметров: {$this->default_name}")
-                );
-        }
-
-        $passport = Passport::draft($req->getParams('name'), $req->getParams('key'));
-
         try {
-            $this->passport_repo->save($passport);
+            $this->passport_service->createPassport($req->getParams('name'), $req->getParams('key'));
         } catch (NameOrKeyIsForbiddenException $e) {
             return new JsonResponse([], 409)->setException($e);
         }

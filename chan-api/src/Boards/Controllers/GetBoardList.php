@@ -6,8 +6,8 @@ use OpenApi\Attributes as OA;
 use PK\Http\Request;
 use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Response;
-use PK\Boards\BoardStorage;
 use PK\Boards\OpenApi\Schemas\BoardList;
+use PK\Boards\Services\BoardService;
 
 #[OA\Get(
     path: '/api/v2/board',
@@ -35,7 +35,7 @@ use PK\Boards\OpenApi\Schemas\BoardList;
 final class GetBoardList
 {
     public function __construct(
-        private BoardStorage $storage,
+        private BoardService $board_service,
         private array $exclude_tags
     ) {
     }
@@ -44,7 +44,7 @@ final class GetBoardList
     {
         $exclude_tags = $req->getParams('exclude_tags', $this->exclude_tags);
 
-        $boards = $this->storage->find($exclude_tags);
+        $boards = $this->board_service->getBoardList($exclude_tags);
 
         return new JsonResponse(['boards' => $boards], 200);
     }

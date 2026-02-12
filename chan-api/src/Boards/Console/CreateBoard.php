@@ -2,8 +2,7 @@
 
 namespace PK\Boards\Console;
 
-use PK\Boards\Board;
-use PK\Boards\BoardStorage;
+use PK\Boards\Services\BoardService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,7 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class CreateBoard extends Command
 {
     public function __construct(
-        private BoardStorage $board_storage
+        private BoardService $board_service
     ) {
         parent::__construct();
     }
@@ -32,12 +31,12 @@ final class CreateBoard extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $this->board_storage->save(Board::draft(
+            $id = $this->board_service->createBoard(
                 $input->getArgument('tag'),
                 $input->getArgument('name')
-            ));
+            );
 
-            $io->success('Создан!');
+            $io->success("Создан #{$id}!");
 
             return Command::SUCCESS;
         } catch (\Throwable $e) {

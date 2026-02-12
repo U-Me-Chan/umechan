@@ -8,12 +8,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use PK\Posts\Exceptions\NotIsThreadException;
-use PK\Posts\Services\PostFacade;
+use PK\Posts\Services\PostService;
 
 final class SetStickyThread extends Command
 {
     public function __construct(
-        private PostFacade $post_facade
+        private PostService $post_service
     ) {
         parent::__construct();
     }
@@ -31,7 +31,7 @@ final class SetStickyThread extends Command
         $io = new SymfonyStyle($input_interface, $output_interface);
 
         try {
-            $this->post_facade->setStickyFlagStateToThread($input_interface->getArgument('thread_id'), true);
+            $this->post_service->setStickyFlagStateToThread($input_interface->getArgument('thread_id'), true);
 
             $io->success('Установлен!');
 
