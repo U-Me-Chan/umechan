@@ -1,5 +1,53 @@
 name: umechan
 services:
+  kafka:
+    image: apache/kafka:4.1.1
+    container_name: umechan-kafka-broker
+    restart: always
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093,SASL_PLAINTEXT://kafka:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,SASL_PLAINTEXT://10.10.10.37:9094
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_MESSAGE_MAX_BYTES: 20971520
+      KAFKA_SOCKET_REQUEST_MAX_BYTES: 20991520
+      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf
+    user: "0:0"
+    volumes:
+       - "./data/kafka:/tmp/kafka-logs"
+       - "./data/configs/kafka/kafka_server_jaas.conf:/etc/kafka/kafka_server_jaas.conf"
+    ports:
+      - "9094:9094"
+    profiles:
+      - production
+      - chan
+      - ${TARGET:-}
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z kafka 9092"]
+      timeout: 2s
+      retries: 10
+  kafka-ui:
+    container_name: umechan-kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    restart: always
+    ports:
+      - 8010:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_CLUSTERS_0_NAME: umechan
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
   nginx:
     build:
       dockerfile: images/web-server/Dockerfile
@@ -42,7 +90,7 @@ services:
       - ${TARGET:-}
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 10s
+      timeout: 2s
       retries: 10
   api:
     build:
@@ -56,6 +104,8 @@ services:
         condition: service_healthy
       chan-migrations:
         condition: service_completed_successfully
+      kafka:
+        condition: service_healthy
     env_file:
       - '.env'
     environment:
@@ -74,6 +124,7 @@ services:
       - BASE_URL=${BASE_URL}
       - EPDS_DUMP_PATH=${EPDS_DUMP_PATH}
       - IS_DEV=no
+      - NODE_ID=${NODE_ID:-area8ulyanovsk}
     volumes:
       - './data/logs:/var/log'
       - './data/dumps:/tmp/dumps'

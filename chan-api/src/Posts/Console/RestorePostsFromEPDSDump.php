@@ -8,12 +8,12 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use PK\Posts\Services\PostFacade;
+use PK\Posts\Services\PostService;
 
 final class RestorePostsFromEPDSDump extends Command
 {
     public function __construct(
-        private PostFacade $post_facade
+        private PostService $post_service
     ) {
         parent::__construct();
     }
@@ -33,7 +33,7 @@ final class RestorePostsFromEPDSDump extends Command
         $io->info('Будет выполнено восстановление данных постов из дампа EPDS');
 
         try {
-            $this->post_facade->restorePostFromEPDSDump($input->getArgument('from_timestamp'));
+            $this->post_service->restorePostFromEPDSDump($input->getArgument('from_timestamp'));
 
             $io->success('Выполнено!');
 

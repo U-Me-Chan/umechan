@@ -6,12 +6,12 @@ use InvalidArgumentException;
 use PK\Http\Request;
 use PK\Http\Responses\JsonResponse;
 use PK\Posts\Exceptions\ThreadNotFoundException;
-use PK\Posts\Services\PostFacade;
+use PK\Posts\Services\PostService;
 
-final class DeletePost
+final class DeletePostByOwnerChan
 {
     public function __construct(
-        private PostFacade $post_facade,
+        private PostService $post_service,
         private string $key
     ) {
     }
@@ -33,8 +33,8 @@ final class DeletePost
         $id = $vars['id'];
 
         try {
-            $this->post_facade->deletePostByOwnerChan($id, $reason);
-            return new JsonResponse([], 204);
+            $this->post_service->deletePostByOwnerChan($id, $reason);
+            return new JsonResponse([], 200);
         } catch (ThreadNotFoundException $e) {
             return new JsonResponse([], 404)->setException($e);
         }

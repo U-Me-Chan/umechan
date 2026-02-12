@@ -78,6 +78,15 @@ class Post implements \JsonSerializable
         );
     }
 
+    public static function getAllowedMutationPropsList(): array
+    {
+        return [
+            'poster',
+            'subject',
+            'message',
+        ];
+    }
+
     public function jsonSerialize(): array
     {
         $data = get_object_vars($this);
@@ -87,9 +96,9 @@ class Post implements \JsonSerializable
         $data['media']             = $media;
         $data['truncated_message'] = $truncated_message;
         $data['id']                = $this->id->value;
+        $data['password']          = $this->password->toString();
 
         unset(
-            $data['password'],
             $data['is_draft'],
             $data['is_thread']
         );
@@ -140,6 +149,7 @@ class Post implements \JsonSerializable
         public ?int $parent_id,
         #[OA\Property(description: 'Метка времени в unixtime последнего обновления поста')]
         public int $updated_at,
+        #[OA\Property(description: 'Хеш пароля от поста', type: 'string')]
         public PasswordHash $password,
         #[OA\Property(items: new OA\Items(ref: Post::class), description: 'Список ответов на нить')]
         public array $replies = [],

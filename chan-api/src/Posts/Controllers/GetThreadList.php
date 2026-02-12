@@ -9,7 +9,7 @@ use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Error;
 use PK\OpenApi\Schemas\Response;
 use PK\Posts\OpenApi\Schemas\ThreadList;
-use PK\Posts\Services\PostFacade;
+use PK\Posts\Services\PostService;
 
 #[OA\Get(
     path: '/api/v2/board/{tags}',
@@ -81,7 +81,7 @@ use PK\Posts\Services\PostFacade;
 final class GetThreadList
 {
     public function __construct(
-        private PostFacade $post_facade,
+        private PostService $post_service,
         private array $exclude_tags
     ) {
     }
@@ -96,7 +96,7 @@ final class GetThreadList
 
         $exclude_tags = $req->getParams('exclude_tags', $this->exclude_tags);
 
-        list($threads, $count, $boards) = $this->post_facade->getThreadList($tags, $limit, $offset, $exclude_tags, $no_board_list);
+        list($threads, $count, $boards) = $this->post_service->getThreadList($tags, $limit, $offset, $exclude_tags, $no_board_list);
 
         return new JsonResponse([
             'count'  => $count,

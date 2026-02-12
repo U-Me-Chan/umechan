@@ -78,10 +78,17 @@ class BoardStorage
         return $id;
     }
 
-    public function updateCounters(int $id): void
+    public function updateNewPostsCount(Board $board): void
     {
-        $threads_count = $this->db->count('posts', ['board_id' => $id, 'parent_id' => null]);
+        $threads_count = $this->db->count('posts', ['board_id' => $board->id, 'parent_id' => null]);
 
+        $board->threads_count = $threads_count;
+
+        $this->save($board);
+    }
+
+    public function updateThreadsCount(Board $board): void
+    {
         $date = Timestamp::draft()->toString();
 
         $start_timestamp = Timestamp::fromString($date)->toInt();
@@ -92,16 +99,13 @@ class BoardStorage
         $new_posts_count = $this->db->count(
             'posts',
             [
-                'board_id'     => $id,
+                'board_id'     => $board->id,
                 'timestamp[>]' => $start_timestamp,
                 'timestamp[<]' => $end_timestamp
             ]
         );
 
-        $board = $this->findById($id);
-
         $board->new_posts_count = $new_posts_count;
-        $board->threads_count   = $threads_count;
 
         $this->save($board);
     }
