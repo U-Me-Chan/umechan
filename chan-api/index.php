@@ -75,7 +75,7 @@ $db = new Medoo([
 $message_broker = new KafkaWrapper(['kafka:9092']);
 
 $chan_event_builder = new ChanEventBuilder($config['node_sign']);
-$filestore_event_builder = new FilestoreEventBuilder('foo');
+$filestore_event_builder = new FilestoreEventBuilder($config['node_sign']);
 
 $passport_storage = new PassportStorage($db);
 $board_storage    = new BoardStorage($db);
