@@ -377,7 +377,7 @@ EOT;
             $this->chan_event_builder->build(
                 UpdatePost::class,
                 new UpdatePostPayload([
-                    'is_sticky' => $is_blocked
+                    'is_blocked' => $is_blocked
                 ])
             )
         );
