@@ -78,7 +78,7 @@ class BoardStorage
         return $id;
     }
 
-    public function updateNewPostsCount(Board $board): void
+    public function updateThreadsCount(Board $board): void
     {
         $threads_count = $this->db->count('posts', ['board_id' => $board->id, 'parent_id' => null]);
 
@@ -87,7 +87,7 @@ class BoardStorage
         $this->save($board);
     }
 
-    public function updateThreadsCount(Board $board): void
+    public function updateNewPostsCount(Board $board): void
     {
         $date = Timestamp::draft()->toString();
 
