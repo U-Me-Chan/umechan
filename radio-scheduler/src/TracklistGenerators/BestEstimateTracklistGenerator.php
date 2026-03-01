@@ -2,6 +2,7 @@
 
 namespace Ridouchire\RadioScheduler\TracklistGenerators;
 
+use Exception;
 use InvalidArgumentException;
 use Medoo\Medoo;
 use Ridouchire\RadioScheduler\ITracklistGenerator;
@@ -19,27 +20,22 @@ class BestEstimateTracklistGenerator implements ITracklistGenerator
             throw new InvalidArgumentException('Список жанров не может быть пустым');
         }
 
-        $genres = array_map(fn(string $genre) => "{$genre}/%", $genres);
+        $genres = implode('|', $genres);
 
-        $conditions = [
-            'path[~]' => $genres,
-            'LIMIT'   => $count,
-            'ORDER'   => [
-                'estimate'     => 'DESC',
-                'last_playing' => 'ASC'
-            ],
-        ];
+        $paths = $this->db->query(
+            "WITH sorted_paths AS (SELECT path FROM tracks WHERE path REGEXP :genres ORDER BY estimate DESC, last_playing ASC LIMIT 100), " .
+                "random_paths AS (SELECT path FROM sorted_paths ORDER BY RAND() LIMIT :count) " .
+                "SELECT * FROM random_paths",
+            [
+                ':genres' => $genres,
+                ':count'  => $count
+            ]
+        )->fetchAll();
 
-        if (!empty($exclude_paths)) {
-            $conditions['path[!]'] = $exclude_paths;
+        if (empty($paths)) {
+            return [];
         }
 
-        /**
-         * @phpstan-ignore-next-line
-         */
-        $paths =  $this->db->select('tracks', 'path', $conditions);
-
-        /** @phpstan-ignore nullCoalesce.variable */
-        return $paths ?? [];
+        return array_map(fn(array $arr) => $arr['path'], $paths);
     }
 }

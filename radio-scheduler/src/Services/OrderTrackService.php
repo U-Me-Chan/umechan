@@ -21,7 +21,8 @@ class OrderTrackService
         private Logger $logger,
         private RandomTracklistGenerator $random_tracklist_generator,
         private NewOrLongStandingTracklistGenerator $new_or_long_standing_tracklist_generator,
-        private AverageEstimateTracklistGenerator $average_estimate_tracklist_generator
+        private AverageEstimateTracklistGenerator $average_estimate_tracklist_generator,
+        private BestEstimateTracklistGenerator $best_estimate_tracklist_generator
     ) {
     }
 
@@ -61,6 +62,10 @@ class OrderTrackService
                 shuffle($track_paths);
 
                 break;
+            case 'best':
+                $track_paths = $this->best_estimate_tracklist_generator->build([$genre], 10);
+
+                break;
             case 'random':
             default:
                 $track_paths = $this->random_tracklist_generator->build([$genre], 10);
@@ -72,8 +77,8 @@ class OrderTrackService
             throw new RuntimeException();
         }
 
-        array_walk($track_paths, function (string $track_path) {
-            $this->logger->info("OrderTrackList: ставлю в очередь файл: {$track_path}");
+        array_walk($track_paths, function (string $track_path) use ($rotation) {
+            $this->logger->info("OrderTrackList: {$rotation}: ставлю в очередь файл: {$track_path}");
 
             $this->mpd->addToQueue($track_path);
         });

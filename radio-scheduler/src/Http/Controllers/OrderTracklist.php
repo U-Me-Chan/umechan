@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Message\Response;
 use Ridouchire\RadioScheduler\Services\OrderTrackService;
 use RuntimeException;
+use Throwable;
 
 #[OA\Post(
     path: '/radio/queue/',
@@ -153,6 +154,11 @@ final class OrderTracklist
         } catch (DomainException) {
             $res = Response::json(['status' => 'failed', 'reason' => 'queue is full']);
             $res = $res->withStatus(Response::STATUS_FORBIDDEN);
+
+            return $res;
+        } catch (Throwable $e) {
+            $res = Response::json(['status' => 'failed', 'reason' => $e->getMessage()]);
+            $res = $res->withStatus(Response::STATUS_INTERNAL_SERVER_ERROR);
 
             return $res;
         }
