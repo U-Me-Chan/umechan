@@ -135,17 +135,23 @@ final class OrderTracklist
         $body   = $req->getBody()->getContents();
         $params = json_decode($body, true);
 
-        if (!isset($params['genre'])) {
+        if(isset($params['genres'])) {
+            $genres = $params['genres'];
+        }
+
+        if (isset($params['genre'])) {
+            $genres[] = $params['genre'];
+        }
+
+        if (empty($genres)) {
             $res = Response::json(['status' => 'failed', 'reason' => 'genre no set']);
             $res = $res->withStatus(Response::STATUS_BAD_REQUEST);
-
-            return $res;
         }
 
         $rotation = isset($params['rotation']) ? $params['rotation'] : 'random';
 
         try {
-            $this->order_track_service->putTrackListInQueue($params['genre'], $rotation);
+            $this->order_track_service->putTrackListInQueue($genres, $rotation);
         } catch (RuntimeException) {
             $res = Response::json(['status' => 'failed', 'reason' => 'genre is empty']);
             $res = $res->withStatus(Response::STATUS_INTERNAL_SERVER_ERROR);

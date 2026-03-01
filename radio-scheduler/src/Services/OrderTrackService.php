@@ -47,7 +47,7 @@ class OrderTrackService
         $this->logger->info("OrderTrack: ставлю в очередь файл {$track_path}");
     }
 
-    public function putTrackListInQueue(string $genre, string $rotation = 'random'): void
+    public function putTrackListInQueue(array $genres, string $rotation = 'random'): void
     {
         if ($this->mpd->getQueueCount() > 20) {
             throw new DomainException();
@@ -55,20 +55,20 @@ class OrderTrackService
 
         switch($rotation) {
             case 'smart':
-                $new_track_paths = $this->new_or_long_standing_tracklist_generator->build([$genre], 4, 8);
-                $avg_track_paths = $this->average_estimate_tracklist_generator->build([$genre], 4, 8, $new_track_paths);
+                $new_track_paths = $this->new_or_long_standing_tracklist_generator->build($genres, 4, 8);
+                $avg_track_paths = $this->average_estimate_tracklist_generator->build($genres, 4, 8, $new_track_paths);
                 $track_paths     = array_merge($new_track_paths, $avg_track_paths);
 
                 shuffle($track_paths);
 
                 break;
             case 'best':
-                $track_paths = $this->best_estimate_tracklist_generator->build([$genre], 10);
+                $track_paths = $this->best_estimate_tracklist_generator->build($genres, 10);
 
                 break;
             case 'random':
             default:
-                $track_paths = $this->random_tracklist_generator->build([$genre], 10);
+                $track_paths = $this->random_tracklist_generator->build($genres, 10);
 
                 break;
         }
