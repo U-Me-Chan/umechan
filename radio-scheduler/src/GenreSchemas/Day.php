@@ -10,14 +10,10 @@ class Day implements IGenreSchema
     {
         return [
             'Alternative High',
-            'Alternative High/20',
             'Alternative Rock',
-            'Alternative Rock/20',
             'Pop',
-            'Pop/20',
             'Pop Ru',
             'Pop Dance',
-            'Pop Dance/20',
             'Pop Ru Dance',
         ];
     }
@@ -38,18 +34,18 @@ class Day implements IGenreSchema
     {
         return [
             [
-                'Alternative High/20',
-                'Alternative Ru High/20',
-                'Alternative Rock/20',
-                'Alternative Ru Rock/20'
+                'Alternative High',
+                'Alternative Ru High',
+                'Alternative Rock',
+                'Alternative Ru Rock'
             ],
             [
-                'Pop/20',
-                'Pop Ru/20',
+                'Pop',
+                'Pop Ru',
             ],
             [
-                'Pop Dance/20',
-                'Pop Ru Dance/20'
+                'Pop Dance',
+                'Pop Ru Dance'
             ],
         ];
     }
