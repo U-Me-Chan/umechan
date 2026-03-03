@@ -2,7 +2,6 @@
 
 namespace Ridouchire\RadioScheduler\TracklistGenerators;
 
-use Exception;
 use InvalidArgumentException;
 use Medoo\Medoo;
 use Ridouchire\RadioScheduler\ITracklistGenerator;
