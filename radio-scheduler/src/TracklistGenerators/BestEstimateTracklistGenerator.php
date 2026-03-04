@@ -13,21 +13,26 @@ class BestEstimateTracklistGenerator implements ITracklistGenerator
     ) {
     }
 
+    /**
+     * @return string []
+     */
     public function build(array $genres = [], int $count = 5, array $exclude_paths = []): array
     {
         if (empty($genres)) {
             throw new InvalidArgumentException('Список жанров не может быть пустым');
         }
 
+        $genres = array_map(fn(string $genre) => "^{$genre}/", $genres);
         $genres = implode('|', $genres);
 
         $paths = $this->db->query(
-            "WITH sorted_paths AS (SELECT path FROM tracks WHERE path REGEXP :genres ORDER BY estimate DESC, last_playing ASC LIMIT 100), " .
+            "WITH sorted_paths AS (SELECT path FROM tracks WHERE path REGEXP :genres AND last_playing < :last_playing ORDER BY estimate DESC, last_playing ASC LIMIT 100), " .
                 "random_paths AS (SELECT path FROM sorted_paths ORDER BY RAND() LIMIT :count) " .
                 "SELECT * FROM random_paths",
             [
-                ':genres' => $genres,
-                ':count'  => $count
+                ':genres'       => $genres,
+                ':last_playing' => time() - (60 * 60 * 2),
+                ':count'        => $count
             ]
         )->fetchAll();
 

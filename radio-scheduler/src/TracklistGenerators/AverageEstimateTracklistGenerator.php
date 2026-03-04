@@ -15,6 +15,9 @@ class AverageEstimateTracklistGenerator implements ITracklistGenerator
     ) {
     }
 
+    /**
+     * @return string[]
+     */
     public function build(array $genres = [], int $min = 4, int $max = 8, array $exclude_paths = []): array
     {
         if (sizeof($genres) == 0) {
