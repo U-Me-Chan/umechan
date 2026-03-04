@@ -33,6 +33,17 @@ use Throwable;
             schema: new OA\Schema(
                 type: 'string'
             )
+        ),
+        new OA\Parameter(
+            name: 'count',
+            in: 'query',
+            description: 'count',
+            required: false,
+            schema: new OA\Schema(
+                type: 'integer',
+                format: 'int64',
+                default: 3
+            )
         )
     ]
 )]
@@ -149,9 +160,10 @@ final class OrderTracklist
         }
 
         $rotation = isset($params['rotation']) ? $params['rotation'] : 'random';
+        $count    = isset($params['count']) ? $params['count'] : 3;
 
         try {
-            $this->order_track_service->putTrackListInQueue($genres, $rotation);
+            $this->order_track_service->putTrackListInQueue($genres, $rotation, $count);
         } catch (RuntimeException) {
             $res = Response::json(['status' => 'failed', 'reason' => 'genre is empty']);
             $res = $res->withStatus(Response::STATUS_INTERNAL_SERVER_ERROR);
