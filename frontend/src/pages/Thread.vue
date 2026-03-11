@@ -39,23 +39,23 @@ export default {
       bus.$emit('app.loader', [true]);
       
       getThreadData(this.id).then((response) => {
-        if (response.data.payload.thread_data.parent_id !== null) {
-          self.$router.push('/thread/' + response.data.payload.thread_data.parent_id + '/#' + self.id);
+        self.post = response.data.payload.thread_data;
+
+        if (self.post.parent_id !== null) {
+          self.$router.push('/thread/' + self.post.parent_id + '/#' + self.id);
           
           return;
         }
-        
-        self.post = response.data.payload.thread_data;
         
         bus.$emit('boards.update', [self.post.board.tag]);
         bus.$emit('app.loader', [false]);
         
         document.title = '/'
-          + response.data.payload.thread_data.board.tag
+          + self.post.board.tag
           + '/'
-          + response.data.payload.thread_data.subject
+          + self.post.subject
           + ':'
-          + response.data.payload.thread_data.id;
+          + self.post.id;
       }).catch((error) => {
         console.error(error);
         self.$buefy.toast.open(`Произошла ошибка при запросе данных треда: ${error}`);
@@ -63,17 +63,25 @@ export default {
       });
     },
     scrollTo: function (section) {
+      if (section === "") {
+        return
+      }
+
       var el = window.document.getElementById(section);
-      
+
+      if (el == null) {
+        return
+      }
+
       this.$nextTick(() => el.scrollIntoView())
-      
+
       el.classList.add('post-active');
     }
   },
   created: function () {
     this.id = this.$route.params.id;
     this.init();
-    
+
     var self = this;
     bus.$on('form:success', () => self.init());
     bus.$on('thread:updated', () => this.init());
