@@ -4,6 +4,9 @@ namespace PK\Posts\Post;
 
 use PK\Utils\PostMessageParser;
 
+/**
+ * @template TVideoParseData of array{link: string, preview: string, type: 'video'}
+ */
 final class VideoParser extends PostMessageParser
 {
     private const REGEXP = '/' .
@@ -16,6 +19,9 @@ final class VideoParser extends PostMessageParser
         '\/files\/\w+\.(webm|mp4|mov))\)' .
         '/mi';
 
+    /**
+     * @return array{list<TVideoParseData>, string}
+     */
     public static function parse(string $message): array
     {
         $videos = [];

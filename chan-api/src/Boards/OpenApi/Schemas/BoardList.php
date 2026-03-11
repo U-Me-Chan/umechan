@@ -8,6 +8,9 @@ use PK\Boards\Board;
 #[OA\Schema]
 abstract class BoardList
 {
+    /**
+     * @var list<Board> $boards
+     */
     #[OA\Property(
         description: 'Список досок',
         type: 'array',

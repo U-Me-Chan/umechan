@@ -62,17 +62,19 @@ use PK\Posts\Services\PostService;
 final class GetThread
 {
     public function __construct(
-        private PostService $post_service,
-        private array $exclude_tags
+        private PostService $post_service
     ) {
     }
 
+    /**
+     * @param array{id: int} $vars
+     */
     public function __invoke(Request $req, array $vars): JsonResponse
     {
         /** @var int */
         $id = $vars['id'];
 
-        $exclude_tags  = $req->getParams('exclude_tags', $this->exclude_tags);
+        $exclude_tags  = $req->getParams('exclude_tags', []);
         $no_board_list = $req->getParams('no_board_list') ? true : false;
 
         try {

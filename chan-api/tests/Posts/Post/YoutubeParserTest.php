@@ -7,6 +7,9 @@ use PK\Posts\Post\YoutubeParser;
 
 class YoutubeParserTest extends TestCase
 {
+    /**
+     * @param array{string, string} $expected
+     */
     #[Test]
     #[DataProvider('dpForTestParse')]
     public function testParse(string $message, array $expected): void
@@ -14,6 +17,9 @@ class YoutubeParserTest extends TestCase
         $this->assertEquals($expected, YoutubeParser::parse($message));
     }
 
+    /**
+     * @return array{array{string, array{array{array{link: string, preview: string}}}}}
+     */
     public static function dpForTestParse(): array
     {
         return [

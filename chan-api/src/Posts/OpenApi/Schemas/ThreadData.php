@@ -15,6 +15,9 @@ abstract class ThreadData
     )]
     public Post $thread_data;
 
+    /**
+     * @var Board[] $boards
+     */
     #[OA\Property(
         description: 'Список досок',
         type: 'array',

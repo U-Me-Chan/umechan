@@ -3,6 +3,7 @@
 namespace PK\Boards\Services;
 
 use PK\Boards\Board;
+use PK\Boards\Board\PublicFlag;
 use PK\Boards\BoardStorage;
 use PK\Boards\Events\ChanEvents\CreateBoard;
 use PK\Boards\Events\ChanEvents\CreateBoardPayload;
@@ -11,7 +12,7 @@ use PK\Boards\Events\ChanEvents\UpdateBoardPayload;
 use PK\Events\ChanEventBuilder;
 use PK\Events\MessageBroker;
 
-final class BoardService
+class BoardService
 {
     public function __construct(
         private BoardStorage $board_storage,
@@ -20,6 +21,11 @@ final class BoardService
     ) {
     }
 
+    /**
+     * @param string[] $exclude_tags
+     *
+     * @return list<Board>
+     */
     public function getBoardList(array $exclude_tags = []): array
     {
         return $this->board_storage->find($exclude_tags);
@@ -91,6 +97,22 @@ final class BoardService
     public function updateThreadsCount(Board $board): void
     {
         $this->board_storage->updateThreadsCount($board);
+
+        $this->message_broker->publish(
+            $this->chan_event_builder->build(
+                UpdateBoard::class,
+                new UpdateBoardPayload($board)
+            )
+        );
+    }
+
+    public function setPublicFlagState(string $tag, bool $state): void
+    {
+        $board = $this->getBoardByTag($tag);
+
+        $board->is_public = PublicFlag::fromBool($state);
+
+        $this->board_storage->save($board);
 
         $this->message_broker->publish(
             $this->chan_event_builder->build(

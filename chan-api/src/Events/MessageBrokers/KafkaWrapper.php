@@ -13,6 +13,9 @@ final class KafkaWrapper implements MessageBroker
 {
     private Producer $producer;
 
+    /**
+     * @param string[] $kafka_addrs
+     */
     public function __construct(
         public array $kafka_addrs
     ) {

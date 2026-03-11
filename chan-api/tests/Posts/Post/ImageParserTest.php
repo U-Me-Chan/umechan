@@ -9,12 +9,15 @@ define('BASE_URL', 'https:\/\/scheoble.xyz');
 
 class ImageParserTest extends TestCase
 {
+    /**
+     * @param array{array{preview: string, link: string, type: string}} $expected_images
+     */
     #[DataProvider('dataProvider')]
     #[Test]
     public function test(
         string $orig_message,
         string $expected_message,
-        array $expected_images = []
+        array $expected_images
     ): void
     {
         list($images, $message) = ImageParser::parse($orig_message);
@@ -23,6 +26,9 @@ class ImageParserTest extends TestCase
         $this->assertEquals($expected_images, $images, 'Список изображений не соответствует ожидаемому');
     }
 
+    /**
+     * @return array{array{string, string, array{array{preview: string, link: string, type: string}}}}
+     */
     public static function dataProvider(): array
     {
         return [

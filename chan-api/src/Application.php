@@ -34,7 +34,7 @@ class Application
         $this->send($res);
     }
 
-    private function send(Response $res): void
+    private function send(Response $res): never
     {
         $this->hook_service->setHook(ApplicationHook::before_send, [$res]);
 

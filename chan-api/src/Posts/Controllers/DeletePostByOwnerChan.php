@@ -16,6 +16,9 @@ final class DeletePostByOwnerChan
     ) {
     }
 
+    /**
+     * @param array{id: int} $vars
+     */
     public function __invoke(Request $req, array $vars): JsonResponse
     {
         if ($req->getHeaders('HTTP_KEY') == null) {

@@ -15,7 +15,7 @@ development:
 	$(MAKE) generate-frontend-env
 	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} -e 'DROP DATABASE IF EXISTS ${MYSQL_CHAN_DATABASE}'"
 	docker exec umechan-db /bin/sh -c "mysql -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} -e 'CREATE DATABASE ${MYSQL_CHAN_DATABASE}'"
-	docker restart umechan-migrations
+	docker restart umechan-migrations && sleep 1s
 	$(MAKE) chan-create-board tag=b name=Bred
 
 generate-frontend-env:
@@ -46,3 +46,7 @@ chan-unset-blocked-thread:
 	docker exec umechan-api php index.php posts:unset-blocked-thread $(thread_id)
 chan-create-board:
 	docker exec umechan-api php index.php boards:create $(tag) $(name)
+chan-set-public-board:
+	docker exec umechan-api php index.php boards:set-public $(tag)
+chan-unset-public-board:
+	docker exec umechan-api php index.php boards:unset-public $(tag)

@@ -3,6 +3,7 @@
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use PK\Boards\Board;
+use PK\Boards\Board\PublicFlag;
 use PK\Posts\Post;
 
 class PostTest extends TestCase
@@ -67,15 +68,16 @@ class PostTest extends TestCase
                 'tag' => 'rnd',
                 'name' => 'Random',
                 'threads_count' => 1,
-                'new_posts_count' => 2
+                'new_posts_count' => 2,
+                'is_public' => PublicFlag::yes->name,
             ],
             'parent_id' => null,
             'updated_at' => strtotime(date('d-m-Y', time())),
-            'estimate' => 0,
             'password' => 'test',
             'is_verify' => 'yes',
             'is_sticky' => 'no',
             'is_blocked' => 'no',
+            'replies' => [],
             'replies_count' => 501
         ]);
 
@@ -112,15 +114,17 @@ class PostTest extends TestCase
                 'tag' => 'rnd',
                 'name' => 'Random',
                 'threads_count' => 1,
-                'new_posts_count' => 2
+                'new_posts_count' => 2,
+                'is_public' => PublicFlag::yes->name,
             ],
             'parent_id' => 1,
             'updated_at' => strtotime(date('d-m-Y', time())),
-            'estimate' => 0,
             'password' => 'test',
             'is_verify' => 'yes',
             'is_sticky' => 'no',
-            'is_blocked' => 'yes'
+            'is_blocked' => 'yes',
+            'replies' =>  [],
+            'replies_count' => 0
         ]);
 
         $state = $post->toArray();
@@ -141,7 +145,6 @@ class PostTest extends TestCase
                     break;
                 case 'timestamp':
                 case 'updated_at':
-                case 'estimate':
                     break;
                 case 'parent_id':
                     $this->assertEquals(1, $value);
@@ -181,15 +184,17 @@ class PostTest extends TestCase
                 'tag' => 'rnd',
                 'name' => 'Random',
                 'threads_count' => 1,
-                'new_posts_count' => 2
+                'new_posts_count' => 2,
+                'is_public' => PublicFlag::yes->name
             ],
             'parent_id' => 1,
             'updated_at' => strtotime(date('d-m-Y', time())),
-            'estimate' => 0,
             'password' => 'test',
             'is_verify' => 'yes',
             'is_sticky' => 'no',
-            'is_blocked' => 'no'
+            'is_blocked' => 'no',
+            'replies' => [],
+            'replies_count' => 0
         ]);
 
         $state = $post->jsonSerialize();
@@ -210,7 +215,6 @@ class PostTest extends TestCase
                     break;
                 case 'timestamp':
                 case 'updated_at':
-                case 'estimate':
                 case 'media':
                 case 'truncated_message':
                 case 'datetime':
@@ -234,7 +238,7 @@ class PostTest extends TestCase
                     $this->assertInstanceOf(Board::class, $value);
                     break;
                 case 'replies':
-                    $this->assertIsArray($value);
+                    $this->assertEmpty($value);
                     break;
                 case 'replies_count':
                     $this->assertEquals(0, $value);

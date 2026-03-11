@@ -5,6 +5,7 @@ namespace PK\Boards;
 use Medoo\Medoo;
 use PK\Base\Timestamp;
 use PK\Boards\Board;
+use PK\Boards\Board\PublicFlag;
 use PK\Boards\Exceptions\BoardNotFoundException;
 
 class BoardStorage
@@ -14,18 +15,27 @@ class BoardStorage
     ) {
     }
 
+    /**
+     * @param string[] $exclude_tags
+     * @param string[] $tags
+     *
+     * @return list<Board>
+     */
     public function find(array $exclude_tags = [], array $tags = []): array
     {
         $conditions = [
-            'ORDER' => ['tag' => 'ASC']
+            'ORDER'     => ['tag' => 'ASC'],
+            'is_public' => PublicFlag::yes->name
         ];
 
         if (!empty($exclude_tags)) {
             $conditions['tag[!]'] = $exclude_tags;
+            unset($conditions['is_public']);
         }
 
         if (!empty($tags)) {
             $conditions['tag'] = $tags;
+            unset($conditions['is_public']);
         }
 
         $board_datas = $this->db->select('boards', '*', $conditions);

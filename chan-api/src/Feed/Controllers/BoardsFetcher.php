@@ -2,14 +2,18 @@
 
 namespace PK\Feed\Controllers;
 
-use OpenApi\Attributes as OA;
 use Medoo\Medoo;
-use PK\Http\Request;
-use PK\Boards\BoardStorage;
-use PK\Boards\Services\BoardService;
-use PK\Feed\OpenApi\Schemas\Feed;
-use PK\Http\Responses\JsonResponse;
+
+use OpenApi\Attributes as OA;
+use PK\Boards\Board\PublicFlag;
 use PK\OpenApi\Schemas\Response;
+
+use PK\Http\Request;
+use PK\Http\Responses\JsonResponse;
+
+use PK\Boards\Services\BoardService;
+
+use PK\Feed\OpenApi\Schemas\Feed;
 
 #[OA\Get(
     path: '/api/board/all',
@@ -69,15 +73,14 @@ class BoardsFetcher
 {
     public function __construct(
         private BoardService $board_service,
-        private Medoo $db,
-        private array $exclude_tags
+        private Medoo $db
     ) {
     }
 
     public function __invoke(Request $req): JsonResponse
     {
-        /** @var array */
-        $exclude_tags = $req->getParams('exclude_tags') ? $req->getParams('exclude_tags') : $this->exclude_tags;
+        /** @var string[] */
+        $exclude_tags = $req->getParams('exclude_tags', []);
 
         /** @var int */
         $limit = $req->getParams('limit') ? $req->getParams('limit') : 20;
@@ -86,11 +89,18 @@ class BoardsFetcher
         $offset = $req->getParams('offset') ? $req->getParams('offset') : 0;
 
         $conditions = [
-            'AND' => [
-                'boards.tag[!]' => $exclude_tags
+            'ORDER' => [
+                'posts.timestamp' => 'DESC'
             ],
-            'ORDER' => ['posts.timestamp' => 'DESC']
+            'AND' => [
+                'boards.is_public' => PublicFlag::yes->name
+            ]
         ];
+
+        if (!empty($exclude_tags)) {
+            $conditions['AND']['boards.tag[!]'] = $exclude_tags;
+            unset($conditions['AND']['boards.is_public']);
+        }
 
         $limiting = [
             'LIMIT' => [$offset, $limit],
@@ -104,11 +114,15 @@ class BoardsFetcher
         }
 
         $results['boards'] = $this->board_service->getBoardList($exclude_tags);
-        $results['count']  = $this->db->count('posts', [
-            '[>]boards' => [
-                'board_id' => 'id'
-            ]
-        ], '*', $conditions);
+        $results['count']  = $this->db->count(
+            'posts', [
+                '[>]boards' => [
+                    'board_id' => 'id'
+                ]
+            ],
+            '*',
+            $conditions
+        );
 
         $results['posts'] = array_map(function ($post) {
             $post['is_verify'] = ($post['is_verify'] === 'yes' ? true : false);

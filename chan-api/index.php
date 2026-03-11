@@ -13,6 +13,8 @@ use PK\Feed\Controllers\BoardsFetcher;
 
 use PK\Boards\BoardStorage;
 use PK\Boards\Console\CreateBoard;
+use PK\Boards\Console\SetPublicBoard;
+use PK\Boards\Console\UnsetPublicBoard;
 use PK\Boards\Controllers\GetBoardList;
 use PK\Boards\Services\BoardService;
 use PK\Events\ChanEventBuilder;
@@ -45,13 +47,13 @@ use PK\Services\HookService;
 
 require_once __DIR__ . "/vendor/autoload.php";
 
-/** @var array */
+/**
+ * @var array
+ * @phpstan-ignore missingType.iterableValue
+ */
 $config = require_once __DIR__ . '/config.php';
 
 define('BASE_URL', "https?\:\/\/" . preg_quote($_ENV['DOMAIN'], '/'));
-
-/** @var string[] */
-$exclude_tags = explode(',', $config['exclude_tags']);
 
 /** @var string */
 $maintenance_key = $config['maintenance_key'];
@@ -104,6 +106,8 @@ if (PHP_SAPI == 'cli') {
     $app->add(new CreateBoard($board_service));
     $app->add(new SetBlockedThread($post_service));
     $app->add(new UnsetBlockedThread($post_service));
+    $app->add(new SetPublicBoard($board_service));
+    $app->add(new UnsetPublicBoard($board_service));
 
     exit($app->run());
 }
@@ -117,12 +121,12 @@ $r->addRoute('PUT', '/test', new GetDebugRequestData());
 $r->addRoute('PATCH', '/test', new GetDebugRequestData());
 $r->addRoute('DELETE', '/test', new GetDebugRequestData());
 
-$r->addRoute('GET', '/board/all', new BoardsFetcher($board_service, $db, $exclude_tags));
+$r->addRoute('GET', '/board/all', new BoardsFetcher($board_service, $db));
 
-$r->addRoute('GET', '/v2/board', new GetBoardList($board_service, $exclude_tags));
-$r->addRoute('GET', '/v2/board/{tags:[a-z\+]+}', new GetThreadList($post_service, $exclude_tags));
+$r->addRoute('GET', '/v2/board', new GetBoardList($board_service));
+$r->addRoute('GET', '/v2/board/{tags:[a-z\+]+}', new GetThreadList($post_service));
 
-$r->addRoute('GET', '/v2/post/{id:[0-9]+}', new GetThread($post_service, $exclude_tags));
+$r->addRoute('GET', '/v2/post/{id:[0-9]+}', new GetThread($post_service));
 $r->addRoute('POST', '/v2/post', new CreateThread($post_service));
 $r->addRoute('PUT', '/v2/post/{id:[0-9]+}', new CreateReply($post_service));
 $r->addRoute('PATCH', '/v2/post/{id:[0-9]+}', new UpdatePost($post_service));

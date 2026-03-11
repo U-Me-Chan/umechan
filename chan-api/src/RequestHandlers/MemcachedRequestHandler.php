@@ -12,6 +12,7 @@ class MemcachedRequestHandler extends RequestHandler
 
     private \Memcached $memcached;
 
+    /** @phpstan-ignore missingType.iterableValue */
     public function __construct(
         private ?RequestHandler $sucessor,
         private string $host = 'memcached',

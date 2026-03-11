@@ -73,9 +73,11 @@ class PostRestorator
                 'updated_at' => $post_data['updatedAt'],
                 'board_data' => $board->toArray(),
                 'parent_id'  => $post_data['parentId'],
-                'estimate'   => 0,
                 'password'   => PasswordHash::generate()->toString(),
-                'is_sticky'  => 'no'
+                'is_sticky'  => 'no',
+                'replies'    => [],
+                'replies_count' => 0,
+                'is_blocked' => 'no',
             ]);
 
             try {

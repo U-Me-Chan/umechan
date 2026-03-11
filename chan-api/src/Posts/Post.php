@@ -57,6 +57,33 @@ class Post implements \JsonSerializable
         );
     }
 
+    /**
+     * @template TFlag of 'yes'|'no'
+     *
+     * @param array{
+     *     id: int,
+     *     poster: string,
+     *     subject: string,
+     *     message: string,
+     *     timestamp: int,
+     *     board_data: array{
+     *         id: int,
+     *         tag: string,
+     *         name: string,
+     *         new_posts_count: int,
+     *         threads_count: int,
+     *         is_public: TFlag
+     *     },
+     *     parent_id: ?int,
+     *     updated_at: int,
+     *     password: string,
+     *     replies: list<Post>,
+     *     replies_count?: int,
+     *     is_verify: TFlag,
+     *     is_sticky: TFlag,
+     *     is_blocked: TFlag
+     * } $state
+     */
     public static function fromArray(array $state): self
     {
         return new self(
@@ -69,7 +96,7 @@ class Post implements \JsonSerializable
             $state['parent_id'],
             $state['updated_at'],
             PasswordHash::fromString($state['password']),
-            isset($state['replies']) && !empty($state['replies']) ? $state['replies'] : [],
+            !empty($state['replies']) ? $state['replies'] : [],
             isset($state['replies_count']) ? $state['replies_count'] : 0,
             VerifyFlag::from($state['is_verify']) == VerifyFlag::yes ? true : false,
             StickyFlag::from($state['is_sticky']) == StickyFlag::yes ? true: false,
@@ -78,6 +105,9 @@ class Post implements \JsonSerializable
         );
     }
 
+    /**
+     * @return string[]
+     */
     public static function getAllowedMutationPropsList(): array
     {
         return [
@@ -87,6 +117,37 @@ class Post implements \JsonSerializable
         ];
     }
 
+    /**
+     * @return array{
+     *     id: int,
+     *     poster: string,
+     *     subject: string,
+     *     message: string,
+     *     truncated_message: string,
+     *     timestamp: int,
+     *     board: array{
+     *         id: int,
+     *         tag: string,
+     *         name: string,
+     *         new_posts_count: int,
+     *         threads_count: int,
+     *         is_public: bool
+     *     },
+     *     parent_id: ?int,
+     *     updated_at: int,
+     *     password: string,
+     *     replies: list<Post>,
+     *     replies_count: int,
+     *     is_verify: bool,
+     *     is_sticky: bool,
+     *     is_blocked: bool,
+     *     media: array{
+     *         "images": list<array{link: string, preview: string, type: 'image'}>,
+     *         "videos": list<array{link: string, preview: string, type: 'video'}>,
+     *         "youtubes": list<array{link: string, preview: string}>
+     *     }
+     * }
+     */
     public function jsonSerialize(): array
     {
         $data = get_object_vars($this);
@@ -106,6 +167,9 @@ class Post implements \JsonSerializable
         return $data;
     }
 
+    /**
+     * @phpstan-ignore missingType.iterableValue
+     */
     public function toArray(): array
     {
         $data = get_object_vars($this);
@@ -132,6 +196,9 @@ class Post implements \JsonSerializable
         return $data;
     }
 
+    /**
+     * @phpstan-ignore missingType.iterableValue
+     */
     private function __construct(
         #[OA\Property(description: 'Идентификатор', type: 'integer')]
         public Id $id,
@@ -169,6 +236,9 @@ class Post implements \JsonSerializable
     ) {
     }
 
+    /**
+     * @phpstan-ignore missingType.iterableValue
+     */
     public function getMedia(): array
     {
         list($media) = $this->getMediaAndTruncatedMessage();
@@ -178,6 +248,9 @@ class Post implements \JsonSerializable
         return $result;
     }
 
+    /**
+     * @phpstan-ignore missingType.iterableValue
+     */
     public function getMediaAndTruncatedMessage(): array
     {
         $message = $this->message;
@@ -188,8 +261,8 @@ class Post implements \JsonSerializable
         list($videos, $message)   = VideoParser::parse($message);
 
         $media = [
-            'videos'   => array_values($videos),
-            'images'   => array_values($images),
+            'videos'   => array_values($videos), // @phpstan-ignore arrayValues.list
+            'images'   => array_values($images), // @phpstan-ignore arrayValues.list
             'youtubes' => $youtubes,
         ];
 

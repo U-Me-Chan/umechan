@@ -7,6 +7,9 @@ use PK\Http\Request;
 
 class RequestTest extends TestCase
 {
+    /**
+     * @phpstan-ignore missingType.iterableValue,missingType.iterableValue,missingType.iterableValue,missingType.iterableValue
+     */
     #[Test]
     #[DataProvider('dataProvider')]
     public function test(
@@ -26,12 +29,15 @@ class RequestTest extends TestCase
         $this->assertEquals($headers, $req->getHeaders());
     }
 
+    /**
+     * @phpstan-ignore missingType.iterableValue
+     */
     public static function dataProvider(): array
     {
         return [
             [
                 [
-                    'HTTP_COOKIE' => 'test',
+                    'HTTP_COOKIE'       => 'test',
                     'HTTP_CONTENT_TYPE' => 'application/json'
                 ],
                 [],
@@ -39,7 +45,7 @@ class RequestTest extends TestCase
                 '',
                 [],
                 [
-                    'HTTP_COOKIE' => 'test',
+                    'HTTP_COOKIE'       => 'test',
                     'HTTP_CONTENT_TYPE' => 'application/json'
                 ]
             ],

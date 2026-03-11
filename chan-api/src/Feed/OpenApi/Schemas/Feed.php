@@ -9,12 +9,18 @@ use PK\Feed\OpenApi\Schemas\RecentPost;
 #[OA\Schema]
 abstract class Feed
 {
+    /**
+     * @var list<Board> $boards
+     */
     #[OA\Property(
         description: 'Список досок',
         items: new OA\Items(ref: Board::class)
     )]
     public array $boards;
 
+    /**
+     * @var list<RecentPost> $posts
+     */
     #[OA\Property(
         description: 'Список постов',
         items: new OA\Items(ref: RecentPost::class)

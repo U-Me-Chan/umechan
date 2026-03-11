@@ -71,6 +71,9 @@ class DeletePostByAuthor
     ) {
     }
 
+    /**
+     * @param array{id: int} $vars
+     */
     public function __invoke(Request $req, array $vars): JsonResponse
     {
         if (!$req->getParams('password')) {

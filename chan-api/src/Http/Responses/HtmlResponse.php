@@ -6,6 +6,9 @@ use PK\Http\Response;
 
 class HtmlResponse implements Response
 {
+    /**
+     * @phpstan-ignore missingType.iterableValue
+     */
     public function __construct(
         private string $content,
         private int $code = 200,
@@ -20,6 +23,9 @@ class HtmlResponse implements Response
         $this->headers[] = $header;
     }
 
+    /**
+     * @return string[]
+     */
     public function getHeaders(): array
     {
         return $this->headers;

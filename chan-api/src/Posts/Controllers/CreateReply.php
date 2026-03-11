@@ -79,6 +79,9 @@ final class CreateReply
     ) {
     }
 
+    /**
+     * @param array{id: int} $vars
+     */
     public function __invoke(Request $req, array $vars): JsonResponse
     {
         $thread_id = $vars['id'];

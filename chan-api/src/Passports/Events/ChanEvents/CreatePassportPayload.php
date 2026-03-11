@@ -16,6 +16,12 @@ class CreatePassportPayload extends ChanEventPayload
     ) {
     }
 
+    /**
+     * @return array{
+     *     name: string,
+     *     hash: string
+     * }
+     */
     public function toArray(): array
     {
         return [

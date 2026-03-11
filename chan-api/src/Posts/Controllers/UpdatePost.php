@@ -14,6 +14,9 @@ final class UpdatePost
     ) {
     }
 
+    /**
+     * @param array{id: int} $vars
+     */
     public function __invoke(Request $request, array $vars): JsonResponse
     {
         try {

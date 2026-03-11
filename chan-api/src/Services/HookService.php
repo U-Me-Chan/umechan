@@ -4,8 +4,11 @@ namespace PK\Services;
 
 use PK\Utils\ApplicationHook;
 
-final class HookService
+class HookService
 {
+    /**
+     * @phpstan-ignore missingType.iterableValue
+     */
     private array $hooks = [];
 
     public function __construct()
@@ -23,6 +26,9 @@ final class HookService
         $this->hooks[$hook->name][] = $handler;
     }
 
+    /**
+     * @phpstan-ignore missingType.iterableValue
+     */
     public function setHook(ApplicationHook $hook, array $context = []): void
     {
         foreach ($this->hooks[$hook->name] as $handler) {

@@ -4,6 +4,9 @@ namespace PK\Posts\Post;
 
 use PK\Utils\PostMessageParser;
 
+/**
+ * @template TImageParseData of array{link: string, preview: string, type: 'image'}
+ */
 final class ImageParser extends PostMessageParser
 {
     private const REGEXP = '/'.
@@ -16,6 +19,10 @@ final class ImageParser extends PostMessageParser
         '\/files\/\w+\.(jpe?g?|png|webp|jfif|gif))\)' .
         '/mi';
 
+
+    /**
+     * @return array{list<TImageParseData>, string}
+     */
     public static function parse(string $message): array
     {
         $images = [];

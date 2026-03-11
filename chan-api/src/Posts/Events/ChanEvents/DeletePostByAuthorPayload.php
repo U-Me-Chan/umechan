@@ -11,6 +11,9 @@ class DeletePostByAuthorPayload extends ChanEventPayload
     ) {
     }
 
+    /**
+     * @return array{id:int}
+     */
     public function toArray(): array
     {
         return get_object_vars($this);

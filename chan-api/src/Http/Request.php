@@ -6,9 +6,18 @@ class Request
 {
     private string $method;
     private string $path;
+    /**
+     * @phpstan-ignore missingType.iterableValue
+     */
     private array $params;
+    /**
+     * @phpstan-ignore missingType.iterableValue
+     */
     private array $headers;
 
+    /**
+     * @phpstan-ignore missingType.iterableValue,missingType.iterableValue
+     */
     public function __construct(array $server = [], array $post = [])
     {
         $this->method = isset($server['REQUEST_METHOD']) ? $server['REQUEST_METHOD'] : 'GET';

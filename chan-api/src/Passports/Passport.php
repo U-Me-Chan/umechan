@@ -15,18 +15,30 @@ class Passport implements JsonSerializable
         return new self(Name::draft($name), Password::draft($password));
     }
 
+    /**
+     * @param array{
+     *     name: string,
+     *     hash: string
+     * } $state
+     */
     public static function fromArray(array $state): self
     {
         return new self(Name::fromString($state['name']), Password::fromString($state['hash']));
     }
 
+    /**
+     * @return array{name: string}
+     */
     public function jsonSerialize(): array
     {
         return [
-            'name' => $this->name
+            'name' => $this->name->toString()
         ];
     }
 
+    /**
+     * @return array{name: string, hash: string}
+     */
     public function toArray(): array
     {
         return [

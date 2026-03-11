@@ -7,6 +7,9 @@ use PK\Posts\Post\VideoParser;
 
 class VideoParserTest extends TestCase
 {
+    /**
+     * @param array{array{preview: string, link: string, type: string}} $exp_videos
+     */
     #[Test]
     #[DataProvider('dataProvider')]
     public function test(
@@ -21,6 +24,9 @@ class VideoParserTest extends TestCase
         $this->assertEquals($exp_videos, $videos);
     }
 
+    /**
+     * @return array{array{string, string, array{array{preview:string, link: string, type: string}}}}
+     */
     public static function dataProvider(): array
     {
         return [

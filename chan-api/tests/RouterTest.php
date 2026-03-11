@@ -32,6 +32,9 @@ class RouterTest extends TestCase
         $this->assertEquals($code, $res->getCode());
     }
 
+    /**
+     * @return array{array{string, string, int}}
+     */
     public static function dataProvider(): array
     {
         return [

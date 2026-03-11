@@ -16,6 +16,11 @@ class PostStorage
     ) {
     }
 
+    /**
+     * @param string[] $tags
+     *
+     * @return array{list<Post>, int}
+     */
     public function find(int $limit = 20, int $offset = 0, array $tags = []): array
     {
         $conditions = [

@@ -14,6 +14,9 @@ final class GetThreadFileList
     ) {
     }
 
+    /**
+     * @param array{id: int} $vars
+     */
     public function __invoke(Request $req, array $vars): JsonResponse
     {
         try {

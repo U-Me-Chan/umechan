@@ -10,7 +10,7 @@ use PK\Passports\Exceptions\NameOrKeyIsForbiddenException;
 use PK\Passports\Passport;
 use PK\Passports\PassportStorage;
 
-final class PassportService
+class PassportService
 {
     public function __construct(
         private PassportStorage $passport_storage,
@@ -20,6 +20,9 @@ final class PassportService
     ) {
     }
 
+    /**
+     * @return array{list<Passport>, int}
+     */
     public function getList(): array
     {
         return $this->passport_storage->fetch();

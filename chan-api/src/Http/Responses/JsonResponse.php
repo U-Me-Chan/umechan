@@ -11,6 +11,9 @@ class JsonResponse implements Response
     private bool $is_preformatted_json = false;
     private string $json;
 
+    /**
+     * @phpstan-ignore missingType.iterableValue,missingType.iterableValue
+     */
     public function __construct(
         private array $data = [],
         private int $code = 200,
@@ -34,6 +37,9 @@ class JsonResponse implements Response
         $this->is_preformatted_json = true;
     }
 
+    /**
+     * @return string[]
+     */
     public function getHeaders(): array
     {
         return $this->headers;
@@ -69,6 +75,15 @@ class JsonResponse implements Response
         return $this;
     }
 
+    /**
+     * @return array{
+     *     type: class-string<Throwable>,
+     *     message: string,
+     *     file: string,
+     *     line: int,
+     *     trace: list<string>
+     * }
+     */
     private function getErrorData(\Throwable $e): array
     {
         return [

@@ -8,6 +8,8 @@ use RuntimeException;
 use PK\Services\HookService;
 use PK\Utils\ApplicationHook;
 use PK\Boards\Services\BoardService;
+use PK\Boards\Exceptions\BoardNotFoundException;
+use PK\Boards\Board;
 use PK\Events\ChanEventBuilder;
 use PK\Events\FilestoreEventBuilder;
 use PK\Events\MessageBroker;
@@ -31,6 +33,7 @@ use PK\Posts\Exceptions\NotIsThreadException;
 use PK\Posts\Exceptions\ThreadBlockedException;
 use PK\Posts\Exceptions\ThreadNotFoundException;
 use PK\Posts\Post;
+use PK\Posts\Post\Id;
 use PK\Posts\Post\PosterKeyHash;
 use PK\Posts\PostStorage;
 
@@ -66,13 +69,13 @@ class PostService
     /**
      * Получить данные нити
      *
-     * @param int   $id            Идентификатор нити
-     * @param array $exclude_tags  Исключаемые теги досок из списка
-     * @param bool  $no_board_list Вернуть список досок?
+     * @param int      $id            Идентификатор нити
+     * @param string[] $exclude_tags  Исключаемые теги досок из списка
+     * @param bool     $no_board_list Вернуть список досок?
      *
      * @throws ThreadNotFoundException
      *
-     * @return array
+     * @return array{Post, list<Board>}
      */
     public function getThread(int $id, array $exclude_tags = [], bool $no_board_list = false): array
     {
@@ -90,13 +93,15 @@ class PostService
     /**
      * Получить список нитей с ответами для списка тегов досок
      *
-     * @param array $tags          Список тегов досок
-     * @param int   $offset        Смещение в списке нитей
-     * @param int   $limit         Количество нитей
-     * @param array $exclude_tags  Исключаемые теги досок из списка
-     * @param bool  $no_board_list Вернуть список досок
+     * @param string[] $tags          Список тегов досок
+     * @param int      $offset        Смещение в списке нитей
+     * @param int      $limit         Количество нитей
+     * @param string[] $exclude_tags  Исключаемые теги досок из списка
+     * @param bool     $no_board_list Вернуть список досок
      *
      * @throws OutOfBoundsException
+     *
+     * @return array{list<Post>, int, list<Board>}
      */
     public function getThreadList(
         array $tags,
@@ -119,11 +124,16 @@ class PostService
     /**
      * Создать ответ на нить
      *
-     * @param array  $params    Дополнительные поля
-     * @pramm string $message   Сообщение
-     * @param int    $thread_id Идентификатор нити
+     * @template TParams of array{poster: string, subject: string, sage: string}|list
+     *
+     * @param TParams $params    Дополнительные поля
+     * @pramm string  $message   Сообщение
+     * @param int     $thread_id Идентификатор нити
      *
      * @throws ThreadNotFoundException
+     * @throws ThreadBlockedException
+     *
+     * @return array{post_id: Id, password: string}
      */
     public function createReplyOnThread(int $thread_id, string $message, array $params = []): array
     {
@@ -177,7 +187,17 @@ class PostService
     }
 
     /**
-     * @throws OutOfBoundsException
+     * Создать новую нить
+     *
+     * @template TParams of array{poster:string, subject: string}|list
+     *
+     * @param string  $tag
+     * @param string  $message
+     * @param TParams $params
+     *
+     * @throws BoardNotFoundException
+     *
+     * @return array{post_id: Id, password: string}
      */
     public function createThread(string $tag, string $message, array $params = []): array
     {
@@ -249,6 +269,7 @@ EOT;
         );
     }
 
+    /** @phpstan-ignore missingType.iterableValue */
     public function updatePostByAuthor(int $id, array $params): void
     {
         if (!isset($params['password'])) {
@@ -383,6 +404,9 @@ EOT;
         );
     }
 
+    /**
+     * @phpstan-ignore missingType.iterableValue
+     */
     public function getThreadFiles(int $thread_id): array
     {
         /** @var Post */

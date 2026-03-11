@@ -81,11 +81,13 @@ use PK\Posts\Services\PostService;
 final class GetThreadList
 {
     public function __construct(
-        private PostService $post_service,
-        private array $exclude_tags
+        private PostService $post_service
     ) {
     }
 
+    /**
+     * @param array{tags: string} $vars
+     */
     public function __invoke(Request $req, array $vars): JsonResponse
     {
         $limit         = $req->getParams('limit') ? $req->getParams('limit') : 20;
@@ -94,7 +96,7 @@ final class GetThreadList
 
         $tags = explode('+', $vars['tags']);
 
-        $exclude_tags = $req->getParams('exclude_tags', $this->exclude_tags);
+        $exclude_tags = $req->getParams('exclude_tags', []);
 
         list($threads, $count, $boards) = $this->post_service->getThreadList($tags, $limit, $offset, $exclude_tags, $no_board_list);
 

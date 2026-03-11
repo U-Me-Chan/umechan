@@ -4,6 +4,9 @@ namespace PK\Posts\Post;
 
 use PK\Utils\PostMessageParser;
 
+/**
+ * @template TYoutubeParseData of array{link: string, preview: string}
+ */
 final class YoutubeParser extends PostMessageParser
 {
     private const YOUTUBE_LINK_REGEXP = '/' .
@@ -14,6 +17,11 @@ final class YoutubeParser extends PostMessageParser
         self::SKIP_CODE_BLOCK_REGEXP .
         '|' . '(?:.+?)?(?:\/v\/|watch\/|\?v=|\&v=|youtu\.be\/|\/v=|^youtu\.be\/|watch\%3Fv\%3D|shorts\/)([a-zA-Z0-9_-]{11})+/mi';
 
+    /**
+     * @param string $message
+     *
+     * @return array{list<TYoutubeParseData>, string}
+     */
     public static function parse(string $message): array
     {
         $youtubes = [];

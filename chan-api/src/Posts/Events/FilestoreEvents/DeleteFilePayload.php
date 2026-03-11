@@ -11,6 +11,9 @@ final class DeleteFilePayload extends FilestoreEventPayload
     ) {
     }
 
+    /**
+     * @return array{filename: string}
+     */
     public function toArray(): array
     {
 	return get_object_vars($this);

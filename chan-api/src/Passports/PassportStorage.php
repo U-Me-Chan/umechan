@@ -14,6 +14,9 @@ class PassportStorage
     ) {
     }
 
+    /**
+     * @return array{list<Passport>, int}
+     */
     public function fetch(): array
     {
         $passport_datas = $this->db->select('passports', '*', ['ORDER' => ['name' => 'ASC']]);
@@ -31,6 +34,9 @@ class PassportStorage
         return [$passports, $count];
     }
 
+    /**
+     * @param array{hash?: string} $filters
+     */
     public function findOne(array $filters = []): Passport
     {
         $conditions = [];

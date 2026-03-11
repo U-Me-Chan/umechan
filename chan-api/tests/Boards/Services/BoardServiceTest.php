@@ -50,6 +50,7 @@ final class BoardServiceTest extends TestCase
                         'payload'   => [
                             'board' => [
                                 'id'              => 1,
+                                'is_public'       => true,
                                 'name'            => 'Random',
                                 'tag'             => 'rnd',
                                 'new_posts_count' => 0,
@@ -87,6 +88,7 @@ final class BoardServiceTest extends TestCase
                         'payload'   => [
                             'board' => [
                                 'id'              => 1,
+                                'is_public'       => true,
                                 'name'            => 'Bred',
                                 'tag'             => 'b',
                                 'new_posts_count' => 0,
@@ -115,6 +117,7 @@ final class BoardServiceTest extends TestCase
                     'payload'   => [
                         'board' => [
                             'id'              => 1,
+                            'is_public'       => true,
                             'name'            => 'test',
                             'tag'             => 'test',
                             'new_posts_count' => 3,
@@ -148,6 +151,7 @@ final class BoardServiceTest extends TestCase
                         'payload'   => [
                             'board' => [
                                 'id'              => 1,
+                                'is_public'       => true,
                                 'name'            => 'test',
                                 'tag'             => 'test',
                                 'new_posts_count' => 1,

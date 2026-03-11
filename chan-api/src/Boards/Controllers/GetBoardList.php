@@ -8,6 +8,7 @@ use PK\Http\Responses\JsonResponse;
 use PK\OpenApi\Schemas\Response;
 use PK\Boards\OpenApi\Schemas\BoardList;
 use PK\Boards\Services\BoardService;
+use PK\Boards\Board;
 
 #[OA\Get(
     path: '/api/v2/board',
@@ -35,16 +36,14 @@ use PK\Boards\Services\BoardService;
 final class GetBoardList
 {
     public function __construct(
-        private BoardService $board_service,
-        private array $exclude_tags
+        private BoardService $board_service
     ) {
     }
 
     public function __invoke(Request $req): JsonResponse
     {
-        $exclude_tags = $req->getParams('exclude_tags', $this->exclude_tags);
-
-        $boards = $this->board_service->getBoardList($exclude_tags);
+        /** @var Board[] $boards */
+        $boards = $this->board_service->getBoardList($req->getParams('exclude_tags', []));
 
         return new JsonResponse(['boards' => $boards], 200);
     }
