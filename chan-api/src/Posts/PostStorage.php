@@ -82,7 +82,8 @@ class PostStorage
                     'boards.tag',
                     'boards.name',
                     'boards.threads_count',
-                    'boards.new_posts_count'
+                    'boards.new_posts_count',
+                    'boards.is_public'
                 ],
                 'replies_count' => Medoo::raw('COUNT(r.id)'),
             ],
@@ -121,7 +122,8 @@ class PostStorage
                             'boards.tag',
                             'boards.name',
                             'boards.threads_count',
-                            'boards.new_posts_count'
+                            'boards.new_posts_count',
+                            'boards.is_public'
                         ]
                     ],
                     [
@@ -162,7 +164,8 @@ class PostStorage
                     'boards.tag',
                     'boards.name',
                     'boards.threads_count',
-                    'boards.new_posts_count'
+                    'boards.new_posts_count',
+                    'boards.is_public'
                 ]
             ],
             [
