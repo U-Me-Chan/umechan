@@ -27,7 +27,6 @@ export default {
     margin: 10px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
     font-size: 14px;
 }
 

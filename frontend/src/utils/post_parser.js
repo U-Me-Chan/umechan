@@ -13,9 +13,11 @@ export function parse(message) {
           const match = rule.exec(src);
 
           if (match) {
-            const text = src.replace(match[0], match => {
-              return `<span class="blockquote">${match}</span>`;
-            });
+            const text = src.replace(match[0], match =>
+              match.split('\n')
+                .map(line => `<span class="blockquote">${line.replace(/\s+/g, ' ')}</span>`)
+                .join('<br>')
+            );
 
             const token = {
               type: 'quote',
