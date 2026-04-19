@@ -1,0 +1,245 @@
+- name: House
+  weekdays:
+    - 4
+  hours:
+    - 0
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:House'
+      count:
+        min: 7
+        max: 10
+- name: Chill Electronica
+  weekdays:
+    - 4
+  hours:
+    - 1
+    - 2
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:Chill Electronica'
+      count:
+        min: 7
+        max: 9
+    - gentype: random
+      sources:
+        - 'dir:Chill Hop'
+      count:
+        max: 1
+- name: Кастрюльби
+  weekdays:
+    - 4
+  hours:
+    - 3
+    - 4
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:DnB Liquid'
+        - 'dir:Dnb Atmosphere'
+      count:
+        max: 10
+- name: Живой голос
+  weekdays:
+    - 4
+  hours:
+    - 5
+    - 6
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Alternative'
+        - 'dir:Alternative Ru'
+      count:
+        max: 10
+- name: Воздушные инструменты
+  weekdays:
+    - 4
+  hours:
+    - 7
+    - 8
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Alternative'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Alternative High'
+        - 'dir:Alternative Ru High'
+      count:
+        min: 6
+        max: 9
+    - gentype: random
+      sources:
+        - 'dir:Alternative'
+        - 'dir:Alternative Ru'
+      count:
+        max: 1
+- name: Воздушные инструменты
+  weekdays:
+    - 4
+  hours:
+    - 9
+    - 10
+    - 11
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Day'
+        - 'dir:Jingles/Alternative'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+        - 'dir:Commercials/Alternative'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Alternative High'
+        - 'dir:Alternative Ru High'
+      count:
+        min: 7
+        max: 9
+- name: Alternative Rock
+  weekdays:
+    - 4
+  hours:
+    - 12
+    - 13
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Day'
+        - 'dir:Jingles/Alternative'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+        - 'dir:Commercials/Alternative'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Alternative Rock'
+        - 'dir:Alternative Ru Rock'
+      count:
+        min: 7
+        max: 9
+- name: Pop Dance
+  weekdays:
+    - 4
+  hours:
+    - 14
+    - 15
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Dance'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+        - 'dir:Commercials/Dance'
+      count:
+        max: 1        
+    - gentype: smart
+      sources:
+        - 'dir:Pop Dance'
+        - 'dir:Pop Ru Dance'
+      count:
+        min: 7
+        max: 9
+- name: Pop Dance Evening
+  weekdays:
+    - 4
+  hours:
+    - 16
+    - 17
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Dance Evening'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+        - 'dir:Commercials/Evening'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Dance Evening'
+        - 'dir:Pop Ru Dance Evening'
+      count:
+        min: 7
+        max: 9
+- name: Retrowave
+  weekdays:
+    - 4
+  hours:
+    - 18
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Retrowave'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Retrowave'
+      count:
+        min: 7
+        max: 9
+- name: 'Четверг: остатки'
+  weekdays:
+    - 4
+  hours:
+    - 19
+    - 20
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop'
+        - 'dir:Jingles/Day'
+        - 'dir:Jingles/Alternative'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Alternative High'
+        - 'dir:Alternative Ru High'
+        - 'dir:Pop'
+        - 'dir:Pop Ru'
+      count:
+        min: 7
+        max: 9
+- name: Video Game Music
+  weekdays:
+    - 4
+  hours:
+    - 21
+    - 22
+    - 23
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:Video Game Music'
+      count:
+        min: 7
+        max: 10

@@ -35,10 +35,6 @@
     <b-tooltip label="Минус треку">
       <a href="#" @click="downvoteTrack">❌</a>
     </b-tooltip>
-
-    <b-tooltip label="Заказать трек">
-      <a href="#" @click="goToOrderTrack">📝</a>
-    </b-tooltip>
   </div>
 
   <input
@@ -122,10 +118,6 @@ export default {
       }
 
       this.estimateTrack(this.track_id, 'minus');
-    },
-    goToOrderTrack: function (event) {
-      event.preventDefault();
-      this.$router.push('/tracks');
     },
     togglePlay: function () {
       if (this.isPlaying) {

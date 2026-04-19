@@ -1,0 +1,297 @@
+- name: Жидкие кастрюли
+  weekdays:
+    - 3
+  hours:
+    - 0
+    - 1
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:Dnb Liquid'
+      count:
+        min: 7
+        max: 9
+    - gentype: random
+      sources:
+        - 'dir:Dnb Liquid Breaker'
+      count:
+        max: 1
+- name: Digital Resistance
+  weekdays:
+    - 3
+  hours:
+    - 2
+    - 23
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:Digital Resistance'
+      count:
+        min: 7
+        max: 10
+- name: Воздушные кастрюли
+  weekdays:
+    - 3
+  hours:
+    - 3
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:DnB Atmosphere'
+      count:
+        min: 7
+        max: 9
+    - gentype: random
+      sources:
+        - 'dir:Dnb Atmosphere Breaker'
+      count:
+        max: 1
+- name: Video Game Music
+  weekdays:
+    - 3
+  hours:
+    - 4
+    - 5
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:Video Game Music'
+      count:
+        min: 7
+        max: 10
+- name: Chill Hop
+  weekdays:
+    - 3
+  hours:
+    - 6
+    - 7
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:Chill Hop'
+      count:
+        min: 7
+        max: 10
+- name: Чилловая среда, чюваки
+  weekdays:
+    - 3
+  hours:
+    - 8
+    - 9
+    - 21
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Evening'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Chill Electronica'
+        - 'dir:Pop Ru Chill'
+      count:
+        min: 7
+        max: 9
+- name: 'Выжить до обеда: Среда'
+  weekdays:
+    - 3
+  hours:
+    - 10
+    - 11
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Day'
+        - 'dir:Jingles/Alternative'
+        - 'dir:Jingles/Pop'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Alternative High'
+        - 'dir:Alternative Ru High'
+        - 'dir:Pop'
+        - 'dir:Pop Ru'
+      count:
+        min: 7
+        max: 9
+- name: Средний разгон
+  weekdays:
+    - 3
+  hours:
+    - 12
+    - 13
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Dance'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Dance/20'
+        - 'dir:Pop Ru Dance/20'
+        - 'dir:DnB Pop'
+      count:
+        min: 7
+        max: 9
+- name: Fast Food Core
+  weekdays:
+    - 3
+  hours:
+    - 14
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Breakcore and Lolicore'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Dancecore'
+      count:
+        min: 5
+        max: 7
+    - gentype: random
+      sources:
+        - 'dir:Dancecore Breaker'
+      count:
+        max: 1
+- name: 'Среда: Чистый звук'
+  weekdays:
+    - 3
+  hours:
+    - 15
+    - 16
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Alternative'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+        - 'dir:Commercials/Alternative'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Alternative Rock'
+        - 'dir:Alternative Ru Rock'
+      count:
+        min: 7
+        max: 9
+- name: Evening Pop Dance 17
+  weekdays:
+    - 3
+  hours:
+    - 17
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Dance Evening'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+        - 'dir:Commercials/Dance'
+      count:
+        max: 1    
+    - gentype: smart
+      sources:
+        - 'dir:Pop Dance Evening'
+        - 'dir:Pop Ru Dance Evening'
+      count:
+        min: 7
+        max: 9
+- name: Pop Retrowave
+  weekdays:
+    - 3
+  hours:
+    - 18
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jinges/Retrowave'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+      count:
+        max: 1    
+    - gentype: smart
+      sources:
+        - 'dir:Pop Retrowave'
+      count:
+        min: 7
+        max: 9
+- name: 'Future Funk: Среда Special'
+  weekdays:
+    - 3
+  hours:
+    - 19
+    - 20
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/CityPop'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:CityPop'
+      count:
+        min: 8
+        max: 8
+    - gentype: random
+      sources:
+        - 'dir:CityPop Breaker'
+      count:
+        max: 1
+- name: Retrowave
+  weekdays:
+    - 3
+  hours:
+    - 22
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Retrowave'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Retrowave'
+      count:
+        min: 7
+        max: 9

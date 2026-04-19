@@ -1,0 +1,61 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": ["name", "positions"],
+        "additionalProperties": false,
+        "properties": {
+            "weekdays": {
+                "type": "array",
+                "items": {
+                    "type": "number"
+                }
+            },
+            "hours": {
+                "type": "array",
+                "items": {
+                    "type": "number"
+                }
+            },
+            "odd_day": {
+                "type": "boolean"
+            },
+            "name": {
+                "type": "string"
+            },
+            "positions": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "gentype": {
+                            "type": "string",
+                            "enum": ["smart", "best", "average", "new", "random"]
+                        },
+                        "sources": {
+                            "type": "array",
+                            "items": {
+                                "type" : "string",
+                                "pattern": "^(dir|tag):([a-zA-Zа-яА-Я0-9\/ ]+)$"
+                            }
+                        },
+                        "count": {
+                            "additionalProperties": false,
+                            "type": "object",
+                            "required": ["max"],
+                            "properties": {
+                                "max": {
+                                    "type": "number"
+                                },
+                                "min": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

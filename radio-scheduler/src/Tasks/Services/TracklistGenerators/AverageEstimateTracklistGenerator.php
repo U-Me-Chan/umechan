@@ -1,0 +1,61 @@
+<?php
+
+namespace Ridouchire\RadioScheduler\Tasks\Services\TracklistGenerators;
+
+use InvalidArgumentException;
+use Medoo\Medoo;
+use Ridouchire\RadioScheduler\Tasks\Services\ITracklistGenerator;
+
+class AverageEstimateTracklistGenerator implements ITracklistGenerator
+{
+    public function __construct(
+        private Medoo $db
+    ) {
+    }
+
+    /**
+     * @return string[]
+     */
+    public function build(array $genres = [], int $min = 4, int $max = 8, array $exclude_paths = []): array
+    {
+        if (sizeof($genres) == 0) {
+            throw new InvalidArgumentException('Список жанров не может быть пустым');
+        }
+
+        $tracks_list  = [];
+        $tracks_count = random_int($min, $max);
+        $genres       = array_map(fn(string $genre) => "{$genre}/%", $genres);
+
+        $conditions = [
+            'LIMIT' => $tracks_count,
+            'ORDER' => [
+                'last_playing' => 'ASC'
+            ]
+        ];
+
+        if (!empty($exclude_paths)) {
+            $conditions['path[!]'] = $exclude_paths;
+        }
+
+        foreach ($genres as $genre) {
+            /** @phpstan-ignore-next-line */
+            $paths = $this->db->select('tracks', 'path', array_merge(
+                [
+                    'path[~]'         => $genre,
+                    'estimate[>=]'    => Medoo::raw("(SELECT AVG(estimate) FROM tracks WHERE path LIKE '{$genre}')"),
+                ],
+                $conditions
+            ));
+
+            /** @phpstan-ignore booleanNot.alwaysTrue */
+            if (!$paths) { // Medoo::select может вернуть как array, так и null
+                continue;
+            }
+
+            /** @phpstan-ignore deadCode.unreachable */
+            $tracks_list = array_merge($tracks_list, $paths);
+        } // FIXME: переписать на CTE
+
+        return $tracks_list;
+    }
+}

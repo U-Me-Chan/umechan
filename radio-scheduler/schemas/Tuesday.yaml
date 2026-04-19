@@ -1,0 +1,270 @@
+- name: Tuesday Dial Tone
+  weekdays:
+    - 2
+  hours:
+    - 0
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Vaporwave'
+      count:
+        max: 5
+    - gentype: random
+      sources:
+        - 'dir:Telewave'
+      count:
+        max: 1
+- name: Deep Dive Tuesday
+  weekdays:
+    - 2
+  hours:
+    - 1
+    - 2
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:Chill Hop'
+        - 'dir:Chill Electronica'
+      count:
+        min: 5
+        max: 7
+- name: Slow Tuesday
+  weekdays:
+    - 2
+  hours:
+    - 3
+    - 4
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:Chill Electronica'
+        - 'dir:Slowave'
+      count:
+        min: 5
+        max: 7
+- name: 'Night Drive: Tuesday'
+  weekdays:
+    - 2
+  hours:
+    - 5
+    - 6
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Retrowave'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Retrowave'
+      count:
+        min: 5
+        max: 9
+- name: 'Вторник. Завтрак. Чилл.'
+  weekdays:
+    - 2
+  hours:
+    - 7
+    - 8
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Evening'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Evening'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Chill Electronica'
+        - 'dir:Pop Ru Chill'
+      count:
+        min: 5
+        max: 7
+- name: 'Pop Global & Local: Вторник'
+  weekdays:
+    - 2
+  hours:
+    - 9
+    - 10
+    - 11
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Day'
+        - 'dir:Jingles/Pop'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop'
+        - 'dir:pop Ru'
+      count:
+        min: 5
+        max: 7
+- name: Tuesday Pop Boost
+  weekdays:
+    - 2
+  hours:
+    - 12
+    - 13
+    - 15
+    - 16
+    - 17
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Dance'
+        - 'dir:Jingles/Day'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+        - 'dir:Commercials/Dance'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Dance'
+        - 'dir:Pop Ru Dance'
+      count:
+        min: 5
+        max: 7
+- name: Tuesday Dnb Pop
+  weekdays:
+    - 2
+  hours:
+    - 14
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Day'
+        - 'dir:Jingles/Dnb Pop'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Day'
+        - 'dir:Commercials/News'
+        - 'dir:Commercials/Social'
+        - 'dir:Commercials/Dance'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:DnB Pop'
+      count:
+        min: 7
+        max: 9
+- name: 'Pop Dance Evening: Tuesday Edition'
+  weekdays:
+    - 2
+  hours:
+    - 18
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Pop Dance Evening'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Evening'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Dance Evening'
+        - 'dir:Pop Ru Dance Evening'
+      count:
+        min: 5
+        max: 7
+- name: 'Tuesday: Chill Mode: ON'
+  weekdays:
+    - 2
+  hours:
+    - 19
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Evening'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Evening'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Chill Electronica'
+        - 'dir:Pop Ru Chill'
+      count:
+        min: 5
+        max: 7
+- name: 'Tuesday: Retrowave'
+  weekdays:
+    - 2
+  hours:
+    - 20
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Retrowave'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Commercials/Evening'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Retrowave'
+        - 'dir:Pop Retrowave'
+      count:
+        min: 5
+        max: 9
+- name: Медленная волна
+  weekdays:
+    - 2
+  hours:
+    - 21
+    - 22
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Evening'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Slowave'
+      count:
+        min: 7
+        max: 9
+- name: Chill Hop
+  weekdays:
+    - 2
+  hours:
+    - 23
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:Chill Hop'
+      count:
+        min: 7
+        max: 9

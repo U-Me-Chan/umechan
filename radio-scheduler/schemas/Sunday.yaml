@@ -1,0 +1,177 @@
+- name: Telewave
+  weekdays:
+    - 7
+  hours:
+    - 0
+    - 22
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Vaporwave'
+      count:
+        max: 7
+    - gentype: random
+      sources:
+        - 'dir:Telewave'
+      count:
+        max: 1
+- name: Кухонный комбайн
+  weekdays:
+    - 7
+  hours:
+    - 1
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/DnB'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:DnB Liquid'
+        - 'dir:DnB Atmosphere'
+        - 'dir:DnB Pop Evening'
+      count:
+        min: 7
+        max: 9
+- name: Chill Mix
+  weekdays:
+    - 7
+  hours:
+    - 6
+    - 7
+    - 17
+    - 18
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Day'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Mix/Evening'
+      count:
+        max: 1
+- name: Pop Chill
+  weekdays:
+    - 7
+  hours:
+    - 8
+    - 9
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Evening'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Chill Electronica'
+        - 'dir:Pop Ru Chill'
+      count:
+        min: 7
+        max: 9
+- name: Pop
+  weekdays:
+    - 7
+  hours:
+    - 10
+    - 11
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop'
+        - 'dir:Jingles/Day'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop'
+        - 'dir:Pop Ru'
+      count:
+        min: 7
+        max: 9
+- name: Day Mix
+  weekdays:
+    - 7
+  hours:
+    - 12
+    - 13
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Day'
+      count:
+        max: 1
+    - gentype: random
+      sources:
+        - 'dir:Mix/Day'
+      count:
+        max: 1
+- name: Pop Dance
+  weekdays:
+    - 7
+  hours:
+    - 14
+    - 15
+    - 16
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Dance'
+        - 'dir:Jingles/Day'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Dance'
+        - 'dir:Pop Ru Dance'
+      count:
+        min: 7
+        max: 9
+- name: Future Funk
+  weekdays:
+    - 7
+  hours:
+    - 19
+    - 20
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Citypop'
+        - 'dir:Jingles/Evening'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:CityPop'
+      count:
+        min: 7
+        max: 9
+- name: Night Mix
+  weekdays:
+    - 7
+  hours:
+    - 2
+    - 3
+    - 4
+    - 5
+    - 21
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Mix/Night'
+      count:
+        max: 1
+- name: Video Game Music
+  weekdays:
+    - 7
+  hours:
+    - 23
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Video Game Music'
+      count:
+        max: 10

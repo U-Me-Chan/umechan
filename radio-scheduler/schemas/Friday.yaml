@@ -1,0 +1,208 @@
+- name: Воздушные кастрюли
+  weekdays:
+    - 5
+  hours:
+    - 0
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:DnB Atmosphere'
+      count:
+        min: 7
+        max: 9
+    - gentype: random
+      sources:
+        - 'dir:DnB Atmosphere Breaker'
+      count:
+        max: 1
+- name: Жидкие кастрюли
+  weekdays:
+    - 5
+  hours:
+    - 1
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:DnB Liquid'
+      count:
+        min: 7
+        max: 9
+    - gentype: random
+      sources:
+        - 'dir:DnB Liquid Breaker'
+      count:
+        max: 1
+- name: Digital Resistance
+  weekdays:
+    - 5
+  hours:
+    - 2
+    - 3
+    - 17
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:Digital Resistance'
+      count:
+        min: 7
+        max: 10
+- name: Future Funk
+  weekdays:
+    - 5
+  hours:
+    - 4
+    - 20
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:CityPop'
+      count:
+        min: 7
+        max: 9
+    - gentype: random
+      sources:
+        - 'dir:CityPop Breaker'
+      count:
+        max: 1
+- name: Кастрюльное
+  weekdays:
+    - 5
+  hours:
+    - 5
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:DnB Pop Evening'
+        - 'dir:DnB Liquid'
+      count:
+        min: 7
+        max: 10
+- name: Pop Dance Morning
+  weekdays:
+    - 5
+  hours:
+    - 6
+    - 7
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Dance Evening'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Dance Evening'
+        - 'dir:Pop Ru Dance Evening'
+      count:
+        min: 7
+        max: 9
+- name: Pop Dance
+  weekdays:
+    - 5
+  hours:
+    - 8
+    - 9
+    - 10
+    - 12
+    - 15
+    - 16
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Dance Friday'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Dance'
+        - 'dir:Pop Ru Dance'
+      count:
+        min: 7
+        max: 9
+- name: DnB Pop
+  weekdays:
+    - 5
+  hours:
+    - 11
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/DnB Pop'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:DnB Pop'
+      count:
+        min: 7
+        max: 9
+- name: Dancecore
+  weekdays:
+    - 5
+  hours:
+    - 13
+    - 14
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Dancecore'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Dancecore'
+        - 'dir:Dancecore Breaker'
+      count:
+        min: 7
+        max: 9
+- name: Pop Retrowave
+  weekdays:
+    - 5
+  hours:
+    - 18
+    - 19
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Retrowave'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Retrowave'
+        - 'dir:Pop Retrowave'
+      count:
+        min: 7
+        max: 9
+- name: Pop Chill
+  weekdays:
+    - 5
+  hours:
+    - 21
+    - 22
+  positions:
+    - gentype: random
+      sources:
+        - 'dir:Jingles/Pop Evening'
+        - 'dir:Jingles/Evening'
+      count:
+        max: 1
+    - gentype: smart
+      sources:
+        - 'dir:Pop Chill Electronica'
+        - 'dir:Pop Ru Chill'
+      count:
+        min: 7
+        max: 9
+- name: Slowave
+  weekdays:
+    - 5
+  hours:
+    - 23
+  positions:
+    - gentype: smart
+      sources:
+        - 'dir:Slowave'
+      count:
+        min: 7
+        max: 10

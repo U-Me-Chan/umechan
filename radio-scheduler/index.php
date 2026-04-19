@@ -5,30 +5,16 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use React\EventLoop\Loop;
-use Ridouchire\RadioScheduler\Http\Controllers\CropQueue;
-use Ridouchire\RadioScheduler\Http\Controllers\GetOpenApiSpecifitation;
-use Ridouchire\RadioScheduler\Http\Controllers\GetQueue;
-use Ridouchire\RadioScheduler\Http\Controllers\GetRedocPage;
-use Ridouchire\RadioScheduler\Http\Controllers\GetTrackList;
-use Ridouchire\RadioScheduler\Http\Controllers\OrderTrack;
-use Ridouchire\RadioScheduler\Http\Controllers\OrderTracklist;
-use Ridouchire\RadioScheduler\Http\Router;
-use Ridouchire\RadioScheduler\Services\Mpd;
-use Ridouchire\RadioScheduler\Services\QueueCropper;
-use Ridouchire\RadioScheduler\RotationMaster;
-use Ridouchire\RadioScheduler\RotationStrategies\DayGenreRotation;
-use Ridouchire\RadioScheduler\RotationStrategies\DayRandomPatternRotation;
-use Ridouchire\RadioScheduler\RotationStrategies\EveningGenreRotation;
-use Ridouchire\RadioScheduler\RotationStrategies\MorningRotationStrategy;
-use Ridouchire\RadioScheduler\RotationStrategies\NightGenreRotation;
-use Ridouchire\RadioScheduler\RotationStrategies\OddMiddayFridayRotation;
-use Ridouchire\RadioScheduler\RotationStrategies\SimpleMiddayFridayRotation;
-use Ridouchire\RadioScheduler\Services\OrderTrackService;
-use Ridouchire\RadioScheduler\Services\RandomizerFromRandomPackageWrapper;
-use Ridouchire\RadioScheduler\TracklistGenerators\AverageEstimateTracklistGenerator;
-use Ridouchire\RadioScheduler\TracklistGenerators\BestEstimateTracklistGenerator;
-use Ridouchire\RadioScheduler\TracklistGenerators\NewOrLongStandingTracklistGenerator;
-use Ridouchire\RadioScheduler\TracklistGenerators\RandomTracklistGenerator;
+use Ridouchire\RadioScheduler\Mpd;
+use Ridouchire\RadioScheduler\Tasks\Services\SequenceGenerator;
+use Ridouchire\RadioScheduler\Tasks\Services\TaskManager;
+use Ridouchire\RadioScheduler\Tasks\Services\TaskParser;
+use Ridouchire\RadioScheduler\Tasks\Services\TracklistGenerators\AverageEstimateTracklistGenerator;
+use Ridouchire\RadioScheduler\Tasks\Services\TracklistGenerators\BestEstimateTracklistGenerator;
+use Ridouchire\RadioScheduler\Tasks\Services\TracklistGenerators\NewOrLongStandingTracklistGenerator;
+use Ridouchire\RadioScheduler\Tasks\Services\TracklistGenerators\RandomTracklistGenerator;
+use Ridouchire\RadioScheduler\Tasks\Services\YamlSchemasDirectoryIterator;
+use Ridouchire\RadioScheduler\Tasks\Task;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -50,63 +36,50 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-$randomizer = new RandomizerFromRandomPackageWrapper();
-
 $random_tracklist_generator               = new RandomTracklistGenerator($db);
-$new_or_long_standing_tracklist_generator = new NewOrLongStandingTracklistGenerator($db, $randomizer);
-$average_estimate_tracklist_generator     = new AverageEstimateTracklistGenerator($db, $randomizer);
+$new_or_long_standing_tracklist_generator = new NewOrLongStandingTracklistGenerator($db);
+$average_estimate_tracklist_generator     = new AverageEstimateTracklistGenerator($db);
 $best_estimate_tracklist_generator        = new BestEstimateTracklistGenerator($db);
 
-$strategy_master = new RotationMaster($log);
+$sequence_generator = new SequenceGenerator(
+    $average_estimate_tracklist_generator,
+    $best_estimate_tracklist_generator,
+    $new_or_long_standing_tracklist_generator,
+    $random_tracklist_generator
+);
 
-$strategy_master->addStrategyByPeriod(0, 5, new NightGenreRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
-$strategy_master->addStrategyByPeriod(6, 8, new MorningRotationStrategy($mpd, $log, $random_tracklist_generator));
-$strategy_master->addStrategyByPeriod(12, 15, new OddMiddayFridayRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator, $random_tracklist_generator));
-$strategy_master->addStrategyByPeriod(12, 15, new SimpleMiddayFridayRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
-$strategy_master->addStrategyByPeriod(9, 18, new DayGenreRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
-$strategy_master->addStrategyByPeriod(9, 18, new DayRandomPatternRotation($mpd, $log, $random_tracklist_generator));
-$strategy_master->addStrategyByPeriod(19, 23, new EveningGenreRotation($mpd, $log, $new_or_long_standing_tracklist_generator, $average_estimate_tracklist_generator));
+$task_manager = new TaskManager($sequence_generator, $mpd, $log);
+$task_parser  = new TaskParser();
+$iterator     = new YamlSchemasDirectoryIterator(__DIR__ . '/schemas/');
 
-$queue_cropper = new QueueCropper($mpd);
+foreach ($iterator->getIterator() as $yaml_file) {
+    $tasks = $task_parser->parseFromFile($yaml_file);
 
-Loop::addPeriodicTimer(1, function () use ($log, $mpd, $queue_cropper, $strategy_master) {
+    array_walk($tasks, function (Task $task) use ($task_manager) {
+        $task_manager->add($task);
+    });
+}
+
+Loop::addPeriodicTimer(1, function () use ($log, $mpd, $task_manager) {
     if ($mpd->isEmptyQueue()) {
         $log->error('MainLoop: очередь воспроизведения пуста');
     }
 
     if ($mpd->getQueueCount() <= 1) {
-        $strategy_master->execute();
+        $res = $task_manager->tick();
+
+        if ($res == TaskManager::EXIT_CODE_ERR_NO_TASKS) {
+            $log->error('MainLoop: нет задач в менеджере');
+        } else if ($res == TaskManager::EXIT_CODE_ERR_NO_TASK_ON_TIME) {
+            $log->error('MainLoop: нет ни одной задачи на это время');
+        }
     }
 
     try {
-        if ($queue_cropper(time()) == false) {
-            $log->error('QueueCropper: Ошибка при очищении очереди воспроизведения');
+        if ($task_manager->cropQueue(time()) == false) {
+            $log->error('MainLoop: Ошибка при очищении очереди воспроизведения');
         }
     } catch (Exception) {
-        $log->debug('QueueCropper: Время очищения очереди воспроизведения ещё не пришло');
+        $log->debug('MainLoop: Время очищения очереди воспроизведения ещё не пришло');
     }
 });
-
-$order_track_service = new OrderTrackService(
-    $mpd,
-    $db,
-    $log,
-    $random_tracklist_generator,
-    $new_or_long_standing_tracklist_generator,
-    $average_estimate_tracklist_generator,
-    $best_estimate_tracklist_generator
-);
-
-$r = new Router();
-
-$r->addRoute('GET', '/radio/docs/openapi.json', new GetOpenApiSpecifitation());
-$r->addRoute('GET', '/radio/docs/redoc.html', new GetRedocPage());
-$r->addRoute('GET', '/radio/queue', new GetQueue($mpd));
-$r->addRoute('PUT', '/radio/queue', new OrderTrack($order_track_service));
-$r->addRoute('POST', '/radio/queue', new OrderTracklist($order_track_service));
-$r->addRoute('DELETE', '/radio/queue', new CropQueue($queue_cropper));
-$r->addRoute('GET', '/radio/tracks', new GetTrackList($db));
-
-$http = new React\Http\HttpServer($r);
-$socket = new React\Socket\SocketServer('0.0.0.0:8080');
-$http->listen($socket);

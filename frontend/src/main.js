@@ -80,10 +80,6 @@ const routes = [
     component: () => import('./pages/Files.vue')
   },
   {
-    path: '/tracks',
-    component: () => import('./pages/Tracks.vue')
-  },
-  {
     path: '/login',
     component: () => import('./pages/AdminCredentials.vue'),
     name: 'LoginPage'
