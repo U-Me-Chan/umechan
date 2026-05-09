@@ -4,7 +4,7 @@ namespace Ridouchire\RadioDbImporter\Tracks\Services;
 
 use Ridouchire\RadioDbImporter\Tracks\Track;
 
-final class TrackEstimateValidator
+class TrackEstimateValidator
 {
     public function __construct(
         private int $bad_estimate_value
@@ -13,7 +13,7 @@ final class TrackEstimateValidator
 
     public function isBadEstimate(Track $track): bool
     {
-        if ($track->getPlayCount() < 1) {
+        if ($track->getPlayCount() <= 3) {
             return false;
         }
 

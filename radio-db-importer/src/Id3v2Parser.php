@@ -3,7 +3,9 @@
 namespace Ridouchire\RadioDbImporter;
 
 use getID3;
-use InvalidArgumentException;
+use Ridouchire\RadioDbImporter\Exceptions\TagParserExceptions\NoArtistInFileTagException;
+use Ridouchire\RadioDbImporter\Exceptions\TagParserExceptions\NoTagInFileException;
+use Ridouchire\RadioDbImporter\Exceptions\TagParserExceptions\NoTitleInFileTagException;
 
 class Id3v2Parser
 {
@@ -19,19 +21,19 @@ class Id3v2Parser
         $this->data = $this->parser->analyze($path);
 
         if (!isset($this->data['tags'])) {
-            throw new InvalidArgumentException();
+            throw new NoTagInFileException($path);
         }
 
         if (!isset($this->data['tags']['id3v2'])) {
-            throw new InvalidArgumentException();
+            throw new NoTagInFileException($path);
         }
 
         if (!isset($this->data['tags']['id3v2']['artist'])) {
-            throw new InvalidArgumentException();
+            throw new NoArtistInFileTagException($path);
         }
 
         if (!isset($this->data['tags']['id3v2']['title'])) {
-            throw new InvalidArgumentException();
+            throw new NoTitleInFileTagException($path);
         }
     }
 

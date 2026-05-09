@@ -2,131 +2,51 @@
 
 namespace Ridouchire\RadioDbImporter;
 
-use InvalidArgumentException;
-use OutOfBoundsException;
+use RuntimeException;
 use SplFileInfo;
 use Monolog\Logger;
-use Ridouchire\RadioDbImporter\Tracks\Services\TrackEstimateValidator;
-use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
-use Ridouchire\RadioDbImporter\Tracks\Track;
-use Ridouchire\RadioDbImporter\Tracks\Track\Hash;
-use Ridouchire\RadioDbImporter\Utils\PathCutter;
-use RuntimeException;
-use Throwable;
+use Ridouchire\RadioDbImporter\Exceptions\DirectoryIsEndException;
 
 final class Handler
 {
     public function __construct(
-        private DirectoryIterator $dir_iterator,
-        private Id3v2Parser $tags_parser,
         private Logger $logger,
-        private TrackRepository $track_repo,
-        private FileManager $file_manager,
-        private PathCutter $path_cutter,
-        private TrackEstimateValidator $track_estimate_validator
+        private DirectoryIterator $dir_iterator,
+        private HandlerStepsChain $pipeline
     ) {
     }
 
+    /**
+     * См. ссылку для понимания возвращаемого типа
+     *
+     * @see React\EventLoop\Loop:addPeriodicTimer()
+     */
     public function __invoke(): void
     {
         try {
             /** @var SplFileInfo */
             $file = $this->dir_iterator->getFile();
+
+            $this->logger->debug("Текущий путь: {$file->getPathname()}");
         } catch (RuntimeException) {
-            $this->logger->info('Все директории были перебраны');
+            $this->logger->info('Директория кончилась');
 
-            exit(0);
+            throw new DirectoryIsEndException();
         }
 
-        if (!$file->isFile()) {
-            $this->dir_iterator->next();
+        $this->pipeline
+            ->process(new HandlerData($file))
+            ->then(function (HandlerData $data) {
+                $this->logger->debug(self::class . ": файл успешно обработан: {$data->file->getPathname()}");
+                $this->logger->debug(self::class . ": Двигаюсь к следующему файлу");
 
-            return;
-        }
+                $this->dir_iterator->next();
+            }, function (\Throwable $e) {
+                $this->logger->debug(self::class . ": неуспешно обработан файл");
+                $this->logger->error($e->getMessage());
+                $this->logger->debug(self::class . ": Двигаюсь к следующему файлу");
 
-        $this->logger->debug('Получен файл: ' . $file->getPathname());
-
-        if ($file->getExtension() !== 'mp3') {
-            $this->logger->info('Трек не в MP3-формате, перемещаю в директорию для конвертации');
-
-            try {
-                $track = $this->track_repo->findOne(['hash' => Hash::fromPath($file->getPathname())->toString()]);
-
-                $this->track_repo->delete($track);
-            } catch (OutOfBoundsException) {
-            } catch (Throwable) {
-                $track = new Track('', '', 0, $file->getPathname(), Hash::fromPath($file->getPathname()));
-
-                $this->track_repo->delete($track);
-
-                //FIXME: треки без тегов в БД вызывают падение
-            }
-
-            $this->file_manager->moveToDirOfConvertibleFiles($file->getPathname(), $file->getFilename());
-            $this->dir_iterator->next();
-
-            return;
-        }
-
-        try {
-            $this->tags_parser->readFile($file->getPathname());
-        } catch (InvalidArgumentException) {
-            $this->logger->info('Трек без тегов, перемещаю в директорию для разметки');
-
-            try {
-                $track = $this->track_repo->findOne(['hash' => Hash::fromPath($file->getPathname())->toString()]);
-
-                $this->track_repo->delete($track);
-            } catch (OutOfBoundsException) {
-            }
-
-            $this->file_manager->moveToDirOfFilesWithoutTags($file->getPathname(), $file->getFilename());
-
-            $this->dir_iterator->next();
-
-            return;
-        }
-
-        try {
-            $track = $this->track_repo->findOne(['hash' => Hash::fromPath($file->getPathname())->toString()]);
-
-            if ($track->getPath() !== $this->path_cutter->cut($file->getPathname())) {
-                /** @phpstan-ignore property.private */
-                $track->path = $this->path_cutter->cut($file->getPathname());
-
-                $this->logger->info('У трека обновлён путь');
-            }
-
-            if ($this->track_estimate_validator->isBadEstimate($track)) {
-                $this->logger->info('У трека отрицательная оценка, перемещаю его в директорию Duplicate');
-
-                /** @phpstan-ignore property.private */
-                $track->path = $this->path_cutter->cut($this->file_manager->moveToDirOfNegativeEstimate($file->getPathname(), $file->getFilename()));
-            }
-
-            if ($track->isUpdated()) {
-                $this->track_repo->update($track);
-
-                $this->logger->info('Обновлён трек ' . $file->getPathname());
-            }
-
-            $this->dir_iterator->next();
-
-            return;
-        } catch (OutOfBoundsException) {
-            $track = new Track(
-                $this->tags_parser->getArtist(),
-                $this->tags_parser->getTitle(),
-                $this->tags_parser->getDuration(),
-                $this->path_cutter->cut($file->getPathname()),
-                Hash::fromPath($file->getPathname())
-            );
-
-            $id = $this->track_repo->save($track);
-
-            $this->logger->info('Трек #' . $id . ' добавлен по пути ' . $file->getPathname());
-
-            $this->dir_iterator->next();
-        }
+                $this->dir_iterator->next();
+            });
     }
 }

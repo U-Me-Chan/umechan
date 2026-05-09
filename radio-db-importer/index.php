@@ -6,15 +6,22 @@ use Monolog\Level;
 use Monolog\Logger;
 use React\EventLoop\Loop;
 use Ridouchire\RadioDbImporter\DirectoryIterator;
+use Ridouchire\RadioDbImporter\Exceptions\DirectoryIsEndException;
 use Ridouchire\RadioDbImporter\FileManager;
 use Ridouchire\RadioDbImporter\Handler;
+use Ridouchire\RadioDbImporter\HandlerStepsChain;
+use Ridouchire\RadioDbImporter\HandleSteps\CheckFileDirectoryIsServiceDirStep;
+use Ridouchire\RadioDbImporter\HandleSteps\CheckFileExtenstionStep;
+use Ridouchire\RadioDbImporter\HandleSteps\CheckFileIsFileStep;
+use Ridouchire\RadioDbImporter\HandleSteps\CheckTrackEstimateStep;
+use Ridouchire\RadioDbImporter\HandleSteps\CheckTrackPathStep;
+use Ridouchire\RadioDbImporter\HandleSteps\RetrieveTrackFromDatabaseStep;
 use Ridouchire\RadioDbImporter\Id3v2Parser;
 use Ridouchire\RadioDbImporter\Tracks\Services\TrackEstimateValidator;
 use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
-use Ridouchire\RadioDbImporter\Utils\PathCutter;
 
-require_once __DIR__ . DIRECTORY_SEPARATOR . "vendor/autoload.php";
-require_once __DIR__ . DIRECTORY_SEPARATOR . "vendor/james-heinrich/getid3/getid3/getid3.php";
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor/james-heinrich/getid3/getid3/getid3.php';
 
 $logger = new Logger('importer');
 $logger->pushHandler(new StreamHandler(__DIR__ . DIRECTORY_SEPARATOR . 'logs/radio-db-importer.log', Level::Info));
@@ -36,23 +43,45 @@ $db = new Medoo([
     'collation'     => 'utf8mb4_unicode_ci'
 ]);
 
-$path_cutter  = new PathCutter($music_dir_path);
 $dir_iterator = new DirectoryIterator($music_dir_path);
 $tags_parser  = new Id3v2Parser(new getID3());
 $track_repo   = new TrackRepository($db);
 $file_manager = new FileManager(
     $music_dir_of_convertible_files,
     $music_dir_of_files_without_tags,
-    $music_dir_of_negative_estimates
+    $music_dir_of_negative_estimates,
+    $music_dir_path
 );
-$handler = new Handler(
-    $dir_iterator,
-    $tags_parser,
-    $logger,
-    $track_repo,
-    $file_manager,
-    $path_cutter,
-    new TrackEstimateValidator($bad_estimate_value)
-);
+$track_estimate_validator = new TrackEstimateValidator($bad_estimate_value);
 
-Loop::addPeriodicTimer(0, $handler);
+$pipeline = new HandlerStepsChain()
+    ->addHandler(new CheckFileIsFileStep($logger))
+    ->addHandler(new CheckFileExtenstionStep($logger))
+    ->addHandler(new CheckFileDirectoryIsServiceDirStep($file_manager, $logger))
+    ->addHandler(new RetrieveTrackFromDatabaseStep(
+        $track_repo,
+        $tags_parser,
+        $file_manager,
+        $logger
+    ))
+    ->addHandler(new CheckTrackEstimateStep(
+        $track_estimate_validator,
+        $track_repo,
+        $file_manager,
+        $logger
+    ))
+    ->addHandler(new CheckTrackPathStep(
+        $file_manager,
+        $track_repo,
+        $logger
+    ));
+
+$handler = new Handler($logger, $dir_iterator, $pipeline);
+
+Loop::addPeriodicTimer(0, function () use ($handler) {
+    try {
+        $handler();
+    } catch (DirectoryIsEndException) {
+        exit(0);
+    }
+});

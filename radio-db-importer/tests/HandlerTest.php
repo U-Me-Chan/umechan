@@ -1,303 +1,116 @@
-g<?php
+<?php
 
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use React\Promise\Promise;
 use Ridouchire\RadioDbImporter\DirectoryIterator;
-use Ridouchire\RadioDbImporter\FileManager;
+use Ridouchire\RadioDbImporter\Exceptions\DirectoryIsEndException;
 use Ridouchire\RadioDbImporter\Handler;
-use Ridouchire\RadioDbImporter\Id3v2Parser;
-use Ridouchire\RadioDbImporter\Tracks\Track;
-use Ridouchire\RadioDbImporter\Tracks\Track\Hash;
-use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
-use Ridouchire\RadioDbImporter\Utils\PathCutter;
+use Ridouchire\RadioDbImporter\HandlerData;
+use Ridouchire\RadioDbImporter\HandlerStepsChain;
+use Ridouchire\RadioDbImporter\HandleStep;
 
 class HandlerTest extends TestCase
 {
-    private Handler $handler;
-    private DirectoryIterator|MockObject $dir_iterator;
-    private Id3v2Parser|MockObject $parser;
-    private Logger|MockObject $logger;
-    private TrackRepository|MockObject $track_repo;
-    private FileManager|MockObject $file_manager;
-    private PathCutter $path_cutter;
-    private string $tmp_mp3_file_path;
-    private string $tmp_ogg_file_path;
-    private string $tmp_file_with_negative_estimate;
-    private string $dir_of_convertible_files;
-    private string $dir_of_files_without_tags;
-    private string $dir_of_negative_estimate;
+    private MockObject|Logger $logger;
+    private MockObject|DirectoryIterator $directory_iterator;
 
     public function setUp(): void
     {
-        $tmp_dir = sys_get_temp_dir();
+        $this->logger             = $this->createMock(Logger::class);
+        $this->directory_iterator = $this->createMock(DirectoryIterator::class);
+    }
 
-        $this->dir_of_convertible_files  = $tmp_dir . DIRECTORY_SEPARATOR . '/convert';
-        $this->dir_of_files_without_tags = $tmp_dir . DIRECTORY_SEPARATOR . '/tagme';
-        $this->dir_of_negative_estimate  = $tmp_dir . DIRECTORY_SEPARATOR . '/Duplicate';
+    #[Test]
+    public function attemptRunWhenDirectoryIsEnd(): void
+    {
+        $this->directory_iterator->expects($this->once())
+            ->method('getFile')
+            ->willThrowException(new RuntimeException());
 
-        if (!is_dir($this->dir_of_convertible_files)) {
-            mkdir($this->dir_of_convertible_files);
-        }
+        $this->logger->expects($this->once())->method('info');
 
-        if (!is_dir($this->dir_of_files_without_tags)) {
-            mkdir($this->dir_of_files_without_tags);
-        }
+        $pipeline = new HandlerStepsChain();
 
-        if (!is_dir($this->dir_of_negative_estimate)) {
-            mkdir($this->dir_of_negative_estimate);
-        }
+        $this->expectException(DirectoryIsEndException::class);
 
-        @mkdir($tmp_dir . '/Test');
-
-        $this->tmp_mp3_file_path               = $tmp_dir . DIRECTORY_SEPARATOR . 'Test/1.mp3';
-        $this->tmp_ogg_file_path               = $tmp_dir . DIRECTORY_SEPARATOR . 'Test/1.ogg';
-        $this->tmp_file_with_negative_estimate = $tmp_dir . DIRECTORY_SEPARATOR . 'Test/2.mp3';
-
-        @touch($this->tmp_mp3_file_path);
-        @touch($this->tmp_ogg_file_path);
-        @touch($this->tmp_file_with_negative_estimate);
-
-        /** @var DirectoryIterator|MockObject*/
-        $this->dir_iterator = $this->createMock(DirectoryIterator::class);
-
-        /** @var Id3v2Parser|MockObject */
-        $this->parser = $this->createMock(Id3v2Parser::class);
-
-        /** @var Logger|MockObject */
-        $this->logger = $this->createMock(Logger::class);
-
-        /** @var TrackRepository|MockObject */
-        $this->track_repo = $this->createMock(TrackRepository::class);
-
-        $this->file_manager = new FileManager($this->dir_of_convertible_files, $this->dir_of_files_without_tags, $this->dir_of_negative_estimate);
-
-        $this->path_cutter = new PathCutter($tmp_dir);
-
-        $this->handler = new Handler(
-            $this->dir_iterator,
-            $this->parser,
+        $handler = new Handler(
             $this->logger,
-            $this->track_repo,
-            $this->file_manager,
-            $this->path_cutter
+            $this->directory_iterator,
+            $pipeline
         );
+
+        $handler->__invoke();
     }
 
-    public function testWithTrackIsNotMp3(): void
+    #[Test]
+    public function attemptRunWhenPipelineIsFailed(): void
     {
-        $path_to_ogg_file = $this->tmp_ogg_file_path;
+        $file = $this->getMockBuilder(SplFileObject::class)
+            ->setConstructorArgs(['php://memory'])
+            ->getMock();
 
-        $this->dir_iterator->expects($this->once())
+        $this->directory_iterator->expects($this->once())
             ->method('getFile')
-            ->willReturnCallback(function () use ($path_to_ogg_file) {
-                /** @var SplFileObject|MockObject */
-                $file = $this->getMockBuilder(SplFileObject::class)
-                    ->setConstructorArgs(['php://memory'])
-                    ->getMock();
-                $file->method('getExtension')->willReturn('ogg');
-                $file->method('getPathname')->willReturn($path_to_ogg_file);
-                $file->method('getFilename')->willReturn('1.ogg');
-                $file->method('isFile')->willReturn(true);
-
-                return $file;
-            });
-
-        $this->track_repo->method('findOne')->willThrowException(new OutOfBoundsException());
+            ->willReturn($file);
+        $this->directory_iterator->expects($this->once())
+            ->method('next');
 
         $this->logger->expects($this->once())
-            ->method('info')
-            ->willReturnCallback(fn (string $message) => $this->assertEquals('Трек не в MP3-формате, перемещаю в директорию для конвертации', $message));
+            ->method('error');
 
-        $this->dir_iterator->expects($this->once())->method('next');
+        $pipeline = new HandlerStepsChain();
 
-        $h = $this->handler;
+        $handler_step = $this->createMock(HandleStep::class);
+        $handler_step->method('process')
+            ->willReturn(new Promise(function ($resolve, $reject) {
+                $reject(new RuntimeException());
+            }));
 
-        $h();
+        $pipeline->addHandler($handler_step);
 
-        $this->assertTrue(file_exists($this->dir_of_convertible_files . DIRECTORY_SEPARATOR . '1.ogg'));
+        $handler = new Handler(
+            $this->logger,
+            $this->directory_iterator,
+            $pipeline
+        );
+
+        $handler->__invoke();
     }
 
-    public function testWithTrackWithoutId3v2Tags(): void
+    #[Test]
+    public function attemptRunWhenPipelineIsSuccess(): void
     {
-        $path_to_mp3_file = $this->tmp_mp3_file_path;
+        $file = $this->getMockBuilder(SplFileObject::class)
+            ->setConstructorArgs(['php://memory'])
+            ->getMock();
 
-        $this->dir_iterator->expects($this->once())
+        $this->directory_iterator->expects($this->once())
             ->method('getFile')
-            ->willReturnCallback(function () use ($path_to_mp3_file) {
-                /** @var SplFileObject|MockObject */
-                $file = $this->getMockBuilder(SplFileObject::class)
-                    ->setConstructorArgs(['php://memory'])
-                    ->getMock();
-                $file->method('getExtension')->willReturn('mp3');
-                $file->method('getPathname')->willReturn($path_to_mp3_file);
-                $file->method('getFilename')->willReturn('1.mp3');
-                $file->method('isFile')->willReturn(true);
+            ->willReturn($file);
 
-                return $file;
-            });
+        $pipeline = new HandlerStepsChain();
 
-        $this->parser->expects($this->once())
-            ->method('readFile')
-            ->willReturnCallback(function (string $path) use ($path_to_mp3_file) {
-                $this->assertEquals($path_to_mp3_file, $path);
-            })->willThrowException(new InvalidArgumentException());
+        $data = new HandlerData($file);
 
-        $this->logger->expects($this->once())
-            ->method('info')
-            ->willReturnCallback(fn (string $message) => $this->assertEquals('Трек без тегов, перемещаю в директорию для разметки', $message));
+        $handler_step = $this->createMock(HandleStep::class);
+        $handler_step->method('process')
+            ->willReturn(new Promise(function ($resolve) use ($data) {
+                $this->assertInstanceOf(SplFileInfo::class, $data->file);
 
-        $this->dir_iterator->expects($this->once())->method('next');
+                $resolve($data);
+            }));
 
-        $h = $this->handler;
+        $pipeline->addHandler($handler_step);
 
-        $h();
+        $handler = new Handler(
+            $this->logger,
+            $this->directory_iterator,
+            $pipeline
+        );
 
-        $this->assertTrue(file_exists($this->dir_of_files_without_tags . DIRECTORY_SEPARATOR . '1.mp3'));
-    }
-
-    public function testWithExistTrack(): void
-    {
-        $path_to_mp3_file = $this->tmp_mp3_file_path;
-
-        $this->dir_iterator->expects($this->once())
-            ->method('getFile')
-            ->willReturnCallback(function () use ($path_to_mp3_file) {
-                /** @var SplFileObject|MockObject */
-                $file = $this->getMockBuilder(SplFileObject::class)
-                    ->setConstructorArgs(['php://memory'])
-                    ->getMock();
-                $file->method('getExtension')->willReturn('mp3');
-                $file->method('getPathname')->willReturn($path_to_mp3_file);
-                $file->method('getFilename')->willReturn('1.mp3');
-                $file->method('isFile')->willReturn(true);
-
-                return $file;
-            });
-
-        $this->parser->expects($this->once())
-            ->method('readFile')
-            ->willReturnCallback(function (string $path) use ($path_to_mp3_file) {
-                $this->assertEquals($path_to_mp3_file, $path);
-            });
-
-        $this->parser->method('getArtist')->willReturn('Foo');
-        $this->parser->method('getTitle')->willReturn('Bar');
-        $this->parser->method('getDuration')->willReturn(120);
-
-        $this->track_repo->expects($this->once())
-            ->method('findOne')
-            ->willReturnCallback(function (array $filters) use ($path_to_mp3_file) {
-                $this->assertArrayHasKey('hash', $filters);
-
-                return new Track('Bar', 'Foo', 120, $path_to_mp3_file, Hash::fromString('foo'));
-            });
-
-        $this->track_repo->expects($this->once())
-            ->method('update')
-            ->willReturnCallback(function (Track $track) {
-                $this->assertEquals('Foo', $track->getArtist());
-                $this->assertEquals('Bar', $track->getTitle());
-                $this->assertEquals('Test/1.mp3', $track->getPath());
-            });
-
-        $this->logger->expects($this->exactly(4))
-            ->method('info');
-
-        $this->dir_iterator->expects($this->once())->method('next');
-
-        $h = $this->handler;
-
-        $h();
-    }
-
-    public function testWithNewTrack(): void
-    {
-        $tmp_file = $this->tmp_mp3_file_path;
-
-        $this->dir_iterator->expects($this->once())
-            ->method('getFile')
-            ->willReturnCallback(function () use ($tmp_file){
-                /** @var SplFileObject|MockObject */
-                $file = $this->getMockBuilder(SplFileObject::class)
-                    ->setConstructorArgs(['php://memory'])
-                    ->getMock();
-                $file->method('getExtension')->willReturn('mp3');
-                $file->method('getPathname')->willReturn($tmp_file);
-                $file->method('getFilename')->willReturn('1.mp3');
-                $file->method('isFile')->willReturn(true);
-
-                return $file;
-            });
-
-        $this->parser->expects($this->once())
-            ->method('readFile')
-            ->willReturnCallback(fn(string $path) => $this->assertEquals($tmp_file, $path));
-
-        $this->parser->method('getArtist')->willReturn('Foo');
-        $this->parser->method('getTitle')->willReturn('Bar');
-        $this->parser->method('getDuration')->willReturn(120);
-
-        $this->track_repo->expects($this->once())
-            ->method('findOne')
-            ->willThrowException(new  OutOfBoundsException());
-
-        $this->track_repo->expects($this->once())
-            ->method('save')
-            ->willReturn(1);
-
-        $this->logger->expects($this->once())
-            ->method('info')
-            ->willReturnCallback(fn(string $message) => $this->assertEquals('Трек #1 добавлен по пути ' . $tmp_file, $message));
-
-        $h = $this->handler;
-
-        $h();
-    }
-
-    public function testWithTrackOfNegativeEstimate(): void
-    {
-        $tmp_file = $this->tmp_file_with_negative_estimate;
-
-        $this->dir_iterator->expects($this->once())
-            ->method('getFile')
-            ->willReturnCallback(function () use ($tmp_file) {
-                /** @var SplFileObject|MockObject */
-                $file = $this->getMockBuilder(SplFileObject::class)
-                    ->setConstructorArgs(['php://memory'])
-                    ->getMock();
-                $file->method('getExtension')->willReturn('mp3');
-                $file->method('getPathname')->willReturn($tmp_file);
-                $file->method('getFilename')->willReturn('2.mp3');
-                $file->method('isFile')->willReturn(true);
-
-                return $file;
-            });
-
-        $this->parser->expects($this->once())
-            ->method('readFile')
-            ->willReturnCallback(fn(string $path) => $this->assertEquals($tmp_file, $path));
-
-        $this->parser->method('getArtist')->willReturn('Foo');
-        $this->parser->method('getTitle')->willReturn('Bar');
-        $this->parser->method('getDuration')->willReturn(120);
-
-        $this->track_repo->expects($this->once())
-            ->method('findOne')
-            ->willReturnCallback(function (array $filters) use ($tmp_file) {
-                $this->assertArrayHasKey('hash', $filters);
-
-                return new Track('Foo', 'Bar', 120, $this->path_cutter->cut($tmp_file), Hash::fromString('foo'), 0 - 1201, 0, 0, 10);
-            });
-
-        $this->logger->expects($this->exactly(2))->method('info');
-
-        $this->dir_iterator->expects($this->once())->method('next');
-
-        $h = $this->handler;
-
-        $h();
-
-        $this->assertTrue(file_exists($this->dir_of_negative_estimate . DIRECTORY_SEPARATOR . '2.mp3'));
+        $handler->__invoke();
     }
 }
