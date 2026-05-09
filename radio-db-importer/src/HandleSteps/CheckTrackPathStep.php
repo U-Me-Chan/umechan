@@ -33,7 +33,7 @@ class CheckTrackPathStep implements HandleStep
                     if ($this->file_manager->isFileExist($previous_absolute_pathfile)) {
                         $this->file_manager->removeFile($previous_absolute_pathfile);
 
-                        $this->logger->info('Удалён дубликат трека: ' . $previous_absolute_pathfile);
+                        $this->logger->info(self::class . ': Удалён дубликат трека: ' . $previous_absolute_pathfile);
                     }
 
                     /** @phpstan-ignore property.private */
@@ -41,7 +41,7 @@ class CheckTrackPathStep implements HandleStep
 
                     $this->track_repository->update($data->track);
 
-                    $this->logger->info('У трека был обновлён путь: ' . $data->track->getPath());
+                    $this->logger->info(self::class . ': У трека был обновлён путь: ' . $data->track->getPath());
                 }
 
                 $resolve($data);

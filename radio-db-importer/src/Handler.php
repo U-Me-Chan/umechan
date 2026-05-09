@@ -27,9 +27,9 @@ final class Handler
             /** @var SplFileInfo */
             $file = $this->dir_iterator->getFile();
 
-            $this->logger->debug("Текущий путь: {$file->getPathname()}");
+            $this->logger->debug(self::class . ": Текущий путь: {$file->getPathname()}");
         } catch (RuntimeException) {
-            $this->logger->info('Директория кончилась');
+            $this->logger->info(self::class . ': Директория кончилась');
 
             throw new DirectoryIsEndException();
         }
