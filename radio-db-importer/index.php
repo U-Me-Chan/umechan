@@ -12,7 +12,6 @@ use Ridouchire\RadioDbImporter\Handler;
 use Ridouchire\RadioDbImporter\HandlerStepsChain;
 use Ridouchire\RadioDbImporter\HandleSteps\CheckFileDirectoryIsServiceDirStep;
 use Ridouchire\RadioDbImporter\HandleSteps\CheckFileExtenstionStep;
-use Ridouchire\RadioDbImporter\HandleSteps\CheckFileIsFileStep;
 use Ridouchire\RadioDbImporter\HandleSteps\CheckTrackEstimateStep;
 use Ridouchire\RadioDbImporter\HandleSteps\CheckTrackPathStep;
 use Ridouchire\RadioDbImporter\HandleSteps\RetrieveTrackFromDatabaseStep;
