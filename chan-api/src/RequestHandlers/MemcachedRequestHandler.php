@@ -9,6 +9,7 @@ use PK\RequestHandler;
 class MemcachedRequestHandler extends RequestHandler
 {
     private const CACHE_KEY = 'chan-api-response-caches';
+    private const EXPIRATION_TIME_SECONDS = 60 * 60 * 24 * 14;
 
     private \Memcached $memcached;
 
@@ -46,7 +47,7 @@ class MemcachedRequestHandler extends RequestHandler
 
             $this->cache_map[$req->getHash()] = $res;
 
-            $this->memcached->set(self::CACHE_KEY, $this->cache_map);
+            $this->memcached->set(self::CACHE_KEY, $this->cache_map, self::EXPIRATION_TIME_SECONDS);
 
             return $res;
         }

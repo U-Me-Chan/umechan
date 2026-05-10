@@ -144,6 +144,6 @@ $request_sucessor = $_ENV['IS_DEV'] == 'yes' ? $r : new MemcachedRequestHandler(
 
 $request = new Request($_SERVER, $_POST);
 
-$app = new Application($r, $hook_service);
+$app = new Application($request_sucessor, $hook_service);
 
 $app->run($request);
