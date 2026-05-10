@@ -55,7 +55,6 @@ $file_manager = new FileManager(
 $track_estimate_validator = new TrackEstimateValidator($bad_estimate_value);
 
 $pipeline = new HandlerStepsChain()
-    ->addHandler(new CheckFileIsFileStep($logger))
     ->addHandler(new CheckFileExtenstionStep($logger))
     ->addHandler(new CheckFileDirectoryIsServiceDirStep($file_manager, $logger))
     ->addHandler(new RetrieveTrackFromDatabaseStep(

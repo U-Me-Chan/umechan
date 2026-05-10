@@ -2,8 +2,8 @@
 
 namespace Ridouchire\RadioDbImporter\HandleSteps;
 
-use Monolog\Logger;
 use OutOfBoundsException;
+use Monolog\Logger;
 use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 use Ridouchire\RadioDbImporter\Exceptions\ATagParserException;
@@ -14,7 +14,6 @@ use Ridouchire\RadioDbImporter\Id3v2Parser;
 use Ridouchire\RadioDbImporter\Tracks\Track;
 use Ridouchire\RadioDbImporter\Tracks\Track\Hash;
 use Ridouchire\RadioDbImporter\Tracks\TrackRepository;
-use RuntimeException;
 
 class RetrieveTrackFromDatabaseStep implements HandleStep
 {

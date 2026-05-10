@@ -38,7 +38,7 @@ class CheckTrackEstimateStep implements HandleStep
 
                     $this->track_repository->update($data->track);
 
-                    $reject(new RuntimeException('Трек был перемещён в директорию с отрицательными оценками: ' . $data->track->getPath()));
+                    $reject(new RuntimeException(self::class . ': Трек был перемещён в директорию с отрицательными оценками: ' . $data->track->getPath()));
                 } else {
                     $this->logger->debug(self::class . ": Трек имеет положительную оценку: {$data->file->getPathname()}");
 

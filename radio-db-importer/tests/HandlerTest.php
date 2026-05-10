@@ -46,11 +46,45 @@ class HandlerTest extends TestCase
     }
 
     #[Test]
+    public function attemptRunWhenFileIsNotFile(): void
+    {
+        $file = $this->getMockBuilder(SplFileObject::class)
+            ->setConstructorArgs(['php://memory'])
+            ->getMock();
+
+        $file->method('isFile')->willReturn(false);
+        $file->method('getPathname')->willReturn('/tmp/music/1.mp3');
+
+        $this->directory_iterator->expects($this->once())
+            ->method('getFile')
+            ->willReturn($file);
+        $this->directory_iterator->expects($this->once())
+            ->method('next');
+
+        $this->logger->expects($this->once())
+            ->method('debug');
+        $this->logger->expects($this->once())
+            ->method('info');
+
+        $pipeline = new HandlerStepsChain();
+
+        $handler = new Handler(
+            $this->logger,
+            $this->directory_iterator,
+            $pipeline
+        );
+
+        $handler->__invoke();
+    }
+
+    #[Test]
     public function attemptRunWhenPipelineIsFailed(): void
     {
         $file = $this->getMockBuilder(SplFileObject::class)
             ->setConstructorArgs(['php://memory'])
             ->getMock();
+
+        $file->method('isFile')->willReturn(true);
 
         $this->directory_iterator->expects($this->once())
             ->method('getFile')

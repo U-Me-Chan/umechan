@@ -20,11 +20,11 @@ class CheckFileExtenstionStep implements HandleStep
     {
         return new Promise(function ($resolve, $reject) use ($data) {
             if ($data->file->getExtension() == 'mp3') {
-                $this->logger->debug(self::class . ": допустимое расширение файла: {$data->file->getPathname()}");
+                $this->logger->debug(self::class . ": Допустимое расширение файла: {$data->file->getPathname()}");
 
                 $resolve($data);
             } else {
-                $reject(new RuntimeException('Недопустимое расширение файла'));
+                $reject(new RuntimeException(self::class . ': Недопустимое расширение файла'));
             }
         });
     }
