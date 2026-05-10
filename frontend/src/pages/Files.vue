@@ -24,6 +24,18 @@
       :key="file.name"
       />
   </div>
+
+    <b-pagination
+    :total="count"
+    :current="current"
+    :per-page="perPage"
+    :page-input="true"
+    v-model="current"
+    v-on:change="changePage"
+    order="is-centered"
+    size="is-small"
+    >
+  </b-pagination>
 </div>
 </template>
 
