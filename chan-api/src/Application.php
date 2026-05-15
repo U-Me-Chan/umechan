@@ -38,8 +38,6 @@ class Application
     {
         $this->hook_service->setHook(ApplicationHook::before_send, [$res]);
 
-        ob_start();
-
         if (!empty($res->getHeaders())) {
             foreach ($res->getHeaders() as $header) {
                 header($header);
@@ -48,8 +46,6 @@ class Application
 
         http_response_code($res->getCode());
         echo $res->getBody();
-
-        ob_end_flush();
 
         $this->hook_service->setHook(ApplicationHook::after_send);
 
