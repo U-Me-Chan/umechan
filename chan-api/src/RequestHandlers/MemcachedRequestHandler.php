@@ -22,7 +22,7 @@ class MemcachedRequestHandler extends RequestHandler
 
         $_cache = $this->cache->get(self::CACHE_KEY);
 
-        $this->cache_map = $_cache === false ? [] : $_cache;
+        $this->cache_map = $_cache === null ? [] : $_cache;
     }
 
     protected function processing(Request $req): ?Response
