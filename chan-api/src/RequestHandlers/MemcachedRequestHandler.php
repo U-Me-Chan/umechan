@@ -2,6 +2,7 @@
 
 namespace PK\RequestHandlers;
 
+use PK\Cache;
 use PK\Http\Request;
 use PK\Http\Response;
 use PK\RequestHandler;
@@ -9,36 +10,33 @@ use PK\RequestHandler;
 class MemcachedRequestHandler extends RequestHandler
 {
     private const CACHE_KEY = 'chan-api-response-caches';
-    private const EXPIRATION_TIME_SECONDS = 60 * 60 * 24 * 14;
-
-    private \Memcached $memcached;
+    private const EXPIRATION_TIME_SECONDS = 60 * 60 * 24;
 
     /** @phpstan-ignore missingType.iterableValue */
     public function __construct(
         private ?RequestHandler $sucessor,
-        private string $host = 'memcached',
-        private int $port = 11211,
+        private Cache $cache,
         private array $cache_map = []
     ) {
         parent::__construct($sucessor);
 
-        $this->memcached = new \Memcached();
-        $this->memcached->addServer($this->host, $this->port);
-
-        $_cache = $this->memcached->get(self::CACHE_KEY);
+        $_cache = $this->cache->get(self::CACHE_KEY);
 
         $this->cache_map = $_cache === false ? [] : $_cache;
     }
 
     protected function processing(Request $req): ?Response
     {
-        if ($req->getMethod() !== 'GET') {
-            $this->memcached->delete(self::CACHE_KEY); // удаляем кеш всех запросов при любой операции записи
+        if (in_array($req->getMethod(), ['POST', 'UPDATE', 'DELETE', 'PATCH'])) {
+            $this->cache_map = [];
+            $this->cache->delete(self::CACHE_KEY);
 
             return null;
         }
 
-        if (!isset($this->cache_map[$req->getHash()])) {
+        $cached_result = $this->cache_map[$req->getHash()] ?? null;
+
+        if (!$cached_result) {
             $res = $this->sucessor->handle($req);
 
             if ($res->getCode() !== 200) {
@@ -46,18 +44,15 @@ class MemcachedRequestHandler extends RequestHandler
             }
 
             $this->cache_map[$req->getHash()] = $res;
-
-            $this->memcached->set(self::CACHE_KEY, $this->cache_map, self::EXPIRATION_TIME_SECONDS);
+            $this->cache->set(self::CACHE_KEY, $this->cache_map, self::EXPIRATION_TIME_SECONDS);
 
             return $res;
         }
 
-        $res = $this->cache_map[$req->getHash()];
+        if ($cached_result instanceof Response) {
+            $cached_result->setHeader('X-Pissykaka-Cache-Response: yes');
 
-        if ($res !== false && $res instanceof Response) {
-            $res->setHeader('X-Pissykaka-Cache-Response: yes');
-
-            return $res;
+            return $cached_result;
         }
 
         return null;

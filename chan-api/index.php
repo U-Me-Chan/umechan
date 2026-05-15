@@ -17,6 +17,7 @@ use PK\Boards\Console\SetPublicBoard;
 use PK\Boards\Console\UnsetPublicBoard;
 use PK\Boards\Controllers\GetBoardList;
 use PK\Boards\Services\BoardService;
+use PK\Cache\Memcached;
 use PK\Events\ChanEventBuilder;
 use PK\Events\FilestoreEventBuilder;
 use PK\Events\MessageBrokers\KafkaWrapper;
@@ -75,6 +76,8 @@ $db = new Medoo([
 ]);
 
 $message_broker = new KafkaWrapper(['kafka:9092']);
+
+$cache = new Memcached();
 
 $chan_event_builder = new ChanEventBuilder($config['node_sign']);
 $filestore_event_builder = new FilestoreEventBuilder($config['node_sign']);
@@ -140,7 +143,7 @@ $r->addRoute('POST', '/v2/passport', new CreatePassport($passport_service));
 $r->addRoute('GET', '/v2/_/openapi.json', new GetOpenApiSpecification(new Generator()));
 $r->addRoute('GET', '/v2/_/redoc.html', new GetRedocPage($_ENV['DOMAIN']));
 
-$request_sucessor = $_ENV['IS_DEV'] == 'yes' ? $r : new MemcachedRequestHandler(sucessor: $r);
+$request_sucessor = $_ENV['IS_DEV'] == 'yes' ? $r : new MemcachedRequestHandler(sucessor: $r, cache: $cache);
 
 $request = new Request($_SERVER, $_POST);
 
