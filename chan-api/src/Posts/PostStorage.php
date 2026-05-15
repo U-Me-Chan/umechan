@@ -74,9 +74,7 @@ class PostStorage
                 'posts.is_sticky',
                 'posts.is_blocked',
                 'posts.password',
-                'posts.board_id',
                 'posts.replies_count',
-                'boards.tag',
                 'board_data' => [
                     'boards.id(board_id)',
                     'boards.tag',
@@ -95,6 +93,20 @@ class PostStorage
 
         $thread_ids = array_column($thread_datas, 'id');
 
+        $board_datas = [];
+
+        foreach ($tags as $tag) {
+            $data = array_find($thread_datas, function (array $thread_data) use ($tag) {
+                return $thread_data['board_data']['tag'] == $tag;
+            });
+
+            if (!$data) {
+                continue;
+            }
+
+            $board_datas[$data['board_data']['board_id']] = $data['board_data'];
+        }
+
         $replies_datas = $this->db->query("
     WITH RankedReplies AS (
         SELECT
@@ -110,15 +122,9 @@ class PostStorage
             posts.is_blocked,
             posts.password,
             posts.replies_count,
-            boards.id AS board_id,
-            boards.tag AS board_tag,
-            boards.name AS board_name,
-            boards.threads_count AS board_threads_count,
-            boards.new_posts_count AS board_new_posts_count,
-            boards.is_public AS board_is_public,
+            posts.board_id,
             ROW_NUMBER() OVER (PARTITION BY posts.parent_id ORDER BY posts.id DESC) as rn
         FROM posts
-        LEFT JOIN boards ON posts.board_id = boards.id
         WHERE posts.parent_id IN (" . implode(',', $thread_ids) . ")
     )
     SELECT * FROM RankedReplies WHERE rn <= 3
@@ -133,14 +139,7 @@ class PostStorage
                 $replies_by_thread[$parent_id] = [];
             }
 
-            $replies_data['board_data'] = [
-                'id'              => $replies_data['board_id'],
-                'tag'             => $replies_data['board_tag'],
-                'name'            => $replies_data['board_name'],
-                'threads_count'   => $replies_data['board_threads_count'],
-                'new_posts_count' => $replies_data['board_new_posts_count'],
-                'is_public'       => $replies_data['board_is_public']
-            ];
+            $replies_data['board_data'] = $board_datas[$replies_data['board_id']];
 
             array_unshift($replies_by_thread[$parent_id], Post::fromArray($replies_data));
         }
@@ -204,8 +203,7 @@ class PostStorage
 
         $thread_data = array_shift($thread_and_replies_datas);
 
-        $thread_data['replies']       = array_map(fn(array $post_data) => Post::fromArray($post_data), $thread_and_replies_datas);
-        $thread_data['replies_count'] = $this->db->count('posts', ['parent_id' => $thread_data['id']]);
+        $thread_data['replies'] = array_map(fn(array $post_data) => Post::fromArray($post_data), $thread_and_replies_datas);
 
         return Post::fromArray($thread_data);
     }
