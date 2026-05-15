@@ -37,6 +37,7 @@ RUN pecl install xdebug && \
   make \
   linux-headers
 COPY images/chan-api/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+COPY images/chan-api/opcache-dev.ini /usr/local/etc/php-fpm.d/opcache.ini
 
 FROM base AS production
 RUN apk del --purge \
@@ -45,6 +46,7 @@ RUN apk del --purge \
   make \
   linux-headers
 COPY images/chan-api/php-logging.conf /usr/local/etc/php-fmp.d/logging.conf
+COPY images/chan-api/opcache.ini /usr/local/etc/php-fpm.d/opcache.ini
 WORKDIR /var/www/html
 COPY --from=deps /app/vendor ./vendor
 COPY chan-api/index.php .
