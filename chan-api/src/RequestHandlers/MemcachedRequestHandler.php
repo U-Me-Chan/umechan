@@ -27,7 +27,7 @@ class MemcachedRequestHandler extends RequestHandler
 
     protected function processing(Request $req): ?Response
     {
-        if (in_array($req->getMethod(), ['POST', 'UPDATE', 'DELETE', 'PATCH'])) {
+        if (in_array($req->getMethod(), ['POST', 'UPDATE', 'DELETE', 'PATCH', 'PUT'])) {
             $this->cache_map = [];
             $this->cache->delete(self::CACHE_KEY);
 
