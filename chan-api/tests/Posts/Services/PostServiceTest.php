@@ -18,6 +18,7 @@ use PK\Posts\Services\PostService;
 use PK\Posts\Exceptions\ThreadBlockedException;
 use PK\Posts\Exceptions\ThreadNotFoundException;
 use PK\Services\HookService;
+use PK\Utils\ApplicationHook;
 
 final class PostServiceTest extends TestCase
 {
@@ -232,8 +233,13 @@ final class PostServiceTest extends TestCase
             ->method('publish');
 
         $this->hook_service
-            ->expects($this->once())
-            ->method('registerHookHandler');
+            ->expects($this->exactly(2))
+            ->method('registerHookHandler')
+            ->willReturnCallback(function ($hook, $handler) {
+                $this->assertInstanceOf(ApplicationHook::class, $hook);
+                $this->assertEquals(ApplicationHook::after_send, $hook);
+                $this->assertIsCallable($handler);
+            });
 
         $this->post_service->createReplyOnThread(1, 'test', ['poster' => 'key']);
     }
@@ -266,8 +272,13 @@ final class PostServiceTest extends TestCase
             ->method('publish');
 
         $this->hook_service
-            ->expects($this->once())
-            ->method('registerHookHandler');
+            ->expects($this->exactly(2))
+            ->method('registerHookHandler')
+            ->willReturnCallback(function ($hook, $handler) {
+                $this->assertInstanceOf(ApplicationHook::class, $hook);
+                $this->assertEquals(ApplicationHook::after_send, $hook);
+                $this->assertIsCallable($handler);
+            });
 
         $this->post_service->createReplyOnThread(1, 'test', ['poster' => 'key']);
     }

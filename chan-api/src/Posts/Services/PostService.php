@@ -182,6 +182,7 @@ class PostService
         );
 
         $this->hook_service->registerHookHandler(ApplicationHook::after_send, fn() => $this->board_service->updateNewPostsCount($thread->board));
+        $this->hook_service->registerHookHandler(ApplicationHook::after_send, fn() => $this->updateRepliesCountInThread($thread));
 
         return ['post_id' => $id, 'password' => $post->password->clearPasswordToString()];
     }
@@ -420,5 +421,12 @@ EOT;
         }
 
         return $result;
+    }
+
+    private function updateRepliesCountInThread(Post $thread): void
+    {
+        $thread->replies_count = $this->post_storage->getRepliesCountById($thread->id);
+
+        $this->post_storage->save($thread);
     }
 }

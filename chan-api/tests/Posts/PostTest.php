@@ -164,6 +164,9 @@ class PostTest extends TestCase
                 case 'is_blocked':
                     $this->assertEquals('yes', $value);
                     break;
+                case 'replies_count':
+                    $this->assertEquals(0, $value);
+                    break;
                 default:
                     throw new Exception("Неизвестное имя колонки: {$column}");
             }

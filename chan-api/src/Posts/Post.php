@@ -184,7 +184,6 @@ class Post implements \JsonSerializable
         unset(
             $data['board'],
             $data['replies'],
-            $data['replies_count'],
             $data['bump_limit_reached'],
             $data['is_draft'],
             $data['datetime'],
