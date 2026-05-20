@@ -22,7 +22,10 @@ class FinfoMimetypeExtractor implements MimetypeExtractor
         $mimetype = reset($mimetype);
 
         return match ($mimetype) {
+            'image/bmp'       => Mimetype::image,
             'image/jpeg'      => Mimetype::image,
+            'image/pjpeg'     => Mimetype::image,
+            'image/tiff'      => Mimetype::image,
             'image/png'       => Mimetype::image,
             'image/webp'      => Mimetype::image,
             'image/gif'       => Mimetype::video, // некоторые тамбнейлы с артефактами, если обрабатывать как изображение
