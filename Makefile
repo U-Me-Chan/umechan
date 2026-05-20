@@ -51,4 +51,4 @@ chan-set-public-board:
 chan-unset-public-board:
 	docker exec umechan-api php index.php boards:unset-public $(tag)
 chan-rebuild-thumbnails:
-	docker exec umechan-filestore php index.php files:rebuild-thumbnails $(from_offset)
+	docker exec umechan-filestore php index.php files:rebuild-thumbnails $(latest_number)

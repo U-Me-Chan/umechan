@@ -24,7 +24,7 @@ final class RebuildThumbnails extends Command
         $this
             ->setName('files:rebuild-thumbnails')
             ->setDescription('Регенирирует миниатюры файлов')
-            ->addArgument('from_offset', InputArgument::OPTIONAL, 'Смещение в списке для повторных запусков');
+            ->addArgument('latest_number', InputArgument::OPTIONAL, 'Смещение в списке для повторных запусков');
     }
 
     public function execute(InputInterface $input, OutputInterface $output): int
@@ -33,14 +33,12 @@ final class RebuildThumbnails extends Command
 
         $io->info('Пройдусь по всем файлам и регенирирую для них миниатюры');
 
-        $from_offset = $input->getArgument('from_offset') ?? 0;
-
         /** @var FileCollection  */
         $files_collection = $this->files_service->getFileList(0, 1);
 
         $count = $files_collection->count;
 
-        $from_offset = $count - $from_offset;
+        $from_offset = $input->getArgument('latest_number') ? $count - $input->getArgument('latest_number') : 0;
 
         for ($i = $from_offset; $i < $count; $i++) {
             $files_collection = $this->files_service->getFileList($i, 1);
