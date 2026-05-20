@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use IH\Services\Files;
 use IH\FileCollection;
+use Symfony\Component\Console\Input\InputArgument;
 
 final class RebuildThumbnails extends Command
 {
@@ -22,7 +23,8 @@ final class RebuildThumbnails extends Command
     {
         $this
             ->setName('files:rebuild-thumbnails')
-            ->setDescription('Регенирирует миниатюры файлов');
+            ->setDescription('Регенирирует миниатюры файлов')
+            ->addArgument('from_offset', InputArgument::OPTIONAL, 'Смещение в списке для повторных запусков');
     }
 
     public function execute(InputInterface $input, OutputInterface $output): int
@@ -31,12 +33,14 @@ final class RebuildThumbnails extends Command
 
         $io->info('Пройдусь по всем файлам и регенирирую для них миниатюры');
 
+        $from_offset = $input->getArgument('from_offset') ?? 0;
+
         /** @var FileCollection  */
         $files_collection = $this->files_service->getFileList(0, 1);
 
         $count = $files_collection->count;
 
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = $from_offset; $i < $count; $i++) {
             $files_collection = $this->files_service->getFileList($i, 1);
 
             /** @var File */
