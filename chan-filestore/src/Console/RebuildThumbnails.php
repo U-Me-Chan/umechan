@@ -40,6 +40,8 @@ final class RebuildThumbnails extends Command
 
         $count = $files_collection->count;
 
+        $from_offset = $count - $from_offset;
+
         for ($i = $from_offset; $i < $count; $i++) {
             $files_collection = $this->files_service->getFileList($i, 1);
 
