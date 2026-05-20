@@ -50,3 +50,5 @@ chan-set-public-board:
 	docker exec umechan-api php index.php boards:set-public $(tag)
 chan-unset-public-board:
 	docker exec umechan-api php index.php boards:unset-public $(tag)
+chan-rebuild-thumbnails:
+	docker exec umechan-filestore php index.php files:rebuild-thumbnails

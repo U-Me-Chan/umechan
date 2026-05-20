@@ -1,5 +1,7 @@
 <?php
 
+use IH\Console\RebuildThumbnails;
+use Symfony\Component\Console\Application;
 use Medoo\Medoo;
 use Rweb\App;
 use Rweb\Middlewares\Router;
@@ -47,6 +49,13 @@ $files_service = new Files(
     $_ENV['STATIC_URL'],
     $files_path
 );
+
+if (PHP_SAPI == 'cli') {
+    $app = new Application('ChanFilestore');
+    $app->addCommands([new RebuildThumbnails($files_service)]);
+
+    exit($app->run());
+}
 
 /** @var Router */
 $r = new Router();

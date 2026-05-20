@@ -36,7 +36,8 @@ class FilesTest extends TestCase
             $this->finfo_mimetype_extractor,
             $this->thumbnail_creator,
             $this->file_repository,
-            self::STATIC_URL
+            self::STATIC_URL,
+            '/tmp'
         );
     }
 

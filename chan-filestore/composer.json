@@ -18,7 +18,8 @@
         "ridouchire/rweb": "dev-master",
         "ext-imagick": "*",
         "catfan/medoo": "^2.1",
-        "guzzlehttp/guzzle": "^7.9"
+        "guzzlehttp/guzzle": "^7.9",
+        "symfony/console": "^8.0"
     },
     "autoload": {
         "psr-4": {

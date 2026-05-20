@@ -28,6 +28,17 @@ class Files
         return $this->file_repository->findMany(['offset' => $offset, 'limit' => $limit]);
     }
 
+    public function rebuildThumbnailFile(File $file): void
+    {
+        $mimetype = $this->finfo_mimetype_extractor->extract($this->files_dir . DIRECTORY_SEPARATOR . $file->name);
+
+        if ($mimetype == Mimetype::unsupported) {
+            throw new FileUnsupportedMimetype();
+        }
+
+        $this->thumbnail_creator->execute($mimetype, $file->name);
+    }
+
     public function uploadFile(ReceivedFile $file): File
     {
         $mimetype = $this->finfo_mimetype_extractor->extract($file->getRealPath());
