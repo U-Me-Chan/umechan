@@ -31,11 +31,6 @@ restore-chan-database-from-dump:
 restore-chan-database-from-epds-dump:
 	docker exec umechan-api php index.php posts:restore-from-epds-dump $(timestamp)
 
-backup-chan-database-to-dump:
-	docker exec umechan-db /bin/sh -c "mysqldump -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} ${MYSQL_CHAN_DATABASE} > /tmp/dumps/$(DTBS_DUMP_PATH)"
-backup-radio-database-to-dump:
-	docker exec umechan-db /bin/sh -c "mysqldump -u${MYSQL_USERNAME} -p${MYSQL_PASSWORD} ${MYSQL_RADIO_DATABASE} > /tmp/dumps/umeradio.sql"
-
 chan-set-sticky-thread:
 	docker exec umechan-api php index.php posts:set-sticky-thread $(thread_id)
 chan-unset-sticky-thread:
@@ -52,3 +47,10 @@ chan-unset-public-board:
 	docker exec umechan-api php index.php boards:unset-public $(tag)
 chan-rebuild-thumbnails:
 	docker exec umechan-filestore php index.php files:rebuild-thumbnails $(latest_number)
+
+chan-backup-filestore:
+	bash ./scripts/backup_filestore.sh
+chan-backup-database:
+	bash ./scripts/backup_database.sh
+radio-backup-music:
+	bash ./scripts/backup_music.sh
