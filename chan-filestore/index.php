@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use IH\Controllers\UploadFile;
 use IH\Controllers\GetFilelist;
 use IH\Controllers\DeleteFile;
+use IH\Controllers\GetSupportedMimetypes;
 use IH\FileRepository;
 use IH\Services\Files;
 use IH\Services\MimetypeExtractors\FinfoMimetypeExtractor;
@@ -60,6 +61,7 @@ if (PHP_SAPI == 'cli') {
 /** @var Router */
 $r = new Router();
 
+$r->addRoute('GET', '/filestore/mimetypes', new GetSupportedMimetypes());
 $r->addRoute('GET', '/filestore/files', new GetFilelist($files_service));
 $r->addRoute('POST', '/filestore', new UploadFile($files_service));
 $r->addRoute('DELETE', '/filestore/files/{id:[0-9a-z\.]+}', new DeleteFile($_ENV['ADMINISTRATOR_KEY'], $files_service));

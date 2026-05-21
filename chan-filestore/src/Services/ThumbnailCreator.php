@@ -2,7 +2,7 @@
 
 namespace IH\Services;
 
-use IH\Enums\Mimetype;
+use IH\Enums\Filetype;
 use IH\Exceptions\ThumbnailerNotFoundByMimetype;
 use IH\Services\Thumbnailer;
 
@@ -18,7 +18,7 @@ class ThumbnailCreator
     /**
      * Запускает изготовить миниатюры согласно типу файла, возвращает имя файла и его миниатюры
      */
-    public function execute(Mimetype $mimetype, string $filename): array
+    public function execute(Filetype $mimetype, string $filename): array
     {
         if (!isset($this->map[$mimetype->value])) {
             throw new ThumbnailerNotFoundByMimetype();

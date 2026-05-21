@@ -4,7 +4,7 @@ namespace IH\Services;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile as ReceivedFile;
-use IH\Enums\Mimetype;
+use IH\Enums\Filetype;
 use IH\Exceptions\FileNotUploaded;
 use IH\Exceptions\FileUnsupportedMimetype;
 use IH\File;
@@ -32,7 +32,7 @@ class Files
     {
         $mimetype = $this->finfo_mimetype_extractor->extract($this->files_dir . DIRECTORY_SEPARATOR . $file->name);
 
-        if ($mimetype == Mimetype::unsupported) {
+        if ($mimetype == Filetype::unsupported) {
             throw new FileUnsupportedMimetype();
         }
 
@@ -43,7 +43,7 @@ class Files
     {
         $mimetype = $this->finfo_mimetype_extractor->extract($file->getRealPath());
 
-        if ($mimetype == Mimetype::unsupported) {
+        if ($mimetype == Filetype::unsupported) {
             throw new FileUnsupportedMimetype();
         }
 

@@ -3,6 +3,7 @@
 namespace IH\Services\MimetypeExtractors;
 
 use finfo;
+use IH\Enums\Filetype;
 use IH\Enums\Mimetype;
 use IH\Services\MimetypeExtractor;
 
@@ -15,24 +16,24 @@ class FinfoMimetypeExtractor implements MimetypeExtractor
         $this->finfo = new finfo(FILEINFO_MIME);
     }
 
-    public function extract(string $path_to_file): Mimetype
+    public function extract(string $path_to_file): Filetype
     {
         $mimetype = $this->finfo->file($path_to_file);
         $mimetype = explode(';', $mimetype);
         $mimetype = reset($mimetype);
 
         return match ($mimetype) {
-            'image/bmp'       => Mimetype::image,
-            'image/jpeg'      => Mimetype::image,
-            'image/pjpeg'     => Mimetype::image,
-            'image/tiff'      => Mimetype::image,
-            'image/png'       => Mimetype::image,
-            'image/webp'      => Mimetype::image,
-            'image/gif'       => Mimetype::video, // некоторые тамбнейлы с артефактами, если обрабатывать как изображение
-            'video/webm'      => Mimetype::video,
-            'video/mp4'       => Mimetype::video,
-            'video/quicktime' => Mimetype::video,
-            default           => Mimetype::unsupported
+            Mimetype::image_bmp->value   => Filetype::image,
+            Mimetype::image_jpeg->value  => Filetype::image,
+            Mimetype::image_pjpeg->value => Filetype::image,
+            Mimetype::image_tiff->value  => Filetype::image,
+            Mimetype::image_png->value   => Filetype::image,
+            Mimetype::image_webp->value  => Filetype::image,
+            Mimetype::image_gif->value   => Filetype::video, // некоторые тамбнейлы с артефактами, если обрабатывать как изображение
+            Mimetype::video_webm->value  => Filetype::video,
+            Mimetype::video_mp4->value   => Filetype::video,
+            Mimetype::video_mov->value   => Filetype::video,
+            default               => Filetype::unsupported
         };
     }
 }

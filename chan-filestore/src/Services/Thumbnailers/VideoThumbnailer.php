@@ -2,7 +2,7 @@
 
 namespace IH\Services\Thumbnailers;
 
-use IH\Enums\Mimetype;
+use IH\Enums\Filetype;
 use IH\Services\Thumbnailer;
 
 class VideoThumbnailer implements Thumbnailer
@@ -13,9 +13,9 @@ class VideoThumbnailer implements Thumbnailer
     private string $filepath;
     private string $temp_thumb_filepath;
 
-    public static function getType(): Mimetype
+    public static function getType(): Filetype
     {
-        return Mimetype::video;
+        return Filetype::video;
     }
 
     public function __construct(

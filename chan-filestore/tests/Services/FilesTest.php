@@ -1,15 +1,15 @@
 <?php
 
-use IH\Enums\Mimetype;
-use IH\Exceptions\FileUnsupportedMimetype;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use IH\Enums\Filetype;
 use IH\FileCollection;
 use IH\FileRepository;
 use IH\Services\Files;
 use IH\Services\MimetypeExtractors\FinfoMimetypeExtractor;
 use IH\Services\ThumbnailCreator;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use IH\Exceptions\FileUnsupportedMimetype;
 
 class FilesTest extends TestCase
 {
@@ -50,7 +50,7 @@ class FilesTest extends TestCase
 
     public function testUploadUnsupportedFile(): void
     {
-        $this->finfo_mimetype_extractor->method('extract')->willReturn(Mimetype::unsupported);
+        $this->finfo_mimetype_extractor->method('extract')->willReturn(Filetype::unsupported);
 
         /** @var MockObject|UploadedFile */
         $file = $this->createMock(UploadedFile::class);

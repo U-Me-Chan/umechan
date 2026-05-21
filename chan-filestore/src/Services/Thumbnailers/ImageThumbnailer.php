@@ -2,16 +2,16 @@
 
 namespace IH\Services\Thumbnailers;
 
-use IH\Enums\Mimetype;
+use IH\Enums\Filetype;
 use IH\Services\Thumbnailer;
 
 class ImageThumbnailer implements Thumbnailer
 {
     private \Imagick $image;
 
-    public static function getType(): Mimetype
+    public static function getType(): Filetype
     {
-        return Mimetype::image;
+        return Filetype::image;
     }
 
     public function __construct(

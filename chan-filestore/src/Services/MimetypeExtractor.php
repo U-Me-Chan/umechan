@@ -2,9 +2,9 @@
 
 namespace IH\Services;
 
-use IH\Enums\Mimetype;
+use IH\Enums\Filetype;
 
 interface MimetypeExtractor
 {
-    public function extract(string $path_to_file): Mimetype;
+    public function extract(string $path_to_file): Filetype;
 }
