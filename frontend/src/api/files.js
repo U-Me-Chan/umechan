@@ -13,3 +13,7 @@ export const deleteFile = (name, params) => {
 export const uploadFile = (uploadData) => {
   return axios.post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data' }});
 }
+
+export const getSupportedMimetypes = () =>  {
+  return axios.get(config.filestore_url + '/mimetypes');
+}

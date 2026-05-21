@@ -38,17 +38,19 @@
       <b-upload
         v-model="files"
         class="file-label"
-        accept="image/png, image/jpeg, image/gif, video/webm, video/mp4, image/webp, video/quicktime"
+        :accept="supportedMimetypesAsString"
         drag-drop
         multiple
       >
         <span class="file-cta">
           <b-icon class="file-icon" icon="upload"/>
-          <span class="file-label">PNG JPEG WEBP GIF WEBM MP4 MOV</span>
+          <span class="file-label">Выберите файл для прикрепления к сообщению</span>
         </span>
       </b-upload>
       <span v-if="filesNames.length > 0">
-        {{ filesNames.join(', ') }}
+        <ul>
+          <li class="uploaded-filename" v-for="filename in filesNames" :key="filename">{{filename}}</li>
+        </ul>
       </span>
     </div>
   </b-field>
@@ -68,7 +70,7 @@ const config   = require('../../config')
 
 import { bus } from '../bus';
 import { createReply, createThread } from '../api/posts'
-import { uploadFile } from '../api/files'
+import { uploadFile, getSupportedMimetypes } from '../api/files'
 import { CLPBRD_ERR } from '../constants/common-error-texts';
 import { convertBytesToMegabytes } from '../utils/filesize_formatter'
 import { getPosterName, setPosterName, setPostPassword } from '../utils/storage'
@@ -87,6 +89,11 @@ export default {
       type: String,
       default: ''
     }
+  },
+  created: function () {
+    getSupportedMimetypes().then((response) => {
+      this.supportedMimetypesAsString = response.data.mimetypes.join(', ');
+    });
   },
   methods: {
     init: function () {
@@ -270,7 +277,8 @@ export default {
       isSage: false,
       files: [],
       filesNames: [],
-      isLoading: false
+      isLoading: false,
+      supportedMimetypesAsString: 'Ошибка загрузки поддерживаемых типов файлов'
     }
   },
   watch: {
@@ -303,5 +311,14 @@ export default {
 <style>
 .form__poster-input[data-is-empty="false"] + .icon {
     visibility: hidden;
+}
+
+.form__file-uploader-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.uploaded-filename {
+    list-style-type: none;
 }
 </style>
