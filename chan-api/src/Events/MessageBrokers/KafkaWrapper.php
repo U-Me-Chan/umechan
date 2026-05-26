@@ -11,7 +11,8 @@ use RuntimeException;
 
 final class KafkaWrapper implements MessageBroker
 {
-    private Producer $producer;
+    private ?Producer $producer = null;
+    private Conf $conf;
 
     /**
      * @param string[] $kafka_addrs
@@ -19,44 +20,34 @@ final class KafkaWrapper implements MessageBroker
     public function __construct(
         public array $kafka_addrs
     ) {
-        $conf = new Conf();
-        $conf->set('log_level', (string) LOG_DEBUG);
-        $conf->set('metadata.broker.list', implode(',', $this->kafka_addrs));
-        $conf->set('acks', 'all');
-        $conf->set('socket.timeout.ms', (string) 10);
-        // $conf->set('socket.blocking.max.ms', 10); // deprecated, synonym for param socket.timeout.ms
-        $conf->set('queue.buffering.max.ms', (string) 1);
-
-        $this->producer = new Producer($conf);
-
-        $this->isConnect();
+        $this->conf = new Conf();
+        $this->conf->set('log_level', (string) LOG_DEBUG);
+        $this->conf->set('metadata.broker.list', implode(',', $this->kafka_addrs));
+        $this->conf->set('acks', 'all');
+        $this->conf->set('socket.timeout.ms', (string) 10);
+        // $this->conf->set('socket.blocking.max.ms', 10); // deprecated, synonym for param socket.timeout.ms
+        $this->conf->set('queue.buffering.max.ms', (string) 1);
     }
 
     public function publish(Message $message): void
     {
         /** @var ProducerTopic */
-        $topic = $this->producer->newTopic($message->topic);
+        $topic = $this->getConnection()->newTopic($message->topic);
         $topic->produce(RD_KAFKA_PARTITION_UA, RD_KAFKA_MSG_F_BLOCK, (string) $message);
 
-        $this->producer->poll(100);
+        $this->getConnection()->poll(100);
 
-        if ($this->producer->flush(1000) !== RD_KAFKA_RESP_ERR_NO_ERROR) {
+        if ($this->getConnection()->flush(1000) !== RD_KAFKA_RESP_ERR_NO_ERROR) {
             throw new RuntimeException('Не смог отправить сообщение в Kafka');
         }
     }
 
-    public function flush(): void
+    private function getConnection(): Producer
     {
-        $this->producer->flush(1000);
-    }
-
-    private function isConnect(): void
-    {
-        /** @phpstan-ignore method.notFound */
-        if ($this->producer->getControllerId(10) == -1) {
-            throw new RuntimeException('Нет связи с брокером');
+        if (!$this->producer) {
+            $this->producer = new Producer($this->conf);
         }
 
-        //NOTE: я не нашёл иного способа проверить подключение к брокеру
+        return $this->producer;
     }
 }
