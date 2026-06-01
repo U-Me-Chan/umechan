@@ -18,7 +18,7 @@
 * Доменные события в Kafka [ALPHA]: будущий механизм синхронизации данных между двумя нодами
 * Бекапы постов и файлов с шифрованием симметричным ключом
 * Кеширование ответов API форума с помощью Memcached [BETA]
-* Сторонние клиенты к форуму: `https://github.com/U-Me-Chan/pissychan-front` и `https://github.com/kugimiya/umechan-opti`
+* Сторонние клиенты к форуму: https://github.com/U-Me-Chan/pissychan-front и https://github.com/kugimiya/umechan-opti
 
 ## Установка (только форум)
 
