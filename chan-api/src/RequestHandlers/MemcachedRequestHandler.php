@@ -34,6 +34,10 @@ class MemcachedRequestHandler extends RequestHandler
             return null;
         }
 
+        if ($req->getPath() == '/api/test') {
+            return null;
+        }
+
         $cached_result = $this->cache_map[$req->getHash()] ?? null;
 
         if (!$cached_result) {
