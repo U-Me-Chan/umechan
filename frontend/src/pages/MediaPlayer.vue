@@ -65,6 +65,7 @@
 
   <div v-if="!isEmptyFilesList">
     <button @click="shuffleFilesList">Shuffle</button>
+    <button @click="reverseFileList">Reverse</button>
   </div>
 </div>
 </template>
@@ -192,6 +193,9 @@ export default {
     },
     shuffleFilesList() {
       this.files.sort(() => Math.random() - 0.5);
+    },
+    reverseFileList() {
+      this.files.reverse();
     },
     onVolumeChange() {
       if (this.$refs.videoPlayer && this.currentFile?.type === 'video') {
