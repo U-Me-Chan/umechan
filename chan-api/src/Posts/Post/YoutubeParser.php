@@ -32,10 +32,14 @@ final class YoutubeParser extends PostMessageParser
                     'link'    => "https://youtu.be/{$id}",
                     'preview' => "https://i1.ytimg.com/vi/{$id}/hqdefault.jpg"
                 ];
+
+                $message = preg_replace(
+                    self::YOUTUBE_LINK_REGEXP,
+                    "https://youtu.be/{$id}",
+                    $message
+                );
             }
         }
-
-        $message = preg_replace(self::YOUTUBE_LINK_REGEXP, '', $message);
 
         return [array_values($youtubes), $message];
     }

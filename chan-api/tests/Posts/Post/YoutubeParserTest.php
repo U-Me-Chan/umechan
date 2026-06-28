@@ -32,7 +32,7 @@ class YoutubeParserTest extends TestCase
                             'preview' => "https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg"
                         ]
                     ],
-                    ' test'
+                    'https://youtu.be/IJf6U07fb5A test'
                 ]
             ],
             [
@@ -44,7 +44,7 @@ class YoutubeParserTest extends TestCase
                             'preview' => "https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg"
                         ]
                     ],
-                    ''
+                    'https://youtu.be/IJf6U07fb5A'
                 ]
             ],
             [
@@ -56,7 +56,7 @@ class YoutubeParserTest extends TestCase
                             'preview' => 'https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg'
                         ]
                     ],
-                    ''
+                    'https://youtu.be/IJf6U07fb5A'
                 ]
             ],
             [
@@ -68,7 +68,7 @@ class YoutubeParserTest extends TestCase
                             'preview' => 'https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg'
                         ]
                     ],
-                    ''
+                    'https://youtu.be/IJf6U07fb5A'
                 ]
             ],
             [
@@ -80,7 +80,7 @@ class YoutubeParserTest extends TestCase
                             'preview' => 'https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg'
                         ]
                     ],
-                    ''
+                    'https://youtu.be/IJf6U07fb5A'
                 ]
             ],
             [
@@ -92,7 +92,7 @@ class YoutubeParserTest extends TestCase
                             'preview' => 'https://i1.ytimg.com/vi/IJf6U07fb5A/hqdefault.jpg'
                         ]
                     ],
-                    ''
+                    'https://youtu.be/IJf6U07fb5A'
                 ]
             ]
         ];
