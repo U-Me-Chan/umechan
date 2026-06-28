@@ -10,7 +10,6 @@ use Ridouchire\RadioDbImporter\Exceptions\DirectoryIsEndException;
 use Ridouchire\RadioDbImporter\FileManager;
 use Ridouchire\RadioDbImporter\Handler;
 use Ridouchire\RadioDbImporter\HandlerStepsChain;
-use Ridouchire\RadioDbImporter\HandleSteps\CheckFileDirectoryIsServiceDirStep;
 use Ridouchire\RadioDbImporter\HandleSteps\CheckFileExtenstionStep;
 use Ridouchire\RadioDbImporter\HandleSteps\CheckTrackEstimateStep;
 use Ridouchire\RadioDbImporter\HandleSteps\CheckTrackPathStep;
@@ -55,7 +54,6 @@ $track_estimate_validator = new TrackEstimateValidator($bad_estimate_value);
 
 $pipeline = new HandlerStepsChain()
     ->addHandler(new CheckFileExtenstionStep($logger))
-    ->addHandler(new CheckFileDirectoryIsServiceDirStep($file_manager, $logger))
     ->addHandler(new RetrieveTrackFromDatabaseStep(
         $track_repo,
         $tags_parser,
