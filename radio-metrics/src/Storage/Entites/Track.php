@@ -66,6 +66,12 @@ class Track extends AEntity
 
     public function decreaseEstimate(): void
     {
+        if ($this->play_count < 5) {
+            $this->estimate = 0;
+
+            return;
+        }
+
         $estimate = (int) ceil($this->estimate / $this->duration);
 
         if ($estimate < 0)  {
