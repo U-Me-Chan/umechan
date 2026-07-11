@@ -93,6 +93,10 @@ class PostStorage
 
         $thread_ids = array_column($thread_datas, 'id');
 
+        if (empty($thread_ids)) {
+            return [[], $count];
+        }
+
         $board_datas = [];
 
         foreach ($tags as $tag) {
