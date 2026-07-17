@@ -11,9 +11,10 @@ import (
 )
 
 type TrackData struct {
-	ID     int    `json:"id"`
-	Artist string `json:"artist"`
-	Title  string `json:"title"`
+	ID       int    `json:"id"`
+	Artist   string `json:"artist"`
+	Title    string `json:"title"`
+	Duration int    `json:"duration"`
 }
 
 func main() {
@@ -41,9 +42,10 @@ func main() {
 		var track TrackData
 
 		if m, ok := rawData.(map[any]any); ok {
-			track.ID     = int(m["id"].(int64))
-			track.Artist = m["artist"].(string)
-			track.Title  = m["title"].(string)
+			track.ID       = int(m["id"].(int64))
+			track.Artist   = m["artist"].(string)
+			track.Title    = m["title"].(string)
+			track.Duration = int(m["duration"].(int64))
 		} else {
 			http.Error(w, "Неверный формат данных", http.StatusInternalServerError)
 			return
