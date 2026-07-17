@@ -253,6 +253,14 @@ services:
       - '/home/ridouchire/Music:/var/lib/music'
     profiles:
       - production
+  radio-status:
+    build:
+      dockerfile: images/radio-status/Dockerfile
+      context: .
+    container_name: umechan-radio-status
+    restart: always
+    profiles:
+      - production
   promtail:
     container_name: umechan-promtail
     image: grafana/promtail:latest

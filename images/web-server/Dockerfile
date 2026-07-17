@@ -38,3 +38,4 @@ COPY --from=frontend-builder /app/dist /var/www/html
 FROM chan AS production
 COPY images/web-server/nginx-metrics.conf /etc/nginx/locations
 COPY images/web-server/nginx-scheduler.conf /etc/nginx/locations
+COPY images/web-server/nginx-radio-status.conf /etc/nginx/locations
