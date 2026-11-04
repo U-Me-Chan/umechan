@@ -75,7 +75,7 @@
   --color-bg: #121212;
   --color-surface: #1e1e1e;
   --color-surface-secondary: #252525;
-  --color-text: #e0e0e0;
+  --color-text: #ffffff;
   --color-text-secondary: #bbb;
   --color-link: #cf6679;
   --color-link-hover: #e57373;
@@ -88,8 +88,8 @@
   --color-blockquote-bg: transparent;
   --color-tag-bg: #2c2c2c;
   --color-tag-text: #e0e0e0;
-  --color-tag-info-bg: #1a237e;
-  --color-tag-info-text: #90caf9;
+  --color-tag-info-bg: #546878;
+  --color-tag-info-text: #ffffff;
   --color-card-bg: #1e1e1e;
   --color-card-border: #3a2d5c;
   --color-reply-border: #444;
@@ -367,4 +367,8 @@ pre {
 
 .theme-dark .loading-overlay {
   background-color: var(--color-loading-overlay);
+}
+
+.theme-dark .post-message {
+    color: var(--color-text)
 }
