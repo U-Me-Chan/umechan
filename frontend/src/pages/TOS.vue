@@ -48,10 +48,11 @@ h1 {
     font-size: 40px;
     text-align: center;
     margin: 20px;
+    color: var(--color-text);
 }
 
 .hero {
-    background-color: #fff;
+    background-color: var(--color-surface-secondary);
     border-radius: 3px;
     margin: 1px;
 }

@@ -44,7 +44,7 @@
       >
         <span class="file-cta">
           <b-icon class="file-icon" icon="upload"/>
-          <span class="file-label">Выберите файл для прикрепления к сообщению</span>
+          <span class="file-label">Выберите файл</span>
         </span>
       </b-upload>
       <span v-if="filesNames.length > 0">
@@ -320,5 +320,10 @@ export default {
 
 .uploaded-filename {
     list-style-type: none;
+}
+
+.theme-dark .form .box {
+    background-color: var(--color-surface);
+    color: var(--color-text);
 }
 </style>

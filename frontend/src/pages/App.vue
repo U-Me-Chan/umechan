@@ -11,6 +11,22 @@
       >
       {{ board.name }} {{ board.new_posts_count ? `(+${board.new_posts_count})` : '' }}
     </a>
+
+    <div class="theme-toggle-wrap">
+      <b-tooltip :label="isDark ? 'Светлая тема' : 'Тёмная тема'" position="is-bottom">
+        <b-switch
+          v-model="isDark"
+          type="is-info"
+          size="is-small"
+          rounded
+          class="theme-switch">
+          <span class="theme-switch-label">
+            <template v-if="!isDark">🌙</template>
+            <template v-else>☀️</template>
+          </span>
+        </b-switch>
+      </b-tooltip>
+    </div>
   </header>
 
   <main class="columns-wrap">
@@ -40,6 +56,7 @@
 import { bus } from '../bus'
 import Radio from '../components/Radio/Radio.vue'
 import { getBoardList } from '../api/boards'
+import themeStore from '../stores/theme'
 
 export default {
   name: 'App',
@@ -51,7 +68,8 @@ export default {
       boards: [],
       tag: '',
       isLoading: false,
-      title: 'U III E'
+      title: 'U III E',
+      isDark: themeStore.state.current === 'light'
     }
   },
   created: function () {
@@ -87,35 +105,27 @@ export default {
         console.error(error);
       })
     }
+  },
+  watch: {
+    isDark() {
+      themeStore.toggle();
+    }
   }
 }
 </script>
 
 <style>
+html {
+    background-color: var(--color-bg) !important;
+}
 #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-    background-color: #ccc;
-    color: #000;
-}
-
-a {
-    color: #a00;
-    padding: 5px;
-}
-
 p {
     margin: 10px;
-}
-
-.active {
-    color: #fafafa;
-    background-color: #7957d5;
-    border: 1px solid;
 }
 
 .board-list {
@@ -131,16 +141,6 @@ p {
 
 .columns-wrap {
     margin-block: 10px;
-}
-
-.auth-panel-wrap,
-.radios-panel-wrap,
-.board-list {
-    background-color: #fafafa;
-}
-
-.footer-wrap {
-    background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
 }
 
 .main-content,
@@ -165,12 +165,6 @@ p {
     width: 300px;
 }
 
-.auth-panel-wrap,
-.radios-panel-wrap {
-    border: 2px dotted grey;
-    padding: 10px;
-}
-
 .footer-wrap {
     padding-block: 45px 90px;
 }
@@ -188,5 +182,36 @@ p {
   .footer-content {
       margin-inline: unset;
   }
+}
+
+.theme-toggle-wrap {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+}
+
+.theme-switch-label {
+    font-size: 14px;
+    margin-left: 4px;
+    user-select: none;
+}
+
+.theme-switch .switch-track {
+    background-color: var(--color-tag-bg);
+    border: 1px solid var(--color-border);
+}
+
+.theme-switch.is-info .switch-checked .switch-thumb {
+    background-color: var(--color-accent);
+}
+
+.theme-switch .switch-track {
+    box-shadow: 0 0 1px var(--color-shadow);
+}
+
+@media (max-width: 1300px) {
+    .theme-toggle-wrap {
+        justify-content: center;
+    }
 }
 </style>

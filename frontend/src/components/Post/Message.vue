@@ -31,7 +31,7 @@ export default {
 }
 
 pre {
-    background-color: #f5f2f0;
+    background-color: var(--color-code-bg);
     max-width: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -40,12 +40,12 @@ pre {
 .blockquote {
     margin-left: 0px;
     padding-left: 5px;
-    color: #083;
+    color: var(--color-blockquote);
 }
 
 .hashtag {
     padding-left: 5px;
-    color: red;
+    color: var(--color-hashtag-color);
 }
 
 ol {
@@ -53,7 +53,7 @@ ol {
 }
 
 table, tr, th, td {
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-table-border);
 }
 
 ul {

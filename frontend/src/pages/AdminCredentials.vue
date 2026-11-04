@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="admin-credentials">
   <b-input placeholder="Секрет владельца" v-model="key"/>
 </div>
 </template>
@@ -24,4 +24,8 @@ export default {
 </script>
 
 <style scoped>
+.admin-credentials {
+    max-width: 400px;
+    margin: 40px auto;
+}
 </style>

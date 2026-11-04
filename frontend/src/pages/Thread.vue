@@ -116,14 +116,15 @@ export default {
     cursor: pointer;
     font-weight: bold;
     padding: 5px;
-    background-color: #333;
+    background-color: var(--color-toggle-form-bg);
+    color: var(--color-toggle-form-text);
     text-align: center;
     width: 95%;
-    border: 1px #444 solid;
+    border: 1px var(--color-toggle-form-border) solid;
 }
 
 .toggle-form:hover {
-    color: #aaa;
+    color: var(--color-link-hover);
 }
 
 h3 {
@@ -133,19 +134,20 @@ h3 {
 }
 
 .thread {
-    background-color: #eee;
+    background-color: var(--color-surface);
     margin-top: 0;
     overflow-wrap: anywhere;
     max-width: 1280px;
 }
 
 .post-reply {
-    background-color: #fff;
+    background-color: var(--color-card-bg);
 }
 
 .card {
     margin: 5px;
     padding: 10px;
+    background-color: var(--color-card-bg);
 }
 
 .post-active {

@@ -72,6 +72,7 @@ export default {
 .card {
     margin: 5px;
     padding: 10px;
+    background-color: var(--color-card-bg);
 }
 
 .post-body {

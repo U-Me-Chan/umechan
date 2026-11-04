@@ -97,7 +97,7 @@ export default {
 }
 
 .replies {
-    border-left: 3px solid grey;
+    border-left: 3px solid var(--color-reply-border);
     margin-left: 5px;
 }
 </style>

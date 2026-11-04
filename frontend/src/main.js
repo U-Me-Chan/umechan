@@ -27,8 +27,13 @@ import {
 
 import 'buefy/dist/buefy.css';
 import '@mdi/font/css/materialdesignicons.min.css';
+import './styles/theme.css';
+import themeStore from './stores/theme';
 
 Vue.config.productionTip = true;
+
+themeStore.init();
+
 Vue.use(VueCookie);
 Vue.use(Toast);
 Vue.use(Sidebar);

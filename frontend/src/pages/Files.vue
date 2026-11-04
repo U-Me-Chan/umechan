@@ -107,11 +107,17 @@ h1 {
     font-size: 40px;
     text-align: center;
     margin: 20px;
+    color: var(--color-text);
 }
 
 .files {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+}
+
+.theme-dark .file-list .box {
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
 }
 </style>

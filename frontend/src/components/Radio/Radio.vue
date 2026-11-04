@@ -175,11 +175,11 @@ radio-default-player {
 }
 
 .radio-track-title {
-    background-color: #e8ffff;
+    background-color: var(--color-radio-title-bg);
     font-size: 15px;
     padding: 5px;
     height: 38px;
-    border: 1px solid black;
+    border: 1px solid var(--color-radio-title-border);
     border-radius: 5px;
 }
 
@@ -188,8 +188,8 @@ radio-default-player {
     margin-right: 0;
 }
 
-.radio-track-title_active {
-    box-shadow: inset 2px 1px 2px 1px #8e8ed2;
+.radio-track-tittle_active {
+    box-shadow: inset 2px 1px 2px 1px var(--color-radio-shadow);
 }
 
 .radio-buttons-wrap,

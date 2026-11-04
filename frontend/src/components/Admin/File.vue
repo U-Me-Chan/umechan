@@ -55,6 +55,7 @@ export default {
 .card {
     margin: 10px;
     padding: 5px;
+    background-color: var(--color-card-bg);
 }
 
 img {

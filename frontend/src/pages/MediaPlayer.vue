@@ -260,8 +260,8 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.7);
-    color: white;
+    background: var(--color-toggle-form-bg);
+    color: var(--color-btn-text);
     padding: 10px 20px;
     border-radius: 5px;
 }
@@ -277,8 +277,8 @@ export default {
 
 .nav-btn {
     padding: 5px 10px;
-    background: #007bff;
-    color: white;
+    background: var(--color-navigation-bg);
+    color: var(--color-navigation-text);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -286,11 +286,11 @@ export default {
 }
 
 .nav-btn:hover:not(:disabled) {
-    background: #0056b3;
+    background: var(--color-navigation-hover);
 }
 
 .nav-btn:disabled {
-    background: #ccc;
+    background: var(--color-navigation-disabled);
     cursor: not-allowed;
 }
 
@@ -299,12 +299,13 @@ export default {
     font-weight: bold;
     min-width: 80px;
     text-align: center;
+    color: var(--color-text);
 }
 
 .progress-bar {
     width: 100%;
     height: 4px;
-    background: #e0e0e0;
+    background: var(--color-progress-bg);
     border-radius: 2px;
     overflow: hidden;
     margin-top: 10px;
@@ -312,7 +313,7 @@ export default {
 
 .progress-fill {
     height: 100%;
-    background: #007bff;
+    background: var(--color-progress-fill);
     transition: width 0.1s linear;
 }
 </style>

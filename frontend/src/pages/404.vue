@@ -8,5 +8,6 @@ h1 {
     text-align: center;
     margin-top: 20vh;
     margin-bottom: 40vh;
+    color: var(--color-text);
 }
 </style>

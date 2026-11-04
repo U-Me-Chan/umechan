@@ -183,7 +183,7 @@ hr {
 }
 
 .pagination-list li {
-    background-color: #fff;
+    background-color: var(--color-pagination-bg);
 }
 
 
@@ -196,6 +196,7 @@ hr {
 .card {
     margin: 5px;
     padding: 10px;
+    background-color: var(--color-card-bg);
 }
 
 .board-threads {

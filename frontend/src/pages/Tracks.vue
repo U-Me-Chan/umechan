@@ -149,6 +149,7 @@ h2 {
     font-size: 20px;
     text-align: center;
     margin: 20px;
+    color: var(--color-text);
 }
 
 .tracks-list {
@@ -162,5 +163,12 @@ h2 {
 .queue {
     padding: 10px;
     margin: 2px;
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
+}
+
+.theme-dark .tracks-list .box {
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
 }
 </style>

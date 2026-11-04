@@ -14,7 +14,7 @@ export default {
 
 <style scoped>
 img {
-    border: 3px solid red;
+    border: 3px solid var(--color-youtube-border);
     max-width: 240px;
     max-height: 200px;
     widht: auto;
