@@ -57,22 +57,25 @@ Vue.use(Dropdown);
 
 Vue.use(VueRouter);
 
+// Lazy route loading with webpack chunk names for better code splitting
+const load = (page) => () => import(/* webpackChunkName: "[request]" */ `./pages/${page}.vue`);
+
 const routes = [
   {
     path: '/',
-    component: () => import('./pages/TOS.vue')
+    component: load('TOS')
   },
   {
     path: '/thread/:id',
-    component: () => import('./pages/Thread.vue')
+    component: load('Thread')
   },
   {
     path: '/board/:tag',
-    component: () => import('./pages/Board.vue')
+    component: load('Board')
   },
   {
     path: '/admin/files',
-    component: () => import('./pages/Files.vue'),
+    component: load('Files'),
     name: 'FilesPage',
     beforeEnter: (to, from, next) => {
       console.log(to);
@@ -82,20 +85,20 @@ const routes = [
   {
     path: '/admin/files/:page',
     name: 'FilesConcretePage',
-    component: () => import('./pages/Files.vue')
+    component: load('Files')
   },
   {
     path: '/login',
-    component: () => import('./pages/AdminCredentials.vue'),
+    component: load('AdminCredentials'),
     name: 'LoginPage'
   },
   {
     path: '/thread/:id/player',
-    component: () => import('./pages/MediaPlayer.vue')
+    component: load('MediaPlayer')
   },
   {
     path: '*',
-    component: () => import('./pages/404.vue')
+    component: load('404')
   }
 ];
 
