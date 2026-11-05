@@ -3,77 +3,103 @@
   <div class="form__title">
     {{ parent_id ? 'Ответить в тред' : 'Создать тред' }}
   </div>
-  <b-switch
-    class="form__sage-selector"
-    v-if="parent_id"
-    v-model="isSage"
-  >
+  <label v-if="parent_id" class="form__sage-selector checkbox">
+    <input type="checkbox" v-model="isSage" />
     Не поднимать
-  </b-switch>
-  <b-field label="Имя">
-    <b-input  
-      v-model="poster"
-      custom-class="form__poster-input"
-      placeholder="Anonymous"
-      icon-right="close-circle"
-      icon-right-clickable
-      @icon-right-click="onPosterReset"
-      :data-is-empty="(poster.length > 0).toString()"
-    />
-  </b-field>
-  <b-field label="Тема">
-    <b-input
-      v-model="subject"
-    />
-  </b-field>
-  <b-field label="Сообщение">
-    <b-input
-      v-model="message"
-      type="textarea"
-      ref="message"
-    />
-  </b-field>
-  <b-field label="Медиафайлы">
+  </label>
+
+  <div class="field">
+    <label class="label">Имя</label>
+    <div class="control">
+      <div class="input-with-icon">
+        <input
+          class="input form__poster-input"
+          v-model="poster"
+          placeholder="Anonymous"
+          :data-is-empty="poster.length > 0"
+        />
+        <span v-if="poster.length > 0" class="icon-reset" @click="onPosterReset">✕</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="label">Тема</label>
+    <div class="control">
+      <input
+        class="input"
+        v-model="subject"
+      />
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="label">Сообщение</label>
+    <div class="control">
+      <textarea
+        class="textarea"
+        v-model="message"
+        ref="messageTextarea"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="label">Медиафайлы</label>
     <div class="form__file-uploader-wrap">
-      <b-upload
-        v-model="files"
-        class="file-label"
-        :accept="supportedMimetypesAsString"
-        drag-drop
-        multiple
-      >
+      <label class="file-label file-cta">
+        <input
+          class="file-input"
+          type="file"
+          :accept="supportedMimetypesAsString"
+          multiple
+          @change="onFileSelect"
+        />
         <span class="file-cta">
-          <b-icon class="file-icon" icon="upload"/>
-          <span class="file-label">Выберите файл</span>
+          <span class="file-icon">📤</span>
+          <span class="file-label-text">Выберите файл</span>
         </span>
-      </b-upload>
+      </label>
       <span v-if="filesNames.length > 0">
         <ul>
           <li class="uploaded-filename" v-for="filename in filesNames" :key="filename">{{filename}}</li>
         </ul>
       </span>
     </div>
-  </b-field>
-  <b-button
-    type="is-primary"
-    v-bind:loading="isLoading"
-    @click="defineOutputData(parent_id ? 'reply' : 'thread')"
-    expanded>
-    {{ parent_id ? 'Ответить' : 'Создать'}}
-  </b-button>
+  </div>
+
+  <div class="control">
+    <button
+      class="button is-primary"
+      :class="{ 'is-loading': isLoading }"
+      :disabled="isLoading"
+      @click="defineOutputData(parent_id ? 'reply' : 'thread')"
+      style="width: 100%;">
+      {{ parent_id ? 'Ответить' : 'Создать'}}
+    </button>
+  </div>
 </div>
 </template>
 
 <script>
-const formData = require('form-data');
-const config   = require('../../config')
-
+import { ref, watch, onBeforeUnmount } from 'vue';
 import { bus } from '../bus';
-import { createReply, createThread } from '../api/posts'
-import { uploadFile, getSupportedMimetypes } from '../api/files'
+import { createReply, createThread } from '../api/posts';
+import { uploadFile, getSupportedMimetypes } from '../api/files';
 import { CLPBRD_ERR } from '../constants/common-error-texts';
-import { convertBytesToMegabytes } from '../utils/filesize_formatter'
-import { getPosterName, setPosterName, setPostPassword } from '../utils/storage'
+import { convertBytesToMegabytes } from '../utils/filesize_formatter';
+import { getPosterName, setPosterName, setPostPassword } from '../utils/storage';
+import config from '../../config';
+
+const getFormData = () => {
+  if (typeof window !== 'undefined' && window.FormData) {
+    return window.FormData;
+  }
+  // Simple FormData polyfill for Node.js testing if needed
+  return class FormData {
+    append() {}
+  };
+};
 
 export default {
   name: 'Form',
@@ -90,30 +116,33 @@ export default {
       default: ''
     }
   },
-  created: function () {
+  setup(props) {
+    const poster = ref(getPosterName());
+    const subject = ref('');
+    const isSage = ref(false);
+    const files = ref([]);
+    const filesNames = ref([]);
+    const isLoading = ref(false);
+    const supportedMimetypesAsString = ref('Ошибка загрузки поддерживаемых типов файлов');
+    const messageTextarea = ref(null);
+
+    // Load supported mimetypes on mount
     getSupportedMimetypes().then((response) => {
-      this.supportedMimetypesAsString = response.data.mimetypes.join(', ');
+      supportedMimetypesAsString.value = response.data.mimetypes.join(', ');
     });
-  },
-  methods: {
-    init: function () {
-      this.subject = '';
-      this.message = '';
-      this.isSage = false;
-    },
-    getPoster: function() {
-      return getPosterName();
-    },
-    savePostPassword: function (id, password) {
-      setPostPassword(id, password);
-    },
-    setPoster: function (value) {
-      setPosterName(value);
-    },
-    onPosterReset: function() {
-      this.poster = '';
-    },
-    onNavigatorPaste: async function (event) {
+
+    const formInit = () => {
+      subject.value = '';
+      message.value = '';
+      isSage.value = false;
+      filesNames.value = [];
+    };
+
+    const onPosterReset = () => {
+      poster.value = '';
+    };
+
+    const onNavigatorPaste = async (event) => {
       try {
         const clipboardItems = await navigator.clipboard.read();
         const textMimeType = clipboardItems[0].types.find((value) =>
@@ -124,7 +153,7 @@ export default {
         );
 
         if (clipboardItems.length < 1) {
-          this.$buefy.toast.open(CLPBRD_ERR.empty);
+          showToast(CLPBRD_ERR.empty);
         }
         if (clipboardItems.length > 0) {
           if (mediaMimeType) {
@@ -136,10 +165,10 @@ export default {
             });
             file.uid = String(Math.random());
 
-            this.files.push(file);
+            files.value.push(file);
           }
           if (!mediaMimeType && !textMimeType) {
-            this.$buefy.toast.open(CLPBRD_ERR.mime);
+            showToast(CLPBRD_ERR.mime);
           }
         }
       } catch (error) {
@@ -149,14 +178,15 @@ export default {
             : error.name === 'DataError'
             ? CLPBRD_ERR.data
             : CLPBRD_ERR.unknown;
-        this.$buefy.toast.open(`${errTips} (${error.message})`, 5);
+        showToast(`${errTips} (${error.message})`, 5);
       }
-    },
-    onEventPaste: function (event) {
+    };
+
+    const onEventPaste = function (event) {
       const clipboardItems = event.clipboardData?.files;
 
       if (clipboardItems?.length < 1) {
-        this.$buefy.toast.open(CLPBRD_ERR.empty);
+        showToast(CLPBRD_ERR.empty);
       }
       if (clipboardItems?.length > 0) {
         const imageType = clipboardItems[0].type;
@@ -172,119 +202,140 @@ export default {
             type: clipboardItems?.[0].type
           });
           file.uid = String(Math.random());
-          this.file = file;
+          files.value.push(file);
         }
         if (!hasMediaMimeType && !hasTextMimeType) {
-          this.$buefy.toast.open(CLPBRD_ERR.mime);
+          showToast(CLPBRD_ERR.mime);
         }
       }
-    },
-    handlePasteEvent: async function (event) {
-      if (navigator.clipboard === 'undefined') {
-        this.onEventPaste(event);
-      } else {
-        this.onNavigatorPaste(event);
-      }
-    },
-    sendFile: async function (file) {
-      const self = this;
+    };
 
+    const handlePasteEvent = async function (event) {
+      if (navigator.clipboard === 'undefined') {
+        onEventPaste(event);
+      } else {
+        await onNavigatorPaste(event);
+      }
+    };
+
+    const message = ref(props.message);
+
+    const sendFile = async function (file) {
       if (file.size > config.max_filesize) {
         return Promise.reject(`Превышен максимальный размер файла в ${convertBytesToMegabytes(config.max_filesize)} Мбайт`);
       }
-      const uploadData = new formData();
-
+      const uploadData = new getFormData();
       uploadData.append('image', file);
 
       return uploadFile(uploadData)
         .then((response) => {
           const orig = response.data.original_file;
           const thumb = response.data.thumbnail_file;
-
-          self.message = `${self.message}\n[![](${thumb})](${orig})`;
-          self.image = null;
-
+          message.value = `${message.value}\n[![](${thumb})](${orig})`;
           return file.name;
         });
-    },
-    handleUploadFile: async function () {
-      if (this.files.length > 0) {
-        this.isLoading = true;
+    };
 
-        const self = this;
+    const handleUploadFile = async function () {
+      if (files.value.length > 0) {
+        isLoading.value = true;
 
         return Promise
-          .all(self.files.map((file) => self.sendFile(file).then((filename) => { self.filesNames.push(filename); })))
+          .all(files.value.map((file) => sendFile(file).then((filename) => { filesNames.value.push(filename); })))
           .then(() => {
-            self.files = [];
+            files.value = [];
           })
           .catch((error) => {
-            self.$buefy.toast.open(`Ошибка загрузки файла: ${error}`);
+            showToast(`Ошибка загрузки файла: ${error}`);
           })
           .finally(() => {
-            self.isLoading = false;
+            isLoading.value = false;
           });
       }
       return Promise.reject(CLPBRD_ERR.empty);
-    },
-    createReply: function (outputData) {
-      return createReply(outputData, this.parent_id);
-    },
-    createThread: function (outputData) {
+    };
+
+    const onFileSelect = (event) => {
+      const selectedFiles = Array.from(event.target.files);
+      files.value = selectedFiles;
+    };
+
+    const handleFileChange = () => {
+      // Deprecated: file selection is now handled in onFileSelect
+    };
+
+    const createReplyApi = function (outputData) {
+      return createReply(outputData, props.parent_id);
+    };
+
+    const createThreadApi = function (outputData) {
       return createThread(outputData);
-    },
-    defineOutputData: function (type) {
-      if (this.message.length < 1) {
-        this.$buefy.toast.open('Нельзя отправить пустое сообщение!');
+    };
+
+    const defineOutputData = function (type) {
+      if (message.value.length < 1) {
+        showToast('Нельзя отправить пустое сообщение!');
         return;
       }
-      this.isLoading = true;
+      isLoading.value = true;
 
-      const self = this;
       const outputData = {};
       const isNewThread = type === 'thread';
 
-      outputData['poster']  = self.poster;
-      outputData['subject'] = self.subject;
-      outputData['message'] = self.message;
-      outputData['tag']     = self.tag;
+      outputData['poster']  = poster.value;
+      outputData['subject'] = subject.value;
+      outputData['message'] = message.value;
+      outputData['tag']     = props.tag;
 
-      if (!isNewThread && self.isSage) {
+      if (!isNewThread && isSage.value) {
         outputData['sage'] = true;
       }
-      const appropriatePromise = isNewThread ? self.createThread : self.createReply;
+      const appropriatePromise = isNewThread ? createThreadApi : createReplyApi;
 
       appropriatePromise(outputData)
         .then(({ data }) => {
-          self.savePostPassword(data.payload.post_id.value, data.payload.password);
-          self.init();
+          setPostPassword(data.payload.post_id.value, data.payload.password);
+          formInit();
           bus.$emit('form:success', [data]);
-          self.setPoster(outputData['poster']);
-          self.$buefy.toast.open('Отправлено!');
+          setPosterName(outputData['poster']);
+          showToast('Отправлено!');
         })
         .catch((error) => {
-          self.$buefy.toast.open(`Ошибка: ${error.response.data.error.message}`);
+          showToast(`Ошибка: ${error.response.data.error.message}`);
         })
         .finally(() => {
-          self.isLoading = false;
+          isLoading.value = false;
         });
-    }
-  },
-  data: function () {
+    };
+
+    const showToast = (message) => {
+      alert(message);
+    };
+
+    const filesWatcher = watch(files, () => {
+      handleUploadFile();
+    });
+
+    onBeforeUnmount(() => {
+      filesWatcher();
+    });
+
     return {
-      poster: this.getPoster(),
-      subject: '',
-      isSage: false,
-      files: [],
-      filesNames: [],
-      isLoading: false,
-      supportedMimetypesAsString: 'Ошибка загрузки поддерживаемых типов файлов'
-    }
-  },
-  watch: {
-    'files': function () {
-      this.handleUploadFile();
-    }
+      poster,
+      subject,
+      isSage,
+      files,
+      filesNames,
+      isLoading,
+      supportedMimetypesAsString,
+      messageTextarea,
+      message,
+      formInit,
+      onPosterReset,
+      handlePasteEvent,
+      handleFileChange,
+      defineOutputData
+    };
   }
 }
 </script>
@@ -311,6 +362,28 @@ export default {
 <style>
 .form__poster-input[data-is-empty="false"] + .icon {
     visibility: hidden;
+}
+
+.form__poster-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--color-input-border);
+    background-color: var(--color-input-bg);
+    color: var(--color-input-text);
+    border-radius: 4px;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.icon-reset {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--color-text-secondary);
 }
 
 .form__file-uploader-wrap {

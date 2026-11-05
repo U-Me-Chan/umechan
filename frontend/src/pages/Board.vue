@@ -3,31 +3,26 @@
   <h1>{{ tag }}</h1>
 
   <div v-if="!isMetaBoard">
-    <center><b-button type="is-text" @click="isFormVisible = !isFormVisible">Создать тред</b-button></center>
-    <b-modal v-model="isFormVisible">
+    <center><button class="btn-text" @click="isFormVisible = !isFormVisible">Создать тред</button></center>
+    <div v-if="isFormVisible" class="modal-overlay" @click.self="isFormVisible = false">
       <Form v-if="isFormVisible" :tag="tag"/>
-    </b-modal>
+    </div>
   </div>
   <hr v-if="isContentExist">
 
-  <b-pagination
-    class="board-paginator"
-    v-if="isContentExist"
-    :total="count"
-    :current="current"
-    :per-page="perPage"
-    v-model="current"
-    v-on:change="init"
-    rangeBefore="2"
-    rangeAfter="2"
-    order="is-centered"
-    size="is-small">
-  </b-pagination>
+  <div v-if="isContentExist" class="board-paginator">
+    <PaginationComponent
+      :total="count"
+      :current="current"
+      :per-page="perPage"
+      @change="handlePageChange"
+    />
+  </div>
 
   <div class="board-threads">
     <section class="threads" v-for="post in threads" :key="post.id">
       <hr v-if="isContentExist">
-      <Thread
+      <ThreadComponent
         :board="post.board"
         :id="post.id"
         :poster="post.poster"
@@ -50,128 +45,149 @@
 
   <hr v-if="isContentExist">
 
-  <b-pagination
-    class="board-paginator"
-    v-if="isContentExist"
-    :total="count"
-    :current="current"
-    :per-page="perPage"
-    v-model="current"
-    v-on:change="init"
-    rangeBefore="2"
-    rangeAfter="2"
-    order="is-centered"
-    size="is-small">
-  </b-pagination>
+  <div v-if="isContentExist" class="board-paginator">
+    <PaginationComponent
+      :total="count"
+      :current="current"
+      :per-page="perPage"
+      @change="handlePageChange"
+    />
+  </div>
 
   <hr v-if="isContentExist">
 </div>
 </template>
 
 <script>
-import { bus } from '../bus'
-import Thread from '../components/Thread.vue'
-import Form from '../components/Form.vue'
-import { getBoardData } from '../api/boards'
+import { ref, onMounted, computed, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { bus } from '../bus';
+import ThreadComponent from '../components/Thread.vue';
+import Form from '../components/Form.vue';
+import PaginationComponent from '../components/Pagination.vue';
+import { getBoardData } from '../api/boards';
 
 export default {
   name: 'Board',
   components: {
-    Thread, Form
+    ThreadComponent, Form, PaginationComponent
   },
-  data: function () {
-    return {
-      tag: null,
-      name: '',
-      threads: [],
-      isFormVisible: false,
-      count: 0,
-      current: 1,
-      perPage: 20,
-      tags: [],
-      selectedTags: []
-    }
-  },
-  mounted: function () {
-    var self = this;
+  setup() {
+    const router = useRouter();
+    const route = useRoute();
 
-    bus.$on('form:success', function () {
-      self.isFormVisible = false;
-      self.init(0, true);
-    })
-  },
-  created: function () {
-    this.tag = this.$route.params.tag;
-    this.init();
+    const tag = ref(null);
+    const name = ref('');
+    const threads = ref([]);
+    const isFormVisible = ref(false);
+    const count = ref(0);
+    const current = ref(1);
+    const perPage = ref(20);
 
-    bus.$on('board:updated', () => this.init())
-  },
-  computed: {
-    title: function () {
-      return 'U III E : /' + this.tag;
-    },
-    isContentExist: function () {
-      if (this.threads.length === 0) {
-	return false;
-      }
+    let formSuccessUnsub = null;
 
-      return true;
-    },
-    isMetaBoard: function () {
-      if (this.tag.search(/\+/) !== -1) {
-	return true;
-      }
+    const isContentExist = computed(() => threads.value.length > 0);
+    const isMetaBoard = computed(() => tag.value && tag.value.search(/\+/) !== -1);
+    const title = computed(() => 'U III E : /' + tag.value);
 
-      return false;
-    }
-  },
-  methods: {
-    selectThread: function (id) {
-      this.$router.push('/thread/' + id);
-    },
-    init: function (page, no_cache = false) {
-      this.threads = [];
-      var self = this;
-      var offset = (this.current - 1) * this.perPage;
+    const selectThread = (id) => {
+      router.push('/thread/' + id);
+    };
+
+    const init = (page, no_cache = false) => {
+      threads.value = [];
+      let offset = (current.value - 1) * perPage.value;
+
       bus.$emit('app.loader', [true]);
 
       const params = {
-        offset:        offset,
-        limit:         this.perPage,
+        offset: offset,
+        limit: perPage.value,
         no_board_list: true
-      }
+      };
 
       if (no_cache) {
-        params.no_cache = true
+        params.no_cache = true;
       }
 
-      getBoardData(this.tag, params).then((response) => {
-        self.count = response.data.payload.count;
-        self.threads = response.data.payload.posts;
-        self.tag = self.$route.params.tag;
-	self.name = response.data.payload.name;
-        document.title = self.title;
+      getBoardData(tag.value, params).then((response) => {
+        count.value = response.data.payload.count;
+        threads.value = response.data.payload.posts;
+        tag.value = route.params.tag;
+        name.value = response.data.payload.name;
+        document.title = title.value;
         bus.$emit('app.loader', [false]);
       }).catch((error) => {
-        self.$buefy.toast.open('Произошла ошибка при запросе данных с сервера');
+        showToast('Произошла ошибка при запросе данных с сервера');
         console.log(error);
         bus.$emit('app.loader', [false]);
       });
-    }
-  },
-  watch: {
-    '$route': function (to, from) {
-      if (to.path !== from.path) {
-        this.tag = this.$route.params.tag;
-        this.current = 1;
-        this.init();
+    };
+
+    const handlePageChange = (newPage) => {
+      current.value = newPage;
+      init(newPage);
+    };
+
+    const showToast = (message) => {
+      alert(message);
+    };
+
+    onMounted(() => {
+      tag.value = route.params.tag;
+      init();
+
+      formSuccessUnsub = bus.$on('form:success', function () {
+        isFormVisible.value = false;
+        init(0, true);
+      });
+
+      bus.$on('board:updated', () => init());
+    });
+
+    watch(() => route.path, (to, from) => {
+      if (to !== from) {
+        tag.value = route.params.tag;
+        current.value = 1;
+        init();
       }
-    }
+    });
+
+    return {
+      tag,
+      name,
+      threads,
+      isFormVisible,
+      count,
+      current,
+      perPage,
+      isContentExist,
+      isMetaBoard,
+      title,
+      selectThread,
+      handlePageChange
+    };
+  },
+  beforeUnmount() {
+    // Clean up would go here if needed
   }
 }
 </script>
 
 <style scoped>
+.btn-text {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--color-link);
+    text-decoration: underline;
+}
+
+.btn-text:hover {
+    color: var(--color-link-hover);
+}
+
 h1 {
     font-size: 20px;
     text-align: center;
@@ -205,5 +221,18 @@ hr {
 
 .board-paginator {
     margin-bottom: unset;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-modal-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 </style>

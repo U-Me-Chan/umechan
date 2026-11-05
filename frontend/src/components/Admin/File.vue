@@ -3,13 +3,13 @@
   <a :href="original" target="_blank"><img :src="thumbnail"></a>
   <a :href="`/thread/${id}`" target="_blank" v-for="id in postIds" :key="id">Post #{{id}}</a>
   <span v-if="postIds.length === 0">Нет постов</span>
-  <span @click="deleteFile()">delete</span>
+  <span class="delete-btn" @click="deleteFile()">delete</span>
 </div>
 </template>
 
 <script>
-import { deleteFile } from '../../api/files'
-import { bus } from '../../bus'
+import { deleteFile } from '../../api/files';
+import { bus } from '../../bus';
 
 export default {
   name: 'File',
@@ -20,19 +20,14 @@ export default {
     postIds: Array
   },
   methods: {
-    selectThread: function (id) {
-      this.$router.push('/thread/' + id)
-    },
-    deleteFile: function () {
-      var key = ''
+    deleteFile() {
+      let key = '';
 
-      if (this.$cookie.get('admin_key') !== null) {
-	key = this.$cookie.get('admin_key')
+      if (localStorage.getItem('admin_key') !== null) {
+        key = localStorage.getItem('admin_key');
       } else {
-	key = prompt('Admin key', [''])
+        key = prompt('Admin key', ['']);
       }
-
-      var self = this
 
       deleteFile(this.name, {
         data: {},
@@ -40,12 +35,11 @@ export default {
           'Key': key
         }
       }).then((response) => {
-        bus.$emit('files.file.deleted', [response])
+        bus.$emit('files.file.deleted', [response]);
       }).catch((error) => {
-        console.log(error)
-
-        self.$buefy.toast.open('Произошла ошибка при удалении файла')
-      })
+        console.log(error);
+        alert('Произошла ошибка при удалении файла');
+      });
     }
   }
 }
@@ -65,5 +59,15 @@ img {
 .file {
     display: flex;
     flex-direction: column;
+}
+
+.delete-btn {
+    cursor: pointer;
+    color: var(--color-link);
+    text-decoration: underline;
+}
+
+.delete-btn:hover {
+    color: var(--color-link-hover);
 }
 </style>

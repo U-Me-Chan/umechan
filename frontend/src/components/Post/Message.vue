@@ -4,7 +4,8 @@
 </template>
 
 <script>
-import { parse } from '../../utils/post_parser'
+import { computed } from 'vue';
+import { parse } from '../../utils/post_parser';
 
 export default {
   name: 'Message',
@@ -14,10 +15,14 @@ export default {
       default: ''
     }
   },
-  computed: {
-    formattedMessage: function () {
-      return parse(this.message)
-    }
+  setup(props) {
+    const formattedMessage = computed(() => {
+      return parse(props.message);
+    });
+
+    return {
+      formattedMessage
+    };
   }
 }
 </script>
@@ -64,4 +69,3 @@ ul {
     background-color: transparent !important;
 }
 </style>
-  

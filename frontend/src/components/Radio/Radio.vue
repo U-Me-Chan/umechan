@@ -11,7 +11,7 @@
 
   <div
     class="radio-track-title"
-    v-bind:class="{ 'radio-track-tittle-active': isPlaying }">
+    :class="{ 'radio-track-title-active': isPlaying }">
     <marquee hspace="15px" direction="rigth" scrollamount="4">
       {{ title }}
       <span v-if="isPlaying">
@@ -21,20 +21,15 @@
   </div>
 
   <div class="radio-buttons-wrap">
-    <b-tooltip
-      label="Пауза/Воспроизведение"
+    <span
+      title="Пауза/Воспроизведение"
       class="radio-button-play"
-      :class="{ 'radio-button-play-active' : isPlaying }">
-      <a href="#" @click="togglePlay">⏯</a>
-    </b-tooltip>
+      :class="{ 'radio-button-play-active' : isPlaying }"
+      @click="togglePlay">⏯</span>
 
-    <b-tooltip label="Плюс треку">
-      <a href="#" @click="upvoteTrack">💜</a>
-    </b-tooltip>
+    <span title="Плюс треку" class="radio-button-upvote" @click="upvoteTrack">💜</span>
 
-    <b-tooltip label="Минус треку">
-      <a href="#" @click="downvoteTrack">❌</a>
-    </b-tooltip>
+    <span title="Минус треку" class="radio-button-downvote" @click="downvoteTrack">❌</span>
   </div>
 
   <input
@@ -44,14 +39,16 @@
     ref="volumeSlider"
     max="100"
     v-model="volume"
-    @change="changeVolume(volume)"/>
+    @change="changeVolume"
+  />
 </div>
 </template>
 
 <script>
-const axios = require('axios');
-const config = require('../../../config');
-import { formatDuration } from '../../utils/duration_formatter'
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import axios from 'axios';
+import config from '../../../config';
+import { formatDuration } from '../../utils/duration_formatter';
 
 export default {
   name: 'Radio',
@@ -61,97 +58,124 @@ export default {
       default: '20'
     }
   },
-  data: function () {
-    return {
-      title: 'Включите воспроизведение для обновление информации',
-      listeners: 0,
-      streamUrl: `${config.icecast_url}/stream?bypass_cache_hack=${Date.now()}`,
-      m3uUrl: `${config.icecast_url}/stream.m3u`,
-      isPlaying: false,
-      metadataInterval: null,
-      volume: this.initialVolume,
-      track_id: 0,
-      estimate: 0,
-      duration: 1
-    }
-  },
-  methods: {
-    formatDuration: function (value) {
-      return formatDuration(value);
-    },
-    estimateTrack: function (track_id, operator) {
+  setup(props) {
+    const title = ref('Включите воспроизведение для обновления информации');
+    const listeners = ref(0);
+    const streamUrl = ref(`${config.icecast_url}/stream?bypass_cache_hack=${Date.now()}`);
+    const m3uUrl = ref(`${config.icecast_url}/stream.m3u`);
+    const isPlaying = ref(false);
+    const metadataInterval = ref(null);
+    const volume = ref(props.initialVolume);
+    const track_id = ref(0);
+    const estimate = ref(0);
+    const duration = ref(1);
+
+    const estimateTrack = (trackId, operator) => {
       const data = {};
       data['operator'] = operator;
 
-      axios.post(`${config.base_url}/metrics/tracks/${track_id}`, data, { 'headers': { 'Content-type': 'application/json'}}).then(() => {
-        this.$buefy.toast.open('Отправлено!');
+      axios.post(`${config.base_url}/metrics/tracks/${trackId}`, data, { 'headers': { 'Content-type': 'application/json'}}).then(() => {
+        showToast('Отправлено!');
       }).catch((error) => {
-        this.$buefy.toast.open(`Ошибка: ${error}`);
+        showToast(`Ошибка: ${error}`);
       });
-    },
-    updateMetadata: function() {
+    };
+
+    const updateMetadata = () => {
       axios.get(`${config.base_url}/metrics/info`)
         .then(({ data }) => {
-          this.title    = `${data.artist} - ${data.title}`;
-          this.track_id = data.id;
-          this.estimate = data.estimate;
-          this.duration = data.duration;
+          title.value = `${data.artist} - ${data.title}`;
+          track_id.value = data.id;
+          estimate.value = data.estimate;
+          duration.value = data.duration;
         })
         .catch((error) => {
-          this.$buefy.toast.open(`Ошибка: ${error}`);
-        })
-    },
-    upvoteTrack: function (event) {
+          showToast(`Ошибка: ${error}`);
+        });
+    };
+
+    const upvoteTrack = (event) => {
       event.preventDefault();
+      if (!isPlaying.value) return;
+      estimateTrack(track_id.value, 'plus');
+    };
 
-      if (!this.isPlaying) {
-        return;
-      }
-
-      this.estimateTrack(this.track_id, 'plus');
-    },
-    downvoteTrack: function (event) {
+    const downvoteTrack = (event) => {
       event.preventDefault();
+      if (!isPlaying.value) return;
+      estimateTrack(track_id.value, 'minus');
+    };
 
-      if (!this.isPlaying) {
-        return;
+    const togglePlay = () => {
+      const audioEl = document.querySelector('.radio-default-player');
+      if (isPlaying.value) {
+        if (audioEl) audioEl.pause();
+        if (metadataInterval.value) clearInterval(metadataInterval.value);
       }
 
-      this.estimateTrack(this.track_id, 'minus');
-    },
-    togglePlay: function () {
-      if (this.isPlaying) {
-        this.$refs.audioPlayer.pause();
-        clearInterval(this.metadataInterval);
+      if (!isPlaying.value) {
+        if (audioEl) audioEl.play();
+        updateMetadata();
+        metadataInterval.value = setInterval(() => updateMetadata(), 5000);
       }
 
-      if (!this.isPlaying) {
-        this.$refs.audioPlayer.play();
-        this.updateMetadata();
-        this.metadataInterval = setInterval(() => this.updateMetadata(), 5000);
+      isPlaying.value = !isPlaying.value;
+    };
+
+    const changeVolume = (value) => {
+      const audioEl = document.querySelector('.radio-default-player');
+      if (audioEl) {
+        audioEl.volume = value / 100;
       }
+      volume.value = value;
+      saveVolume(value);
+    };
 
-      this.isPlaying = !this.isPlaying;
-    },
-    changeVolume: function (value) {
-      this.$refs.audioPlayer.volume = value / 100;
-      this.volume = value;
-      this.saveVolume(value);
-    },
-    init: function () {
-      this.changeVolume(this.getVolume());
-    },
-    getVolume: function () {
-      const volume = localStorage.getItem('radio-volume');
+    const getVolume = () => {
+      const vol = localStorage.getItem('radio-volume');
+      return (vol === 'undefined' || vol === null) ? props.initialVolume : vol;
+    };
 
-      return (volume === 'undefined' || volume === null) ? this.initialVolume : volume;
-    },
-    saveVolume: function (value) {
+    const saveVolume = (value) => {
       localStorage.setItem('radio-volume', value);
-    }
-  },
-  mounted: function () {
-    this.init();
+    };
+
+    const init = () => {
+      changeVolume(getVolume());
+    };
+
+    const showToast = (message) => {
+      alert(message);
+    };
+
+    onMounted(() => {
+      init();
+    });
+
+    onBeforeUnmount(() => {
+      if (metadataInterval.value) {
+        clearInterval(metadataInterval.value);
+      }
+    });
+
+    return {
+      title,
+      listeners,
+      streamUrl,
+      m3uUrl,
+      isPlaying,
+      volume,
+      track_id,
+      estimate,
+      duration,
+      formatDuration: (value) => formatDuration(value),
+      estimateTrack,
+      updateMetadata,
+      upvoteTrack,
+      downvoteTrack,
+      togglePlay,
+      changeVolume
+    };
   }
 }
 </script>
@@ -166,7 +190,7 @@ export default {
     margin-bottom: 10px;
 }
 
-radio-default-player {
+.radio-default-player {
     display: none;
 }
 
@@ -188,7 +212,7 @@ radio-default-player {
     margin-right: 0;
 }
 
-.radio-track-tittle_active {
+.radio-track-title-active {
     box-shadow: inset 2px 1px 2px 1px var(--color-radio-shadow);
 }
 
@@ -199,12 +223,16 @@ radio-default-player {
     align-items: center;
 }
 
-radio-button-play {
+.radio-button-play,
+.radio-button-upvote,
+.radio-button-downvote {
     cursor: pointer;
     font-size: 20px;
     padding: 1px;
     border-radius: 5px;
+    user-select: none;
 }
+
 .radio-button-play-active {
     box-shadow: inset 1px 1px 1px 1px grey;
 }

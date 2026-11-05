@@ -1,46 +1,50 @@
-const STORAGE_KEY = 'umechan-theme'
+import { reactive } from 'vue';
+
+const STORAGE_KEY = 'umechan-theme';
 
 export const THEME = {
   LIGHT: 'light',
   DARK: 'dark'
-}
+};
 
 function getInitialTheme() {
-  const stored = localStorage.getItem(STORAGE_KEY)
+  const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === THEME.DARK || stored === THEME.LIGHT) {
-    return stored
+    return stored;
   }
 
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    return THEME.DARK
+    return THEME.DARK;
   }
-  return THEME.LIGHT
+  return THEME.LIGHT;
 }
 
+const state = reactive({
+  current: getInitialTheme()
+});
+
 export default {
-  state: {
-    current: getInitialTheme()
-  },
+  state,
   init() {
-    this.applyTheme()
+    this.applyTheme();
   },
   toggle() {
-    this.state.current = this.state.current === THEME.LIGHT ? THEME.DARK : THEME.LIGHT
-    this.save()
-    this.applyTheme()
+    state.current = state.current === THEME.LIGHT ? THEME.DARK : THEME.LIGHT;
+    this.save();
+    this.applyTheme();
   },
   set(theme) {
     if (theme === THEME.DARK || theme === THEME.LIGHT) {
-      this.state.current = theme
-      this.save()
-      this.applyTheme()
+      state.current = theme;
+      this.save();
+      this.applyTheme();
     }
   },
   save() {
-    localStorage.setItem(STORAGE_KEY, this.state.current)
+    localStorage.setItem(STORAGE_KEY, state.current);
   },
   applyTheme() {
-    document.documentElement.classList.remove('theme-light', 'theme-dark')
-    document.documentElement.classList.add(`theme-${this.state.current}`)
+    document.documentElement.classList.remove('theme-light', 'theme-dark');
+    document.documentElement.classList.add(`theme-${state.current}`);
   }
-}
+};

@@ -1,8 +1,8 @@
 <template>
-<div class="thread" ref="thread-top" id="thread-top">
+<div class="thread" ref="threadTop" id="thread-top">
   <h3>/{{post.board.tag}}/:{{post.subject ?? '...'}}</h3>
-  
-  <Thread
+
+  <ThreadComponent
     :board="post.board"
     :id="post.id"
     :poster="post.poster"
@@ -18,95 +18,93 @@
     :repliesCount="post.replies_count"
     :isBumpLimitReached="post.bump_limit_reached"
     :isSticky="post.is_sticky"
-    />
+  />
 </div>
 </template>
 
 <script>
-import { bus } from '../bus'
-import { getThreadData } from '../api/posts'
-import Thread from '../components/Thread.vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { bus } from '../bus';
+import { getThreadData } from '../api/posts';
+import ThreadComponent from '../components/Thread.vue';
 
 export default {
   name: 'ThreadPage',
   components: {
-    Thread
+    ThreadComponent
   },
-  methods: {
-    init: function () {
-      var self = this;
-      
-      bus.$emit('app.loader', [true]);
-      
-      getThreadData(this.id).then((response) => {
-        self.post = response.data.payload.thread_data;
+  setup() {
+    const router = useRouter();
+    const route = useRoute();
+    const threadTop = ref(null);
+    const id = ref(false);
+    const post = ref(false);
 
-        if (self.post.parent_id !== null) {
-          self.$router.push('/thread/' + self.post.parent_id + '/#' + self.id);
-          
+    let formSuccessUnsub = null;
+    let threadUpdatedUnsub = null;
+
+    const init = () => {
+      bus.$emit('app.loader', [true]);
+
+      getThreadData(id.value).then((response) => {
+        post.value = response.data.payload.thread_data;
+
+        if (post.value.parent_id !== null) {
+          router.push('/thread/' + post.value.parent_id + '/#' + id.value);
           return;
         }
-        
-        bus.$emit('boards.update', [self.post.board.tag]);
+
+        bus.$emit('boards.update', [post.value.board.tag]);
         bus.$emit('app.loader', [false]);
-        
+
         document.title = '/'
-          + self.post.board.tag
+          + post.value.board.tag
           + '/'
-          + self.post.subject
+          + post.value.subject
           + ':'
-          + self.post.id;
+          + post.value.id;
       }).catch((error) => {
         console.error(error);
-        self.$buefy.toast.open(`Произошла ошибка при запросе данных треда: ${error}`);
+        showToast(`Произошла ошибка при запросе данных треда: ${error}`);
         bus.$emit('app.loader', [false]);
       });
-    },
-    scrollTo: function (section) {
-      if (section === "") {
-        return
-      }
+    };
 
-      var el = window.document.getElementById(section);
+    const scrollTo = (section) => {
+      if (section === "") return;
 
-      if (el == null) {
-        return
-      }
+      const el = window.document.getElementById(section);
+      if (el == null) return;
 
-      this.$nextTick(() => el.scrollIntoView())
-
+      setTimeout(() => el.scrollIntoView(), 0);
       el.classList.add('post-active');
-    }
-  },
-  created: function () {
-    this.id = this.$route.params.id;
-    this.init();
+    };
 
-    var self = this;
-    bus.$on('form:success', () => self.init());
-    bus.$on('thread:updated', () => this.init());
-  },
-  updated: function () {
-    var section = this.$router.currentRoute.hash.replace('#', '');
+    const showToast = (message) => {
+      alert(message);
+    };
 
-    this.scrollTo(section, 'post');
-  },
-  watch:  {
-    '$route': function (to, from) {
-      if (to !== from) {
-        this.id = this.$route.params.id;
-        this.init();
+    onMounted(() => {
+      id.value = route.params.id;
+      init();
 
-        var section = this.$router.currentRoute.hash.replace('#', '');
-        this.scrollTo(section, 'post');
-      }
-    }
-  },
-  data: function () {
+      formSuccessUnsub = bus.$on('form:success', () => init());
+      threadUpdatedUnsub = bus.$on('thread:updated', () => init());
+    });
+
+    onBeforeUnmount(() => {
+      if (formSuccessUnsub) formSuccessUnsub();
+      if (threadUpdatedUnsub) threadUpdatedUnsub();
+    });
+
     return {
-      id: false,
-      post: false
-    }
+      threadTop,
+      id,
+      post,
+      init,
+      scrollTo
+    };
   }
 }
 </script>

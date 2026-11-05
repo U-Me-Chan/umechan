@@ -2,102 +2,106 @@
 <div class="file-list">
   <h1>Files</h1>
 
-  <b-pagination
-    :total="count"
-    :current="current"
-    :per-page="perPage"
-    :page-input="true"
-    v-model="current"
-    v-on:change="changePage"
-    order="is-centered"
-    size="is-small"
-    >
-  </b-pagination>
+  <div class="board-paginator">
+    <PaginationComponent
+      :total="count"
+      :current="current"
+      :per-page="perPage"
+      @change="changePage"
+    />
+  </div>
 
   <div class="files">
-    <File
+    <FileComponent
       :name="file.name"
       :original="file.original"
       :thumbnail="file.thumbnail"
       :postIds="file.post_ids"
       v-for="file in files"
       :key="file.name"
-      />
+    />
   </div>
 
-    <b-pagination
-    :total="count"
-    :current="current"
-    :per-page="perPage"
-    :page-input="true"
-    v-model="current"
-    v-on:change="changePage"
-    order="is-centered"
-    size="is-small"
-    >
-  </b-pagination>
+  <div class="board-paginator">
+    <PaginationComponent
+      :total="count"
+      :current="current"
+      :per-page="perPage"
+      @change="changePage"
+    />
+  </div>
 </div>
 </template>
 
 <script>
-import { bus } from '../bus'
-import File from '../components/Admin/File.vue'
-import { getFiles } from '../api/files'
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { bus } from '../bus';
+import FileComponent from '../components/Admin/File.vue';
+import PaginationComponent from '../components/Pagination.vue';
+import { getFiles } from '../api/files';
 
 export default {
   components: {
-    File
+    FileComponent, PaginationComponent
   },
-  data: function () {
-    return {
-      files: [],
-      count: 0,
-      current: 1,
-      perPage: 6
-    }
-  },
-  created: function () {
-    this.init()
+  setup() {
+    const router = useRouter();
+    const route = useRoute();
 
-    var self = this
+    const files = ref([]);
+    const count = ref(0);
+    const current = ref(1);
+    const perPage = ref(6);
 
-    bus.$on('files.file.deleted', function () {
-      self.getFiles(self.current)
-    })
-  },
-  methods: {
-    changePage: function (page) {
-      this.$router.push('/admin/files/' + page)
-    },
-    init: function () {
-      this.getFiles(this.current)
-    },
-    getFiles: function (page) {
-      var self = this
-      bus.$emit('app.loader', [true])
+    let filesDeletedUnsub = null;
 
-      var offset = page - 1
-      offset = offset * this.perPage
+    const changePage = (page) => {
+      router.push('/admin/files/' + page);
+    };
+
+    const init = () => {
+      getFilesData(current.value);
+    };
+
+    const getFilesData = (page) => {
+      bus.$emit('app.loader', [true]);
+
+      const offset = page - 1;
+      const offsetValue = offset * perPage.value;
 
       getFiles({
-        offset: offset,
-        limit: this.perPage
+        offset: offsetValue,
+        limit: perPage.value
       }).then((response) => {
-        self.files = response.data.files
-        self.count = response.data.count
-        bus.$emit('app.loader', [false])
+        files.value = response.data.files;
+        count.value = response.data.count;
+        bus.$emit('app.loader', [false]);
       }).catch((error) => {
-        console.log(error)
-        bus.$emit('app.loader', [false])
-      })
-    }
+        console.log(error);
+        bus.$emit('app.loader', [false]);
+      });
+    };
+
+    onMounted(() => {
+      init();
+
+      filesDeletedUnsub = bus.$on('files.file.deleted', function () {
+        getFilesData(current.value);
+      });
+    });
+
+    return {
+      files,
+      count,
+      current,
+      perPage,
+      changePage,
+      init
+    };
   },
-  watch: {
-    '$route': function(to, from) {
-      if (to.path !== from.path) {
-        this.init()
-      }
-    }
+  beforeUnmount() {
+    // clean up
   }
 }
 </script>
