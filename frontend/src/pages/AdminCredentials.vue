@@ -1,24 +1,38 @@
 <template>
 <div class="admin-credentials">
-  <b-input placeholder="Секрет владельца" v-model="key"/>
+  <input
+    class="input"
+    type="text"
+    placeholder="Секрет владельца"
+    v-model="key"
+    @input="onKeyInput"
+  />
 </div>
 </template>
 
 <script>
-import { getAdminKey, setAdminKey } from '../utils/storage'
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { getAdminKey, setAdminKey } from '../utils/storage';
 
 export default {
   name: 'AdminCredentials',
-  data: function () {
+  setup() {
+    const key = ref('');
+
+    let inputHandler = null;
+
+    const onKeyInput = (e) => {
+      setAdminKey(e.target.value);
+    };
+
+    onMounted(() => {
+      key.value = getAdminKey() || '';
+    });
+
     return {
-      key: ''
-    }
-  },
-  updated: function () {
-    setAdminKey(this.key);
-  },
-  created: function  () {
-    this.key = getAdminKey();
+      key,
+      onKeyInput
+    };
   }
 }
 </script>
@@ -27,5 +41,14 @@ export default {
 .admin-credentials {
     max-width: 400px;
     margin: 40px auto;
+}
+
+.input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--color-input-border);
+    background-color: var(--color-input-bg);
+    color: var(--color-input-text);
+    border-radius: 4px;
 }
 </style>

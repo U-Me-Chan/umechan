@@ -19,26 +19,28 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { bus } from '../bus'
-
-const config = require('../../config')
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import { bus } from '../bus';
+import config from '../../config';
 
 export default {
-  data: function () {
+  name: 'TOS',
+  setup() {
+    const boards = ref([]);
+
+    onMounted(() => {
+      axios.get(config.chan_url + '/v2/board').then((response) => {
+        boards.value = response.data.payload.boards;
+        bus.boards = response.data.payload.boards;
+      }).catch((error) => {
+        console.log(error);
+      });
+    });
+
     return {
-      boards: []
-    }
-  },
-  created: function  () {
-    var self = this
-    
-    axios.get(config.chan_url + '/v2/board').then((response) => {
-      self.boards = response.data.payload.boards
-      bus.global.boards = response.data.payload.boards
-    }).catch((error) => {
-      console.log(error)
-    })
+      boards
+    };
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
 <div class="post card" :id="id" :ref="id">
-  <Meta
+  <MetaComponent
     :id="id"
     :poster="poster"
     :subject="subject"
@@ -12,23 +12,23 @@
     :repliesCount="repliesCount"
     :isBumpLimit="isBumpLimit"
     :isBlocked="isBlocked"
-    />
+  />
   <div class="post-body">
-    <Media :images="images" :youtubes="youtubes" :videos="videos"/>
-    <Message :message="message"/>
+    <MediaComponent :images="images" :youtubes="youtubes" :videos="videos"/>
+    <MessageComponent :message="message"/>
   </div>
 </div>
 </template>
 
 <script>
-import Message from './Post/Message.vue'
-import Meta from './Post/Meta.vue'
-import Media from './Post/Media.vue'
+import MetaComponent from './Post/Meta.vue';
+import MessageComponent from './Post/Message.vue';
+import MediaComponent from './Post/Media.vue';
 
 export default {
   name: 'Post',
   components: {
-    Message, Meta, Media
+    MetaComponent, MessageComponent, MediaComponent
   },
   props: {
     id: Number,

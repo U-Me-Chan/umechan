@@ -1,9 +1,11 @@
 <template>
 <span class="poster">
-  <b-tag v-if="isVerify" size="is-small" type="is-success">
-    <b-tooltip :label="'Личность этого автора удостоверена'" class="poster-tooltip">{{ poster }}</b-tooltip>
-  </b-tag>
-  <b-tag v-if="!isVerify" size="is-small" :style="{ backgroundColor: 'var(--color-poster-tag-bg)', color: 'var(--color-poster-tag-text)' }">{{ poster }}</b-tag>
+  <span v-if="isVerify" class="tag is-success" title="Личность этого автора удостоверена">
+    {{ poster }}
+  </span>
+  <span v-if="!isVerify" class="tag" :style="{ backgroundColor: 'var(--color-poster-tag-bg)', color: 'var(--color-poster-tag-text)' }">
+    {{ poster }}
+  </span>
 </span>
 </template>
 

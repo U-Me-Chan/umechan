@@ -1,111 +1,65 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import App from './pages/App.vue';
-import VueRouter from 'vue-router';
-import VueCookie from 'vue-cookie';
+import { createRouter, createWebHistory } from 'vue-router';
 
-import {
-  Toast,
-  Sidebar,
-  Menu,
-  Button,
-  Modal,
-  Input,
-  Field,
-  Select,
-  Tag,
-  Table,
-  Switch,
-  Collapse,
-  Pagination,
-  Upload,
-  Icon,
-  Tooltip,
-  Loading,
-  Taginput,
-  Dropdown
-} from 'buefy';
-
-import 'buefy/dist/buefy.css';
+import 'core-js';
 import '@mdi/font/css/materialdesignicons.min.css';
 import './styles/theme.css';
 import themeStore from './stores/theme';
 
-Vue.config.productionTip = true;
-
 themeStore.init();
 
-Vue.use(VueCookie);
-Vue.use(Toast);
-Vue.use(Sidebar);
-Vue.use(Menu);
-Vue.use(Button);
-Vue.use(Modal);
-Vue.use(Input);
-Vue.use(Field);
-Vue.use(Select);
-Vue.use(Table);
-Vue.use(Tag);
-Vue.use(Switch);
-Vue.use(Collapse);
-Vue.use(Pagination);
-Vue.use(Upload);
-Vue.use(Icon);
-Vue.use(Tooltip);
-Vue.use(Loading);
-Vue.use(Taginput);
-Vue.use(Dropdown);
+const app = createApp(App);
 
-Vue.use(VueRouter);
+// Lazy route loading
+const load = (page) => () => import(`./pages/${page}.vue`);
 
 const routes = [
   {
     path: '/',
-    component: () => import('./pages/TOS.vue')
+    component: load('TOS')
   },
   {
     path: '/thread/:id',
-    component: () => import('./pages/Thread.vue')
+    component: load('Thread')
   },
   {
     path: '/board/:tag',
-    component: () => import('./pages/Board.vue')
+    component: load('Board')
   },
   {
     path: '/admin/files',
-    component: () => import('./pages/Files.vue'),
+    component: load('Files'),
     name: 'FilesPage',
     beforeEnter: (to, from, next) => {
       console.log(to);
-      next()
+      next();
     }
   },
   {
     path: '/admin/files/:page',
     name: 'FilesConcretePage',
-    component: () => import('./pages/Files.vue')
+    component: load('Files')
   },
   {
     path: '/login',
-    component: () => import('./pages/AdminCredentials.vue'),
+    component: load('AdminCredentials'),
     name: 'LoginPage'
   },
   {
     path: '/thread/:id/player',
-    component: () => import('./pages/MediaPlayer.vue')
+    component: load('MediaPlayer')
   },
   {
     path: '*',
-    component: () => import('./pages/404.vue')
+    component: load('404')
   }
 ];
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes
 });
 
-new Vue({
-  router,
-  render: h => h(App)
-}).$mount('#app');
+app.use(router);
+app.mount('#app');

@@ -1,6 +1,6 @@
 <template>
 <div class="thread" :id="id" :ref="id">
-  <Post
+  <PostComponent
     :id="id"
     :poster="poster"
     :subject="subject"
@@ -16,10 +16,10 @@
     :isBlocked="isBlocked"
     :isBumpLimit="isBumpLimitReached"
     :board="board"
-    />
-  
-  <div class="replies" v-if="replies.lenght !== 0">
-    <Post
+  />
+
+  <div class="replies" v-if="replies.length !== 0">
+    <PostComponent
       v-for="post in replies" :key="post.id"
       :id="post.id"
       :poster="post.poster"
@@ -32,18 +32,18 @@
       :youtubes="post.media.youtubes"
       :videos="post.media.videos"
       :isBlocked="isBlocked"
-      />
+    />
   </div>
 </div>
 </template>
 
 <script>
-import Post from  './Post.vue'
+import PostComponent from  './Post.vue';
 
 export default {
   name: 'Thread',
   components: {
-    Post
+    PostComponent
   },
   props: {
     id: Number,

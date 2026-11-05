@@ -23,13 +23,13 @@ export function parse(message) {
               type: 'quote',
               raw: src,
               text: text
-            }
+            };
 
             return token;
           }
         },
         renderer (token) {
-          return `${token.text}`
+          return `${token.text}`;
         }
       },
       {
@@ -49,13 +49,13 @@ export function parse(message) {
               raw: src,
               text: text,
               tokens: this.lexer.blockTokens(text, [])
-            }
+            };
 
             return token;
           }
         },
         renderer(token) {
-          return `${this.parser.parse(token.tokens)}`
+          return `${this.parser.parse(token.tokens)}`;
         }
       },
       {
@@ -75,19 +75,19 @@ export function parse(message) {
           if (match) {
             const text = src.replace(match[0], match => {
               return `<a class="hashtag">${match}</a>`;
-            })
+            });
 
             const token = {
               type: 'quote',
               raw: src,
               text: text
-            }
+            };
 
             return token;
           }
         },
         renderer (token) {
-          return `${token.text}`
+          return `${token.text}`;
         }
       }
     ]

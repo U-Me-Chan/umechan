@@ -1,5 +1,5 @@
 <template>
-<b-tag size="is-small" :style="{ backgroundColor: 'var(--color-tag-info-bg)', color: 'var(--color-tag-info-text)' }">{{ subject }}</b-tag>
+<span class="tag" :style="{ backgroundColor: 'var(--color-tag-info-bg)', color: 'var(--color-tag-info-text)' }">{{ subject }}</span>
 </template>
 
 <script>

@@ -16,6 +16,6 @@ export default {
 img {
     max-width: 240px;
     max-height: 200px;
-    widht: auto;
+    width: auto;
 }
 </style>
