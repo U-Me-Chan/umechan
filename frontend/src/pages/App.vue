@@ -53,9 +53,12 @@
 </template>
 
 <script>
+import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { bus } from '../bus'
 import Radio from '../components/Radio/Radio.vue'
 import { getBoardList } from '../api/boards'
+import { showToast } from '../utils/toast'
 import themeStore from '../stores/theme'
 
 export default {
@@ -63,53 +66,68 @@ export default {
   components: {
     Radio
   },
-  data: function () {
-    return {
-      boards: [],
-      tag: '',
-      isLoading: false,
-      title: 'U III E',
-      isDark: themeStore.state.current === 'light'
-    }
-  },
-  created: function () {
-    this.updateData();
-    document.title = this.title;
-    
-    setInterval(() => this.updateData(), 30000);
-  },
-  mounted: function () {
-    var self = this
-    
-    bus.$on('boards.update', function (params) {
-      self.tag = params[0]
-    })
-    
-    bus.$on('app.loader', function (args) {
-      self.isLoading = args[0]
-    })
-  },
-  methods: {
-    selectBoard: function (tag, event) {
+  setup() {
+    const router = useRouter();
+    const boards = ref([]);
+    const tag = ref('');
+    const isLoading = ref(false);
+    const title = ref('U III E');
+    const isDark = ref(themeStore.state.current === 'dark');
+
+    const selectBoard = function (selectedTag, event) {
       event.preventDefault();
-      this.tag = tag;
-      this.$router.push('/board/' + tag);
-    },
-    updateData: function () {
-      var self = this;
-      
+      tag.value = selectedTag;
+      router.push('/board/' + selectedTag);
+    };
+
+    const updateData = function () {
       getBoardList().then((response) => {
-        self.boards = response.data.payload.boards;
+        boards.value = response.data.payload.boards;
       }).catch((error) => {
-        self.$buefy.toast.open('Произошла ошибка при запросе данных с сервера')
+        showToast({ message: 'Произошла ошибка при запросе данных с сервера', type: 'is-danger' });
         console.error(error);
-      })
-    }
-  },
-  watch: {
-    isDark() {
+      });
+    };
+
+    let boardsUpdateHandler;
+    let appLoaderHandler;
+    let intervalId;
+
+    onMounted(() => {
+      updateData();
+      document.title = title.value;
+      intervalId = setInterval(() => updateData(), 30000);
+
+      boardsUpdateHandler = (params) => {
+        tag.value = params[0];
+      };
+      appLoaderHandler = (args) => {
+        isLoading.value = args[0];
+      };
+
+      bus.$on('boards.update', boardsUpdateHandler);
+      bus.$on('app.loader', appLoaderHandler);
+    });
+
+    onUnmounted(() => {
+      clearInterval(intervalId);
+      bus.$off('boards.update', boardsUpdateHandler);
+      bus.$off('app.loader', appLoaderHandler);
+    });
+
+    watch(isDark, () => {
       themeStore.toggle();
-    }
+    });
+
+    return {
+      boards,
+      tag,
+      isLoading,
+      title,
+      isDark,
+      selectBoard,
+      updateData
+    };
   }
 }
 </script>

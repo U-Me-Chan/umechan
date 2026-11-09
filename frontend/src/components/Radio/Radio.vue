@@ -49,7 +49,9 @@
 </template>
 
 <script>
-const axios = require('axios');
+import { ref, onMounted } from 'vue';
+
+import axios from 'axios';
 const config = require('../../../config');
 import { formatDuration } from '../../utils/duration_formatter'
 
@@ -61,97 +63,130 @@ export default {
       default: '20'
     }
   },
-  data: function () {
-    return {
-      title: 'Включите воспроизведение для обновление информации',
-      listeners: 0,
-      streamUrl: `${config.icecast_url}/stream?bypass_cache_hack=${Date.now()}`,
-      m3uUrl: `${config.icecast_url}/stream.m3u`,
-      isPlaying: false,
-      metadataInterval: null,
-      volume: this.initialVolume,
-      track_id: 0,
-      estimate: 0,
-      duration: 1
-    }
-  },
-  methods: {
-    formatDuration: function (value) {
+  setup(props) {
+    const title = ref('Включите воспроизведение для обновления информации');
+    const listeners = ref(0);
+    const streamUrl = ref(`${config.icecast_url}/stream?bypass_cache_hack=${Date.now()}`);
+    const m3uUrl = ref(`${config.icecast_url}/stream.m3u`);
+    const isPlaying = ref(false);
+    const volume = ref(props.initialVolume);
+    const audioPlayer = ref(null);
+    const volumeSlider = ref(null);
+    const metadataInterval = ref(null);
+
+    const track_id = ref(0);
+    const estimate = ref(0);
+    const duration = ref(1);
+
+    const formatDurationFn = function (value) {
       return formatDuration(value);
-    },
-    estimateTrack: function (track_id, operator) {
+    };
+
+    const estimateTrack = function (trackId, operator) {
       const data = {};
       data['operator'] = operator;
 
-      axios.post(`${config.base_url}/metrics/tracks/${track_id}`, data, { 'headers': { 'Content-type': 'application/json'}}).then(() => {
-        this.$buefy.toast.open('Отправлено!');
+      axios.post(`${config.base_url}/metrics/tracks/${trackId}`, data, { 'headers': { 'Content-type': 'application/json'}}).then(() => {
+        showToast({ message: 'Отправлено!', type: 'is-success' });
       }).catch((error) => {
-        this.$buefy.toast.open(`Ошибка: ${error}`);
+        showToast({ message: `Ошибка: ${error}`, type: 'is-danger' });
       });
-    },
-    updateMetadata: function() {
+    };
+
+    const updateMetadata = function() {
       axios.get(`${config.base_url}/metrics/info`)
         .then(({ data }) => {
-          this.title    = `${data.artist} - ${data.title}`;
-          this.track_id = data.id;
-          this.estimate = data.estimate;
-          this.duration = data.duration;
+          title.value    = `${data.artist} - ${data.title}`;
+          track_id.value = data.id;
+          estimate.value = data.estimate;
+          duration.value = data.duration;
         })
         .catch((error) => {
-          this.$buefy.toast.open(`Ошибка: ${error}`);
+          showToast({ message: `Ошибка: ${error}`, type: 'is-danger' });
         })
-    },
-    upvoteTrack: function (event) {
+    };
+
+    const upvoteTrack = function (event) {
       event.preventDefault();
 
-      if (!this.isPlaying) {
+      if (!isPlaying.value) {
         return;
       }
 
-      this.estimateTrack(this.track_id, 'plus');
-    },
-    downvoteTrack: function (event) {
+      estimateTrack(track_id.value, 'plus');
+    };
+
+    const downvoteTrack = function (event) {
       event.preventDefault();
 
-      if (!this.isPlaying) {
+      if (!isPlaying.value) {
         return;
       }
 
-      this.estimateTrack(this.track_id, 'minus');
-    },
-    togglePlay: function () {
-      if (this.isPlaying) {
-        this.$refs.audioPlayer.pause();
-        clearInterval(this.metadataInterval);
+      estimateTrack(track_id.value, 'minus');
+    };
+
+    const togglePlay = function () {
+      if (isPlaying.value) {
+        audioPlayer.value.pause();
+        clearInterval(metadataInterval.value);
       }
 
-      if (!this.isPlaying) {
-        this.$refs.audioPlayer.play();
-        this.updateMetadata();
-        this.metadataInterval = setInterval(() => this.updateMetadata(), 5000);
+      if (!isPlaying.value) {
+        audioPlayer.value.play();
+        updateMetadata();
+        metadataInterval.value = setInterval(() => updateMetadata(), 5000);
       }
 
-      this.isPlaying = !this.isPlaying;
-    },
-    changeVolume: function (value) {
-      this.$refs.audioPlayer.volume = value / 100;
-      this.volume = value;
-      this.saveVolume(value);
-    },
-    init: function () {
-      this.changeVolume(this.getVolume());
-    },
-    getVolume: function () {
-      const volume = localStorage.getItem('radio-volume');
+      isPlaying.value = !isPlaying.value;
+    };
 
-      return (volume === 'undefined' || volume === null) ? this.initialVolume : volume;
-    },
-    saveVolume: function (value) {
+    const changeVolume = function (value) {
+      audioPlayer.value.volume = value / 100;
+      volume.value = value;
+      saveVolume(value);
+    };
+
+    const getVolume = function () {
+      const storedVolume = localStorage.getItem('radio-volume');
+      return (storedVolume === 'undefined' || storedVolume === null) ? props.initialVolume : storedVolume;
+    };
+
+    const saveVolume = function (value) {
       localStorage.setItem('radio-volume', value);
-    }
-  },
-  mounted: function () {
-    this.init();
+    };
+
+    const init = function () {
+      changeVolume(parseFloat(getVolume()));
+    };
+
+    onMounted(() => {
+      init();
+    });
+
+    return {
+      title,
+      listeners,
+      streamUrl,
+      m3uUrl,
+      isPlaying,
+      volume,
+      audioPlayer,
+      volumeSlider,
+      track_id,
+      estimate,
+      duration,
+      formatDuration: formatDurationFn,
+      estimateTrack,
+      updateMetadata,
+      upvoteTrack,
+      downvoteTrack,
+      togglePlay,
+      changeVolume,
+      init,
+      getVolume,
+      saveVolume
+    };
   }
 }
 </script>

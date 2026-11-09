@@ -4,7 +4,7 @@
 
   <b-pagination
     :total="count"
-    :current="current"
+    :current-page="current"
     :per-page="perPage"
     :page-input="true"
     v-model="current"
@@ -27,7 +27,7 @@
 
     <b-pagination
     :total="count"
-    :current="current"
+    :current-page="current"
     :per-page="perPage"
     :page-input="true"
     v-model="current"
@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import { ref, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { bus } from '../bus'
 import File from '../components/Admin/File.vue'
 import { getFiles } from '../api/files'
@@ -48,56 +50,61 @@ export default {
   components: {
     File
   },
-  data: function () {
-    return {
-      files: [],
-      count: 0,
-      current: 1,
-      perPage: 6
-    }
-  },
-  created: function () {
-    this.init()
+  setup() {
+    const router = useRouter();
+    const route = useRoute();
 
-    var self = this
+    const files = ref([]);
+    const count = ref(0);
+    const current = ref(1);
+    const perPage = ref(6);
 
-    bus.$on('files.file.deleted', function () {
-      self.getFiles(self.current)
-    })
-  },
-  methods: {
-    changePage: function (page) {
-      this.$router.push('/admin/files/' + page)
-    },
-    init: function () {
-      this.getFiles(this.current)
-    },
-    getFiles: function (page) {
-      var self = this
-      bus.$emit('app.loader', [true])
+    const changePage = function (page) {
+      router.push('/admin/files/' + page);
+    };
 
-      var offset = page - 1
-      offset = offset * this.perPage
+    const getFilesFn = function (page) {
+      bus.$emit('app.loader', [true]);
+
+      var offset = (page - 1) * perPage.value;
 
       getFiles({
         offset: offset,
-        limit: this.perPage
+        limit: perPage.value
       }).then((response) => {
-        self.files = response.data.files
-        self.count = response.data.count
-        bus.$emit('app.loader', [false])
+        files.value = response.data.files;
+        count.value = response.data.count;
+        bus.$emit('app.loader', [false]);
       }).catch((error) => {
-        console.log(error)
-        bus.$emit('app.loader', [false])
-      })
-    }
-  },
-  watch: {
-    '$route': function(to, from) {
-      if (to.path !== from.path) {
-        this.init()
-      }
-    }
+        console.log(error);
+        bus.$emit('app.loader', [false]);
+      });
+    };
+
+    let filesFileDeletedHandler;
+
+    onMounted(() => {
+      getFilesFn(current.value);
+
+      filesFileDeletedHandler = () => {
+        getFilesFn(current.value);
+      };
+
+      bus.$on('files.file.deleted', filesFileDeletedHandler);
+    });
+
+    watch(() => route.path, () => {
+      getFilesFn(current.value);
+    });
+
+    return {
+      files,
+      count,
+      current,
+      perPage,
+      changePage,
+      getFiles: getFilesFn
+    };
   }
 }
 </script>

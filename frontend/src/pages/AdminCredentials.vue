@@ -5,20 +5,23 @@
 </template>
 
 <script>
-import { getAdminKey, setAdminKey } from '../utils/storage'
+import { ref, onMounted } from 'vue';
+import { setAdminKey, getAdminKey } from '../utils/storage'
 
 export default {
   name: 'AdminCredentials',
-  data: function () {
+  setup() {
+    const key = ref('');
+
+    onMounted(() => {
+      setAdminKey(key.value);
+    });
+
+    key.value = getAdminKey();
+
     return {
-      key: ''
-    }
-  },
-  updated: function () {
-    setAdminKey(this.key);
-  },
-  created: function  () {
-    this.key = getAdminKey();
+      key
+    };
   }
 }
 </script>

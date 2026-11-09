@@ -71,157 +71,183 @@
 </template>
 
 <script>
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import axios from 'axios';
 const config = require('../../config');
-const axios  = require('axios');
 
 export default {
   name: 'FileViewer',
-  data() {
-    return {
-      currentIndex: 0,
-      isLoading: false,
-      progress: 0,
-      timer: null,
-      videoTimer: null,
-      files: [],
-      currentVideoVolume: 0.2
-    }
-  },
-  computed: {
-    currentFile() {
-      return this.files[this.currentIndex] || null;
-    },
-    isEmptyFilesList() {
-      return this.files.length === 0;
-    }
-  },
-  created: function () {
-    axios.get(config.chan_url + '/v2/post/' + this.$route.params.id + '/files').then((response) => {
-      this.files = response.data.payload.files
-    }).catch((error) => {
-      console.error(error);
-    });
-  },
-  mounted: function () {
-    if (this.files.length > 0) {
-      this.startTimer();
-      this.restoreVolume();
-    }
-  },
-  beforeDestroy() {
-    this.clearTimers();
-  },
-  watch: {
-    files: {
-      handler() {
-        this.currentIndex = 0;
-        this.clearTimers();
-        if (this.files.length > 0) {
-          this.startTimer();
-          this.restoreVolume();
-        }
-      },
-      deep: true
-    },
-    currentIndex: {
-      handler() {
-        this.$nextTick(() => {
-          this.restoreVolume();
-        });
-      }
-    }
-  },
-  methods: {
-    startTimer() {
-      this.clearTimers();
+  setup() {
+    const route = useRoute();
 
-      if (this.currentFile && this.currentFile.type === 'image') {
-        this.progress = 0;
-        this.timer = setInterval(() => {
-          this.progress += 1;
-          if (this.progress >= 100) {
-            this.nextFile();
+    const currentIndex = ref(0);
+    const isLoading = ref(false);
+    const progress = ref(0);
+    const files = ref([]);
+    const videoPlayer = ref(null);
+
+    const currentVideoVolume = ref(0.2);
+
+    const currentFile = computed(() => files.value[currentIndex.value] || null);
+    const isEmptyFilesList = computed(() => files.value.length === 0);
+
+    let timer = null;
+    let videoTimer = null;
+
+    const clearTimers = function () {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+      if (videoTimer) {
+        clearInterval(videoTimer);
+        videoTimer = null;
+      }
+    };
+
+    const startTimer = function () {
+      clearTimers();
+
+      if (currentFile.value && currentFile.value.type === 'image') {
+        progress.value = 0;
+        timer = setInterval(() => {
+          progress.value += 1;
+          if (progress.value >= 100) {
+            nextFile();
           }
         }, 100);
       }
-    },
-    clearTimers() {
-      if (this.timer) {
-        clearInterval(this.timer);
-        this.timer = null;
+    };
+
+    const onImageLoad = function () {
+      isLoading.value = false;
+      clearTimers();
+      startTimer();
+    };
+
+    const onVideoEnd = function () {
+      nextFile();
+    };
+
+    const onFileError = function () {
+      console.error('Ошибка загрузки файла:', currentFile.value?.link);
+      clearTimers();
+      nextFile();
+    };
+
+    const prevFile = function () {
+      if (currentIndex.value > 0) {
+        currentIndex.value--;
+        clearTimers();
+        startTimer();
       }
-      if (this.videoTimer) {
-        clearInterval(this.videoTimer);
-        this.videoTimer = null;
+    };
+
+    const nextFile = function () {
+      if (currentIndex.value < files.value.length - 1) {
+        currentIndex.value++;
+        clearTimers();
+        startTimer();
       }
-    },
-    onImageLoad() {
-      this.isLoading = false;
-      this.clearTimers();
-      this.startTimer();
-    },
-    onVideoEnd() {
-      this.nextFile();
-    },
-    onFileError() {
-      console.error('Ошибка загрузки файла:', this.currentFile?.link);
-      this.clearTimers();
-      this.nextFile();
-    },
-    prevFile() {
-      if (this.currentIndex > 0) {
-        this.currentIndex--;
-        this.clearTimers();
-        this.startTimer();
-      }
-    },
-    nextFile() {
-      if (this.currentIndex < this.files.length - 1) {
-        this.currentIndex++;
-        this.clearTimers();
-        this.startTimer();
-      }
-    },
-    onEndList() {
-      this.currentIndex = this.files.length - 1;
-    },
-    onStartList() {
-      this.currentIndex = 0;
-    },
-    onNavigateToNumber(number) {
-      console.debug(this.currentIndex, number);
-    },
-    shuffleFilesList() {
-      this.files.sort(() => Math.random() - 0.5);
-    },
-    reverseFileList() {
-      this.files.reverse();
-    },
-    onVolumeChange() {
-      if (this.$refs.videoPlayer && this.currentFile?.type === 'video') {
-        const volume = this.$refs.videoPlayer.volume;
+    };
+
+    const onEndList = function () {
+      currentIndex.value = files.value.length - 1;
+    };
+
+    const onStartList = function () {
+      currentIndex.value = 0;
+    };
+
+    const shuffleFilesList = function () {
+      files.value.sort(() => Math.random() - 0.5);
+    };
+
+    const reverseFileList = function () {
+      files.value.reverse();
+    };
+
+    const onVolumeChange = function () {
+      if (videoPlayer.value && currentFile.value?.type === 'video') {
+        const volume = videoPlayer.value.volume;
         const key = `video_volume`;
         localStorage.setItem(key, volume.toString());
-        this.currentVideoVolume = volume;
+        currentVideoVolume.value = volume;
       }
-    },
-    restoreVolume() {
-      if (this.currentFile && this.currentFile.type === 'video' && this.$refs.videoPlayer) {
+    };
+
+    const restoreVolume = function () {
+      if (currentFile.value && currentFile.value.type === 'video' && videoPlayer.value) {
         const key = `video_volume`;
         const savedVolume = localStorage.getItem(key);
 
         if (savedVolume !== null) {
           const volume = parseFloat(savedVolume);
           if (volume >= 0 && volume <= 1) {
-            this.$refs.videoPlayer.volume = volume;
-            this.currentVideoVolume = volume;
+            videoPlayer.value.volume = volume;
+            currentVideoVolume.value = volume;
           }
         } else {
-          this.$refs.videoPlayer.volume = 0.2;
-          this.currentVideoVolume = 0.2;
+          videoPlayer.value.volume = 0.2;
+          currentVideoVolume.value = 0.2;
         }
       }
-    }
+    };
+
+    onMounted(() => {
+      axios.get(config.chan_url + '/v2/post/' + route.params.id + '/files').then((response) => {
+        files.value = response.data.payload.files;
+      }).catch((error) => {
+        console.error(error);
+      });
+    });
+
+    onBeforeUnmount(() => {
+      clearTimers();
+    });
+
+    watch(files, {
+      handler() {
+        currentIndex.value = 0;
+        clearTimers();
+        if (files.value.length > 0) {
+          startTimer();
+          restoreVolume();
+        }
+      },
+      deep: true
+    });
+
+    watch(currentIndex, () => {
+      nextTick(() => {
+        restoreVolume();
+      });
+    });
+
+    return {
+      currentIndex,
+      isLoading,
+      progress,
+      files,
+      currentVideoVolume,
+      currentFile,
+      isEmptyFilesList,
+      videoPlayer,
+      startTimer,
+      clearTimers,
+      onImageLoad,
+      onVideoEnd,
+      onFileError,
+      prevFile,
+      nextFile,
+      onEndList,
+      onStartList,
+      shuffleFilesList,
+      reverseFileList,
+      onVolumeChange,
+      restoreVolume
+    };
   }
 }
 </script>

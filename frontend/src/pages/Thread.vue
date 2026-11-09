@@ -1,112 +1,126 @@
 <template>
-<div class="thread" ref="thread-top" id="thread-top">
-  <h3>/{{post.board.tag}}/:{{post.subject ?? '...'}}</h3>
-  
-  <Thread
-    :board="post.board"
-    :id="post.id"
-    :poster="post.poster"
-    :isVerify="post.is_verify"
-    :subject="post.subject"
-    :parentId="post.parent_id"
-    :datetime="post.datetime"
-    :message="post.truncated_message"
-    :images="post.media.images"
-    :youtubes="post.media.youtubes"
-    :videos="post.media.videos"
-    :replies="post.replies"
-    :repliesCount="post.replies_count"
-    :isBumpLimitReached="post.bump_limit_reached"
-    :isSticky="post.is_sticky"
+  <div class="thread" ref="threadTop" id="thread-top">
+    <h3>/{{ post.board.tag }}/:{{ post.subject ?? '...' }}</h3>
+
+    <Thread
+      :board="post.board"
+      :id="post.id"
+      :poster="post.poster"
+      :isVerify="post.is_verify"
+      :subject="post.subject"
+      :parentId="post.parent_id"
+      :datetime="post.datetime"
+      :message="post.truncated_message"
+      :images="post.media.images"
+      :youtubes="post.media.youtubes"
+      :videos="post.media.videos"
+      :replies="post.replies"
+      :repliesCount="post.replies_count"
+      :isBumpLimitReached="post.bump_limit_reached"
+      :isSticky="post.is_sticky"
     />
-</div>
+  </div>
 </template>
 
 <script>
-import { bus } from '../bus'
-import { getThreadData } from '../api/posts'
-import Thread from '../components/Thread.vue'
+import { ref, onMounted, watch, nextTick } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { bus } from '../bus';
+import { getThreadData } from '../api/posts';
+import Thread from '../components/Thread.vue';
+import { showToast } from '../utils/toast';
 
 export default {
   name: 'ThreadPage',
   components: {
     Thread
   },
-  methods: {
-    init: function () {
-      var self = this;
-      
-      bus.$emit('app.loader', [true]);
-      
-      getThreadData(this.id).then((response) => {
-        self.post = response.data.payload.thread_data;
+  setup() {
+    const router = useRouter();
+    const route = useRoute();
 
-        if (self.post.parent_id !== null) {
-          self.$router.push('/thread/' + self.post.parent_id + '/#' + self.id);
-          
+    const post = ref({
+      board: { tag: '' },
+      id: null,
+      parent_id: null,
+      replies_count: 0,
+      bump_limit_reached: false,
+      is_sticky: false
+    });
+    const id = ref(null);
+
+    const init = function () {
+      bus.$emit('app.loader', [true]);
+
+      getThreadData(id.value).then((response) => {
+        post.value = response.data.payload.thread_data;
+
+        if (post.value.parent_id !== null) {
+          router.push('/thread/' + post.value.parent_id + '/#' + id.value);
           return;
         }
-        
-        bus.$emit('boards.update', [self.post.board.tag]);
+
+        bus.$emit('boards.update', [post.value.board.tag]);
         bus.$emit('app.loader', [false]);
-        
+
         document.title = '/'
-          + self.post.board.tag
+          + post.value.board.tag
           + '/'
-          + self.post.subject
+          + post.value.subject
           + ':'
-          + self.post.id;
+          + post.value.id;
       }).catch((error) => {
         console.error(error);
-        self.$buefy.toast.open(`Произошла ошибка при запросе данных треда: ${error}`);
+        showToast({ message: `Произошла ошибка при запросе данных треда: ${error}`, type: 'is-danger' });
         bus.$emit('app.loader', [false]);
       });
-    },
-    scrollTo: function (section) {
-      if (section === "") {
-        return
+    };
+
+    const scrollTo = function (section) {
+      if (section === '') {
+        return;
       }
 
-      var el = window.document.getElementById(section);
+      const el = window.document.getElementById(section);
 
       if (el == null) {
-        return
+        return;
       }
 
-      this.$nextTick(() => el.scrollIntoView())
+      nextTick(() => el.scrollIntoView());
 
       el.classList.add('post-active');
-    }
-  },
-  created: function () {
-    this.id = this.$route.params.id;
-    this.init();
+    };
 
-    var self = this;
-    bus.$on('form:success', () => self.init());
-    bus.$on('thread:updated', () => this.init());
-  },
-  updated: function () {
-    var section = this.$router.currentRoute.hash.replace('#', '');
+    const threadTop = ref(null);
 
-    this.scrollTo(section, 'post');
-  },
-  watch:  {
-    '$route': function (to, from) {
-      if (to !== from) {
-        this.id = this.$route.params.id;
-        this.init();
+    onMounted(() => {
+      id.value = route.params.id;
+      init();
 
-        var section = this.$router.currentRoute.hash.replace('#', '');
-        this.scrollTo(section, 'post');
-      }
-    }
-  },
-  data: function () {
+      bus.$on('form:success', () => init());
+      bus.$on('thread:updated', () => init());
+    });
+
+    watch(() => route.hash, (newHash) => {
+      const section = newHash.replace('#', '');
+      scrollTo(section);
+    });
+
+    watch(() => route.params.id, () => {
+      id.value = route.params.id;
+      init();
+
+      const section = route.hash.replace('#', '');
+      scrollTo(section);
+    });
+
     return {
-      id: false,
-      post: false
-    }
+      post,
+      threadTop,
+      init,
+      scrollTo
+    };
   }
 }
 </script>

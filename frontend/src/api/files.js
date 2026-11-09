@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 
 const config = require('../../config')
 
@@ -14,6 +14,6 @@ export const uploadFile = (uploadData) => {
   return axios.post(config.filestore_url, uploadData, { 'headers': { 'Content-Type': 'multipart/form-data' }});
 }
 
-export const getSupportedMimetypes = () =>  {
+export const getSupportedMimetypes = () => {
   return axios.get(config.filestore_url + '/mimetypes');
 }
