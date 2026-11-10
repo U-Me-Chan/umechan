@@ -34,11 +34,12 @@
     <b-field label="Медиафайлы">
       <div class="form__file-uploader-wrap">
         <b-upload
-          v-model="files"
+          :modelValue="files"
           class="file-label"
           :accept="supportedMimetypesAsString"
           drag-drop
           multiple
+          @update:modelValue="files = $event"
         >
           <span class="file-cta">
             <b-icon class="file-icon" icon="upload"/>
@@ -196,22 +197,25 @@ export default {
     };
 
     const handleUploadFile = async function () {
-      if (files.value.length > 0) {
-        isLoading.value = true;
-
-        return Promise
-          .all(files.value.map((file) => sendFile(file).then((filename) => { filesNames.value.push(filename); })))
-          .then(() => {
-            files.value = [];
-          })
-          .catch((error) => {
-            showToast(`Ошибка загрузки файла: ${error}`, 5);
-          })
-          .finally(() => {
-            isLoading.value = false;
-          });
+      if (files.value.length === 0) {
+        return;
       }
-      return Promise.reject(CLPBRD_ERR.empty);
+
+      isLoading.value = true;
+
+      const filesToUpload = [...files.value];
+
+      return Promise
+        .all(filesToUpload.map((file) => sendFile(file).then((filename) => { filesNames.value.push(filename); })))
+        .then(() => {
+          files.value = [];
+        })
+        .catch((error) => {
+          showToast(`Ошибка загрузки файла: ${error}`, 5);
+        })
+        .finally(() => {
+          isLoading.value = false;
+        });
     };
 
     const createReplyFn = function (outputData) {
