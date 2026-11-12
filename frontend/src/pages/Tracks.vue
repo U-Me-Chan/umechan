@@ -14,20 +14,21 @@
         :data="tracks"
         :paginated="true"
         :per-page="perPage"
-        :current-page.sync="current"
+        :current-page="current"
+        v-model:current-page="current"
         backend-pagination
         :total="count"
         @page-change="getTracks">
 
         <b-table-column field="artist" label="Исполнитель" searchable sortable>
-          <template slot="searchable">
+          <template #searchable>
             <b-input v-model="artist" placeholder="Найти исполнителя"/>
           </template>
           <template v-slot="props">{{props.row.artist}}</template>
         </b-table-column>
 
         <b-table-column field="title" label="Композиция" searchable sortable>
-          <template slot="searchable">
+          <template #searchable>
             <b-input v-model="title" placeholder="Найти композицию"/>
           </template>
           <template v-slot="props">{{props.row.title}}</template>
@@ -45,101 +46,106 @@
 </template>
 
 <script>
-const _ = require('lodash')
+import { ref, computed, onMounted, watch } from 'vue';
 
 import { bus } from '../bus'
-import { putTrackToQueue, getQueue, getTrackList } from '../api/radio'
+import { putTrackToQueue as apiPutTrackToQueue, getQueue, getTrackList } from '../api/radio'
 import { formatDuration } from '../utils/duration_formatter'
+import { showToast } from '../utils/toast'
+import _ from 'lodash'
 
 export default {
   name: 'Tracks',
   components: {},
-  data: function () {
-    return {
-      tracks: [],
-      count: 0,
-      current: 1,
-      perPage: 10,
-      artist: '',
-      title: '',
-      queue: []
-    }
-  },
-  created: function  () {
-    this.getTracks(this.current)
-    this.getQueue()
-    this.debouncedGetTracks = _.debounce(this.getTracks, 1000)
-    this.queueUpdateHandler = setInterval(() => this.getQueue(), 5000)
-  },
-  methods: {
-    formatDuration: function (value) {
-      return formatDuration(value)
-    },
-    resetFilters: function (event) {
-      event.preventDefault()
+  setup() {
+    const tracks = ref([]);
+    const count = ref(0);
+    const current = ref(1);
+    const perPage = ref(10);
+    const artist = ref('');
+    const title = ref('');
+    const queue = ref([]);
 
-      this.artist = ''
-      this.title  = ''
-      this.getTracks()
-    },
-    putTrackToQueue: function (track_id, event) {
-      event.preventDefault()
+    const isTracksExist = computed(() => tracks.value.length > 0);
 
-      var self = this
-      bus.$emit('app.loader', [true])
+    const getTracks = function (page) {
+      var offset = (page - 1) * perPage.value;
 
-      putTrackToQueue(track_id).then(() => {
-        self.$buefy.toast.open('Отправлено')
-        self.getQueue()
-        bus.$emit('app.loader', [false])
+      getTrackList(offset, perPage.value, artist.value, title.value).then((response) => {
+        tracks.value = response.data.tracks;
+        count.value = response.data.count;
       }).catch((error) => {
-        console.error(error)
-        self.$buefy.toast.open('Произошла ошибка при заказе трека')
-        bus.$emit('app.loader', [false])
-      })
-    },
-    getQueue: function () {
-      var self = this
+        console.log(error);
+      });
+    };
 
+    const getQueueFn = function () {
       getQueue().then((response) => {
-        self.queue = response.data.queue
+        queue.value = response.data.queue;
       }).catch((error) => {
-        console.error(error)
-      })
-    },
-    getTracks: function (page) {
-      var self = this
-      var offset = page - 1
-      offset = offset * this.perPage
+        console.error(error);
+      });
+    };
 
-      getTrackList(offset, this.perPage, this.artist, this.title).then((response) => {
-        self.tracks = response.data.tracks
-        self.count  = response.data.count
+    const resetFilters = function (event) {
+      event.preventDefault();
+      artist.value = '';
+      title.value = '';
+      getTracks(current.value);
+    };
+
+    const putTrackToQueueFn = function (track_id, event) {
+      event.preventDefault();
+      bus.$emit('app.loader', [true]);
+
+      apiPutTrackToQueue(track_id).then(() => {
+        showToast({ message: 'Отправлено', type: 'is-success' });
+        getQueueFn();
+        bus.$emit('app.loader', [false]);
       }).catch((error) => {
-        console.log(error)
-      })
-    }
-  },
-  computed: {
-    isTracksExist: function () {
-      return this.tracks.length == 0 ? false : true
-    }
-  },
-  watch: {
-    'artist': function(to) {
-      if (to.length < 3) {
-        return
-      }
+        console.error(error);
+        showToast({ message: 'Произошла ошибка при заказе трека', type: 'is-danger' });
+        bus.$emit('app.loader', [false]);
+      });
+    };
 
-      this.debouncedGetTracks()
-    },
-    'title': function (to) {
-      if (to.length < 3) {
-        return
-      }
+    const formatDurationFn = function (value) {
+      return formatDuration(value);
+    };
 
-      this.debouncedGetTracks()
-    }
+    let debouncedGetTracks;
+
+    onMounted(() => {
+      getTracks(current.value);
+      getQueueFn();
+      debouncedGetTracks = _.debounce(() => getTracks(current.value), 1000);
+      setInterval(() => getQueueFn(), 5000);
+    });
+
+    watch(artist, (to) => {
+      if (to.length < 3) return;
+      debouncedGetTracks();
+    });
+
+    watch(title, (to) => {
+      if (to.length < 3) return;
+      debouncedGetTracks();
+    });
+
+    return {
+      tracks,
+      count,
+      current,
+      perPage,
+      artist,
+      title,
+      queue,
+      isTracksExist,
+      formatDuration: formatDurationFn,
+      resetFilters,
+      putTrackToQueue: putTrackToQueueFn,
+      getTracks
+    };
   }
 }
 </script>

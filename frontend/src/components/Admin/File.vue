@@ -8,8 +8,11 @@
 </template>
 
 <script>
+import { useRouter } from 'vue-router';
+
 import { deleteFile } from '../../api/files'
 import { bus } from '../../bus'
+import { showToast } from '../../utils/toast'
 
 export default {
   name: 'File',
@@ -19,34 +22,40 @@ export default {
     thumbnail: String,
     postIds: Array
   },
-  methods: {
-    selectThread: function (id) {
-      this.$router.push('/thread/' + id)
-    },
-    deleteFile: function () {
-      var key = ''
+  setup(props) {
+    const router = useRouter();
 
-      if (this.$cookie.get('admin_key') !== null) {
-	key = this.$cookie.get('admin_key')
+    const selectThread = function (id) {
+      router.push('/thread/' + id);
+    };
+
+    const deleteFileFn = function () {
+      var key = '';
+
+      const adminKey = document.cookie.split('; ').find(row => row.startsWith('umechan-admin_key='))?.split('=')[1];
+      if (adminKey) {
+        key = adminKey;
       } else {
-	key = prompt('Admin key', [''])
+        key = prompt('Admin key', ['']);
       }
 
-      var self = this
-
-      deleteFile(this.name, {
+      deleteFile(props.name, {
         data: {},
         headers: {
           'Key': key
         }
       }).then((response) => {
-        bus.$emit('files.file.deleted', [response])
+        bus.$emit('files.file.deleted', [response]);
       }).catch((error) => {
-        console.log(error)
+        console.log(error);
+        showToast({ message: 'Произошла ошибка при удалении файла', type: 'is-danger' });
+      });
+    };
 
-        self.$buefy.toast.open('Произошла ошибка при удалении файла')
-      })
-    }
+    return {
+      selectThread,
+      deleteFile: deleteFileFn
+    };
   }
 }
 </script>

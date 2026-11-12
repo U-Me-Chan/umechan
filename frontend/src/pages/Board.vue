@@ -14,7 +14,7 @@
     class="board-paginator"
     v-if="isContentExist"
     :total="count"
-    :current="current"
+    :current-page="current"
     :per-page="perPage"
     v-model="current"
     v-on:change="init"
@@ -54,7 +54,7 @@
     class="board-paginator"
     v-if="isContentExist"
     :total="count"
-    :current="current"
+    :current-page="current"
     :per-page="perPage"
     v-model="current"
     v-on:change="init"
@@ -69,104 +69,106 @@
 </template>
 
 <script>
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+
 import { bus } from '../bus'
 import Thread from '../components/Thread.vue'
 import Form from '../components/Form.vue'
 import { getBoardData } from '../api/boards'
+import { showToast } from '../utils/toast'
 
 export default {
   name: 'Board',
   components: {
     Thread, Form
   },
-  data: function () {
-    return {
-      tag: null,
-      name: '',
-      threads: [],
-      isFormVisible: false,
-      count: 0,
-      current: 1,
-      perPage: 20,
-      tags: [],
-      selectedTags: []
-    }
-  },
-  mounted: function () {
-    var self = this;
+  setup() {
+    const router = useRouter();
+    const route = useRoute();
 
-    bus.$on('form:success', function () {
-      self.isFormVisible = false;
-      self.init(0, true);
-    })
-  },
-  created: function () {
-    this.tag = this.$route.params.tag;
-    this.init();
+    const tag = ref(null);
+    const name = ref('');
+    const threads = ref([]);
+    const isFormVisible = ref(false);
+    const count = ref(0);
+    const current = ref(1);
+    const perPage = ref(20);
+    const tags = ref([]);
+    const selectedTags = ref([]);
 
-    bus.$on('board:updated', () => this.init())
-  },
-  computed: {
-    title: function () {
-      return 'U III E : /' + this.tag;
-    },
-    isContentExist: function () {
-      if (this.threads.length === 0) {
-	return false;
-      }
+    const isContentExist = computed(() => threads.value.length > 0);
+    const isMetaBoard = computed(() => tag.value && tag.value.search(/\+/) !== -1);
 
-      return true;
-    },
-    isMetaBoard: function () {
-      if (this.tag.search(/\+/) !== -1) {
-	return true;
-      }
-
-      return false;
-    }
-  },
-  methods: {
-    selectThread: function (id) {
-      this.$router.push('/thread/' + id);
-    },
-    init: function (page, no_cache = false) {
-      this.threads = [];
-      var self = this;
-      var offset = (this.current - 1) * this.perPage;
+    const init = function (page, no_cache = false) {
+      threads.value = [];
+      var offset = (current.value - 1) * perPage.value;
       bus.$emit('app.loader', [true]);
 
       const params = {
-        offset:        offset,
-        limit:         this.perPage,
+        offset: offset,
+        limit: perPage.value,
         no_board_list: true
       }
 
       if (no_cache) {
-        params.no_cache = true
+        params.no_cache = true;
       }
 
-      getBoardData(this.tag, params).then((response) => {
-        self.count = response.data.payload.count;
-        self.threads = response.data.payload.posts;
-        self.tag = self.$route.params.tag;
-	self.name = response.data.payload.name;
-        document.title = self.title;
+      getBoardData(tag.value, params).then((response) => {
+        count.value = response.data.payload.count;
+        threads.value = response.data.payload.posts;
+        tag.value = route.params.tag;
+        name.value = response.data.payload.name;
+        document.title = 'U III E : /' + tag.value;
         bus.$emit('app.loader', [false]);
       }).catch((error) => {
-        self.$buefy.toast.open('Произошла ошибка при запросе данных с сервера');
+        showToast({ message: 'Произошла ошибка при запросе данных с сервера', type: 'is-danger' });
         console.log(error);
         bus.$emit('app.loader', [false]);
       });
-    }
-  },
-  watch: {
-    '$route': function (to, from) {
-      if (to.path !== from.path) {
-        this.tag = this.$route.params.tag;
-        this.current = 1;
-        this.init();
-      }
-    }
+    };
+
+    const selectThread = function (id) {
+      router.push('/thread/' + id);
+    };
+
+    let formSuccessHandler;
+
+    onMounted(() => {
+      tag.value = route.params.tag;
+      init();
+
+      formSuccessHandler = () => {
+        isFormVisible.value = false;
+        init(0, true);
+      };
+
+      bus.$on('form:success', formSuccessHandler);
+      bus.$on('board:updated', () => init());
+    });
+
+    watch(() => route.params.tag, () => {
+      tag.value = route.params.tag;
+      current.value = 1;
+      init();
+    });
+
+    return {
+      tag,
+      name,
+      threads,
+      isFormVisible,
+      count,
+      current,
+      perPage,
+      tags,
+      selectedTags,
+      isContentExist,
+      isMetaBoard,
+      selectThread,
+      init
+    };
   }
 }
 </script>

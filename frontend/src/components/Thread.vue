@@ -18,7 +18,7 @@
     :board="board"
     />
   
-  <div class="replies" v-if="replies.lenght !== 0">
+  <div class="replies" v-if="replies.length !== 0">
     <Post
       v-for="post in replies" :key="post.id"
       :id="post.id"
